@@ -1,0 +1,109 @@
+{
+  "common": {
+    "bookNow": "Book Now",
+    "learnMore": "Learn More",
+    "viewAll": "View All",
+    "contactUs": "Contact Us",
+    "readMore": "Read More",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "perNight": "/night",
+    "guests": "guests",
+    "from": "From"
+  },
+  "nav": {
+    "home": "Home",
+    "rooms": "Rooms",
+    "gallery": "Gallery",
+    "dining": "Dining",
+    "experiences": "Experiences",
+    "blog": "Blog",
+    "contact": "Contact",
+    "booking": "Book",
+    "about": "About"
+  },
+  "home": {
+    "hero": {
+      "title": "Where Sea Meets Sky in Ha Long",
+      "subtitle": "Experience luxury amidst a natural wonder of the world",
+      "cta": "Explore Rooms"
+    },
+    "features": {
+      "title": "The HASANA Experience",
+      "subtitle": "Where every moment becomes extraordinary",
+      "location": {
+        "title": "Prime Location",
+        "description": "Nestled in the heart of Ha Long with stunning ocean views"
+      },
+      "rooms": {
+        "title": "Luxury Rooms",
+        "description": "Minimalist modern design with 5-star amenities"
+      },
+      "service": {
+        "title": "Dedicated Service",
+        "description": "Professional team available 24/7"
+      }
+    },
+    "rooms": {
+      "title": "Rooms & Suites",
+      "subtitle": "Your perfect retreat awaits"
+    },
+    "cta": {
+      "title": "Ready for the Perfect Getaway?",
+      "subtitle": "Book now for the best rates",
+      "button": "Book Now"
+    }
+  },
+  "rooms": {
+    "title": "Rooms & Suites",
+    "subtitle": "Find the space that suits you",
+    "maxGuests": "Up to {count} guests",
+    "size": "{size} m²",
+    "viewDetails": "View Details",
+    "amenities": "Amenities",
+    "priceFrom": "From {price}"
+  },
+  "booking": {
+    "title": "Book a Room",
+    "checkIn": "Check-in Date",
+    "checkOut": "Check-out Date",
+    "guests": "Guests",
+    "roomType": "Room Type",
+    "checkAvailability": "Check Availability",
+    "guestInfo": "Guest Information",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "specialRequests": "Special Requests",
+    "confirmBooking": "Confirm Booking",
+    "bookingSuccess": "Booking confirmed!",
+    "bookingCode": "Booking code",
+    "totalPrice": "Total",
+    "nights": "{count} nights"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "We're always here to help",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "sendMessage": "Send Message",
+    "yourName": "Your Name",
+    "yourEmail": "Your Email",
+    "subject": "Subject",
+    "message": "Message"
+  },
+  "footer": {
+    "description": "Luxury hotel in Ha Long with stunning ocean views.",
+    "quickLinks": "Quick Links",
+    "contactInfo": "Contact Info",
+    "followUs": "Follow Us",
+    "copyright": "© {year} HASANA Hotel. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  }
+}

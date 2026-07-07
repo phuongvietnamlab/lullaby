@@ -1,0 +1,109 @@
+{
+  "common": {
+    "bookNow": "Đặt Phòng",
+    "learnMore": "Tìm Hiểu Thêm",
+    "viewAll": "Xem Tất Cả",
+    "contactUs": "Liên Hệ",
+    "readMore": "Đọc Thêm",
+    "submit": "Gửi",
+    "cancel": "Hủy",
+    "close": "Đóng",
+    "loading": "Đang tải...",
+    "error": "Có lỗi xảy ra",
+    "success": "Thành công",
+    "perNight": "/đêm",
+    "guests": "khách",
+    "from": "Từ"
+  },
+  "nav": {
+    "home": "Trang Chủ",
+    "rooms": "Phòng",
+    "gallery": "Thư Viện Ảnh",
+    "dining": "Ẩm Thực",
+    "experiences": "Trải Nghiệm",
+    "blog": "Blog",
+    "contact": "Liên Hệ",
+    "booking": "Đặt Phòng",
+    "about": "Giới Thiệu"
+  },
+  "home": {
+    "hero": {
+      "title": "Nơi Biển Trời Hạ Long Giao Hòa",
+      "subtitle": "Trải nghiệm kỳ nghỉ sang trọng giữa kỳ quan thiên nhiên thế giới",
+      "cta": "Khám Phá Phòng"
+    },
+    "features": {
+      "title": "Trải Nghiệm HASANA",
+      "subtitle": "Nơi mỗi khoảnh khắc đều trở nên đặc biệt",
+      "location": {
+        "title": "Vị Trí Đắc Địa",
+        "description": "Tọa lạc tại trung tâm Hạ Long, tầm nhìn hướng biển tuyệt đẹp"
+      },
+      "rooms": {
+        "title": "Phòng Sang Trọng",
+        "description": "Thiết kế tối giản hiện đại, tiện nghi đẳng cấp 5 sao"
+      },
+      "service": {
+        "title": "Dịch Vụ Tận Tâm",
+        "description": "Đội ngũ chuyên nghiệp phục vụ 24/7"
+      }
+    },
+    "rooms": {
+      "title": "Phòng & Suite",
+      "subtitle": "Không gian nghỉ dưỡng hoàn hảo"
+    },
+    "cta": {
+      "title": "Sẵn Sàng Cho Kỳ Nghỉ Hoàn Hảo?",
+      "subtitle": "Đặt phòng ngay để nhận ưu đãi tốt nhất",
+      "button": "Đặt Phòng Ngay"
+    }
+  },
+  "rooms": {
+    "title": "Phòng & Suite",
+    "subtitle": "Chọn không gian phù hợp với bạn",
+    "maxGuests": "Tối đa {count} khách",
+    "size": "{size} m²",
+    "viewDetails": "Xem Chi Tiết",
+    "amenities": "Tiện Nghi",
+    "priceFrom": "Từ {price}"
+  },
+  "booking": {
+    "title": "Đặt Phòng",
+    "checkIn": "Ngày Nhận Phòng",
+    "checkOut": "Ngày Trả Phòng",
+    "guests": "Số Khách",
+    "roomType": "Loại Phòng",
+    "checkAvailability": "Kiểm Tra Phòng Trống",
+    "guestInfo": "Thông Tin Khách",
+    "name": "Họ và Tên",
+    "email": "Email",
+    "phone": "Số Điện Thoại",
+    "specialRequests": "Yêu Cầu Đặc Biệt",
+    "confirmBooking": "Xác Nhận Đặt Phòng",
+    "bookingSuccess": "Đặt phòng thành công!",
+    "bookingCode": "Mã đặt phòng",
+    "totalPrice": "Tổng Tiền",
+    "nights": "{count} đêm"
+  },
+  "contact": {
+    "title": "Liên Hệ",
+    "subtitle": "Chúng tôi luôn sẵn sàng hỗ trợ bạn",
+    "address": "Địa Chỉ",
+    "phone": "Điện Thoại",
+    "email": "Email",
+    "sendMessage": "Gửi Tin Nhắn",
+    "yourName": "Tên của bạn",
+    "yourEmail": "Email của bạn",
+    "subject": "Chủ đề",
+    "message": "Nội dung"
+  },
+  "footer": {
+    "description": "Khách sạn sang trọng tại Hạ Long với tầm nhìn hướng biển tuyệt đẹp.",
+    "quickLinks": "Liên Kết Nhanh",
+    "contactInfo": "Thông Tin Liên Hệ",
+    "followUs": "Theo Dõi Chúng Tôi",
+    "copyright": "© {year} HASANA Hotel. Mọi quyền được bảo lưu.",
+    "privacy": "Chính Sách Bảo Mật",
+    "terms": "Điều Khoản Sử Dụng"
+  }
+}

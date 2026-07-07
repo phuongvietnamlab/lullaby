@@ -1,0 +1,348 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================
+// Authentication & Users
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  role          UserRole  @default(RECEPTIONIST)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+  blogPosts BlogPost[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  accountId         String
+  providerId        String
+  accessToken       String?
+  refreshToken      String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope             String?
+  idToken           String?
+  password          String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("verifications")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  MANAGER
+  RECEPTIONIST
+}
+
+// ============================================
+// Room Management
+// ============================================
+
+model RoomType {
+  id          String   @id @default(cuid())
+  name        String
+  nameEn      String
+  slug        String   @unique
+  description String?  @db.Text
+  descriptionEn String? @db.Text
+  basePrice   Decimal  @db.Decimal(10, 2)
+  maxGuests   Int      @default(2)
+  bedType     String?
+  size        Int?     // square meters
+  images      Json     @default("[]") // array of image URLs
+  amenities   Json     @default("[]") // array of amenity strings
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rooms       Room[]
+  bookings    Booking[]
+  promotions  PromotionRoomType[]
+  reviews     Review[]
+
+  @@map("room_types")
+}
+
+model Room {
+  id         String     @id @default(cuid())
+  roomNumber String     @unique
+  roomTypeId String
+  floor      Int        @default(1)
+  status     RoomStatus @default(AVAILABLE)
+  notes      String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  roomType   RoomType   @relation(fields: [roomTypeId], references: [id])
+  bookings   Booking[]
+
+  @@map("rooms")
+}
+
+enum RoomStatus {
+  AVAILABLE
+  OCCUPIED
+  MAINTENANCE
+  OUT_OF_ORDER
+}
+
+// ============================================
+// Booking System
+// ============================================
+
+model Booking {
+  id            String        @id @default(cuid())
+  bookingCode   String        @unique @default(cuid())
+  guestId       String
+  roomId        String?
+  roomTypeId    String
+  checkIn       DateTime
+  checkOut      DateTime
+  guestCount    Int           @default(1)
+  totalPrice    Decimal       @db.Decimal(10, 2)
+  status        BookingStatus @default(PENDING)
+  specialRequests String?     @db.Text
+  notes         String?       @db.Text
+  expiresAt     DateTime?
+  confirmedAt   DateTime?
+  cancelledAt   DateTime?
+  cancelReason  String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  guest         Guest         @relation(fields: [guestId], references: [id])
+  room          Room?         @relation(fields: [roomId], references: [id])
+  roomType      RoomType      @relation(fields: [roomTypeId], references: [id])
+
+  @@map("bookings")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CHECK_IN
+  CHECK_OUT
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  EXPIRED
+}
+
+// ============================================
+// Guest Management
+// ============================================
+
+model Guest {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  phone       String?
+  nationality String?
+  idNumber    String?
+  notes       String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bookings    Booking[]
+  reviews     Review[]
+
+  @@map("guests")
+}
+
+// ============================================
+// Reviews
+// ============================================
+
+model Review {
+  id          String       @id @default(cuid())
+  guestId     String
+  roomTypeId  String?
+  rating      Int          // 1-5
+  comment     String?      @db.Text
+  response    String?      @db.Text // admin response
+  status      ReviewStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  guest       Guest        @relation(fields: [guestId], references: [id])
+  roomType    RoomType?    @relation(fields: [roomTypeId], references: [id])
+
+  @@map("reviews")
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// ============================================
+// Blog / Content
+// ============================================
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  titleEn     String?
+  slug        String   @unique
+  content     String   @db.Text
+  contentEn   String?  @db.Text
+  excerpt     String?
+  excerptEn   String?
+  coverImage  String?
+  authorId    String
+  categoryId  String?
+  isPublished Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author      User     @relation(fields: [authorId], references: [id])
+  category    BlogCategory? @relation(fields: [categoryId], references: [id])
+
+  @@map("blog_posts")
+}
+
+model BlogCategory {
+  id    String @id @default(cuid())
+  name  String
+  nameEn String?
+  slug  String @unique
+
+  posts BlogPost[]
+
+  @@map("blog_categories")
+}
+
+// ============================================
+// Promotions
+// ============================================
+
+model Promotion {
+  id            String         @id @default(cuid())
+  name          String
+  nameEn        String?
+  description   String?        @db.Text
+  descriptionEn String?        @db.Text
+  discountType  DiscountType
+  discountValue Decimal        @db.Decimal(10, 2)
+  startDate     DateTime
+  endDate       DateTime
+  isActive      Boolean        @default(true)
+  code          String?        @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  roomTypes     PromotionRoomType[]
+
+  @@map("promotions")
+}
+
+model PromotionRoomType {
+  promotionId String
+  roomTypeId  String
+
+  promotion   Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  roomType    RoomType  @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+
+  @@id([promotionId, roomTypeId])
+  @@map("promotion_room_types")
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+// ============================================
+// Gallery
+// ============================================
+
+model GalleryImage {
+  id         String  @id @default(cuid())
+  url        String
+  alt        String?
+  altEn      String?
+  category   String  // rooms, facilities, views, dining, exterior
+  roomTypeId String?
+  sortOrder  Int     @default(0)
+  createdAt  DateTime @default(now())
+
+  @@map("gallery_images")
+}
+
+// ============================================
+// Site Configuration
+// ============================================
+
+model SiteConfig {
+  id       String @id @default(cuid())
+  key      String @unique
+  value    Json
+  category String @default("general")
+
+  @@map("site_config")
+}
+
+// ============================================
+// Seasonal Pricing
+// ============================================
+
+model SeasonalPrice {
+  id         String   @id @default(cuid())
+  roomTypeId String
+  name       String   // e.g., "Summer Peak", "Tet Holiday"
+  startDate  DateTime
+  endDate    DateTime
+  multiplier Decimal  @db.Decimal(4, 2) // e.g., 1.5 = 50% more
+  createdAt  DateTime @default(now())
+
+  @@map("seasonal_prices")
+}
