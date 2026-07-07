@@ -16,10 +16,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: locale === "vi" ? "Thư Viện Ảnh" : "Photo Gallery",
     description:
       locale === "vi"
-        ? "Khám phá vẻ đẹp của HASANA Hotel qua bộ sưu tập ảnh phòng nghỉ, cảnh biển, nhà hàng và tiện ích"
-        : "Discover the beauty of HASANA Hotel through our photo collection of rooms, ocean views, dining and facilities",
+        ? "Khám phá vẻ đẹp của Lullaby Sky Villa qua bộ sưu tập ảnh phòng nghỉ, cảnh biển, nhà hàng và tiện ích"
+        : "Discover the beauty of Lullaby Sky Villa through our photo collection of rooms, ocean views, dining and facilities",
     openGraph: {
-      title: locale === "vi" ? "Thư Viện Ảnh | HASANA Hotel" : "Photo Gallery | HASANA Hotel",
+      title: locale === "vi" ? "Thư Viện Ảnh | Lullaby Sky Villa" : "Photo Gallery | Lullaby Sky Villa",
       images: [galleryImages[0].src],
     },
   };

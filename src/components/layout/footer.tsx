@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+﻿import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 export function Footer() {
@@ -14,7 +14,7 @@ export function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <h3 className="font-[family-name:var(--font-heading)] text-2xl text-white mb-4 tracking-wider">
-              HASANA
+              Lullaby
             </h3>
             <p className="text-sm leading-relaxed text-white/60">
               {t("description")}
@@ -68,7 +68,7 @@ export function Footer() {
             <div className="space-y-3 text-sm">
               <p>Ha Long, Quang Ninh, Vietnam</p>
               <p>+84 (0) 203 xxx xxxx</p>
-              <p>info@hasanahotel.com</p>
+              <p>info@lullabyskyvillahahalong.com</p>
             </div>
           </div>
 

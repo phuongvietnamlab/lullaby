@@ -14,8 +14,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: locale === "vi" ? "Giới Thiệu" : "About Us",
     description:
       locale === "vi"
-        ? "Tìm hiểu về HASANA Hotel - khách sạn sang trọng 5 sao tọa lạc tại vịnh Hạ Long, Quảng Ninh"
-        : "Learn about HASANA Hotel - a luxury 5-star hotel located in Ha Long Bay, Quang Ninh, Vietnam",
+        ? "Tìm hiểu về Lullaby Sky Villa - khách sạn sang trọng 5 sao tọa lạc tại vịnh Hạ Long, Quảng Ninh"
+        : "Learn about Lullaby Sky Villa - a luxury 5-star hotel located in Ha Long Bay, Quang Ninh, Vietnam",
   };
 }
 
@@ -35,7 +35,7 @@ function AboutContent() {
       <section className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden">
         <Image
           src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1400&q=80"
-          alt="HASANA Hotel exterior"
+          alt="Lullaby Sky Villa exterior"
           fill
           priority
           sizes="100vw"
@@ -73,7 +73,7 @@ function AboutContent() {
               <div className="relative aspect-[3/4] overflow-hidden rounded-sm">
                 <Image
                   src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80"
-                  alt="HASANA Hotel pool area"
+                  alt="Lullaby Sky Villa pool area"
                   fill
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"

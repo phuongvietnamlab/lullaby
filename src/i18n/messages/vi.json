@@ -9,7 +9,7 @@
     "cancel": "Hủy",
     "close": "Đóng",
     "loading": "Đang tải...",
-    "error": "Có lỗi xảy ra",
+    "error": "Đã xảy ra lỗi",
     "success": "Thành công",
     "perNight": "/đêm",
     "guests": "khách",
@@ -30,20 +30,20 @@
   },
   "home": {
     "hero": {
-      "title": "Nơi Biển Trời Hạ Long Giao Hòa",
-      "subtitle": "Trải nghiệm kỳ nghỉ sang trọng giữa kỳ quan thiên nhiên thế giới",
+      "title": "Nơi Biển Gặp Trời Tại Hạ Long",
+      "subtitle": "Trải nghiệm sự sang trọng giữa kỳ quan thiên nhiên thế giới",
       "cta": "Khám Phá Phòng"
     },
     "features": {
-      "title": "Trải Nghiệm HASANA",
-      "subtitle": "Nơi mỗi khoảnh khắc đều trở nên đặc biệt",
+      "title": "Trải Nghiệm Lullaby",
+      "subtitle": "Nơi mỗi khoảnh khắc trở nên phi thường",
       "location": {
         "title": "Vị Trí Đắc Địa",
-        "description": "Tọa lạc tại trung tâm Hạ Long, tầm nhìn hướng biển tuyệt đẹp"
+        "description": "Tọa lạc tại trung tâm Hạ Long với tầm nhìn ra biển tuyệt đẹp"
       },
       "rooms": {
         "title": "Phòng Sang Trọng",
-        "description": "Thiết kế tối giản hiện đại, tiện nghi đẳng cấp 5 sao"
+        "description": "Thiết kế hiện đại tối giản với tiện nghi 5 sao"
       },
       "service": {
         "title": "Dịch Vụ Tận Tâm",
@@ -52,18 +52,18 @@
     },
     "rooms": {
       "title": "Phòng & Suite",
-      "subtitle": "Không gian nghỉ dưỡng hoàn hảo",
+      "subtitle": "Nơi nghỉ dưỡng hoàn hảo đang chờ bạn",
       "viewAll": "Xem Tất Cả Phòng"
     },
     "cta": {
       "title": "Sẵn Sàng Cho Kỳ Nghỉ Hoàn Hảo?",
-      "subtitle": "Đặt phòng ngay để nhận ưu đãi tốt nhất",
+      "subtitle": "Đặt ngay để nhận giá tốt nhất",
       "button": "Đặt Phòng Ngay"
     }
   },
   "rooms": {
     "title": "Phòng & Suite",
-    "subtitle": "Chọn không gian phù hợp với bạn",
+    "subtitle": "Tìm không gian phù hợp với bạn",
     "maxGuests": "Tối đa {count} khách",
     "size": "{size} m²",
     "viewDetails": "Xem Chi Tiết",
@@ -72,39 +72,39 @@
   },
   "roomTypes": {
     "superior": {
-      "name": "Phòng Superior Hướng Biển",
-      "shortDesc": "Không gian nghỉ dưỡng tinh tế với tầm nhìn đại dương, thiết kế dành cho du khách yêu cầu sự thoải mái và thanh lịch.",
-      "description": "Phòng Superior Hướng Biển mang đến không gian nghỉ dưỡng tinh tế với cửa kính từ sàn đến trần, khung cảnh biển xanh vịnh Hạ Long. Mỗi phòng được trang bị giường ngủ cao cấp, phòng tắm đá cẩm thạch rộng rãi với vòi sen mưa, và ban công riêng nơi bạn có thể ngắm bình minh nhuộm vàng những đảo đá vôi. Thiết kế tối giản để thiên nhiên trở thành tâm điểm."
+      "name": "Superior Hướng Biển",
+      "shortDesc": "Không gian nghỉ dưỡng tinh tế với tầm nhìn toàn cảnh ra biển, dành cho du khách yêu thích sự thoải mái và thanh lịch.",
+      "description": "Phòng Superior Hướng Biển mang đến không gian nghỉ dưỡng tinh tế với cửa kính từ sàn đến trần, đón trọn tầm nhìn ra làn nước xanh ngọc của Vịnh Hạ Long. Mỗi phòng được trang bị giường ngủ cao cấp, phòng tắm đá cẩm thạch rộng rãi với vòi sen mưa, và ban công riêng nơi bạn có thể ngắm bình minh nhuộm vàng những ngọn núi đá vôi. Thiết kế tối giản nhường chỗ cho thiên nhiên tỏa sáng."
     },
     "deluxe": {
-      "name": "Phòng Deluxe Hướng Vịnh",
-      "shortDesc": "Sang trọng rộng rãi với tầm nhìn vịnh bao la, tiện nghi cao cấp và không gian tĩnh lặng.",
-      "description": "Phòng Deluxe Hướng Vịnh nâng tầm kỳ nghỉ của bạn với không gian sống mở rộng và tầm nhìn không bị cản trở ra những hòn đảo đá vôi nổi tiếng của vịnh Hạ Long. Với giường king-size trải ga cao cấp nhất, bồn tắm ngâm sâu, và ban công rộng rãi, căn phòng này là nơi ẩn náu riêng tư của bạn. Dịch vụ dọn phòng buổi tối và cà phê Nespresso miễn phí."
+      "name": "Deluxe Hướng Vịnh",
+      "shortDesc": "Không gian sang trọng rộng rãi với tầm nhìn vịnh thoáng đãng, tiện nghi cao cấp và bầu không khí thanh bình.",
+      "description": "Phòng Deluxe Hướng Vịnh nâng tầm kỳ nghỉ của bạn với không gian sống mở rộng và tầm nhìn không bị che khuất ra những dãy núi đá vôi biểu tượng của Vịnh Hạ Long. Với giường king-size trải ga cao cấp, bồn tắm ngâm sâu và ban công rộng rãi, phòng là nơi ẩn náu riêng tư của bạn. Tận hưởng dịch vụ dọn phòng buổi tối và tiện nghi cà phê cao cấp."
     },
     "premium": {
-      "name": "Suite Premium Hướng Đại Dương",
-      "shortDesc": "Suite đẳng cấp với phòng khách riêng, tầm nhìn đại dương bao quanh và dịch vụ quản gia.",
-      "description": "Suite Premium Hướng Đại Dương mang đến trải nghiệm vượt trội với phòng khách riêng biệt, tầm nhìn đại dương bao quanh và dịch vụ quản gia cá nhân. Thức dậy với chân trời xanh vô tận, thư giãn trong phòng tắm đá cẩm thạch rộng lớn, và tận hưởng quyền truy cập độc quyền vào Executive Lounge. Mọi chi tiết đều được chọn lọc cho những vị khách trân trọng nghệ thuật sống sang trọng."
+      "name": "Premium Ocean Suite",
+      "shortDesc": "Suite đẳng cấp với phòng khách riêng, tầm nhìn toàn cảnh đại dương và dịch vụ quản gia chuyên biệt.",
+      "description": "Premium Ocean Suite mang đến trải nghiệm vượt trội với phòng khách riêng biệt, tầm nhìn bao quát ra đại dương và dịch vụ quản gia cá nhân hóa. Thức dậy với đường chân trời xanh bất tận, thư giãn trong phòng tắm đá cẩm thạch cỡ lớn và tận hưởng quyền sử dụng Executive Lounge. Mọi chi tiết đều được chọn lọc dành cho quý khách trân trọng nghệ thuật sống sang trọng."
     },
     "suite": {
-      "name": "Suite Executive",
-      "shortDesc": "Suite rộng lớn với tầm nhìn toàn cảnh, khu vực ăn uống riêng và dịch vụ tư vấn riêng.",
-      "description": "Suite Executive là kiệt tác về không gian và phong cách, mang đến tầm nhìn toàn cảnh từ mọi cửa sổ, khu vực ăn uống riêng cho những buổi gặp gỡ thân mật, và đội ngũ tư vấn riêng. Suite trang trí bằng tranh nghệ thuật được chọn lọc, phòng ngủ sang trọng với phòng thay đồ riêng, và phòng tắm phong cách spa. Bao gồm liệu pháp spa miễn phí và xe đưa đón sân bay."
+      "name": "Executive Suite",
+      "shortDesc": "Suite rộng lớn với tầm nhìn toàn cảnh, khu vực ăn uống riêng và dịch vụ concierge theo yêu cầu.",
+      "description": "Executive Suite là kiệt tác của không gian và phong cách, mang đến tầm nhìn toàn cảnh từ mọi cửa sổ, khu vực ăn uống riêng cho những buổi sum họp thân mật và đội ngũ concierge riêng. Suite được trang trí bằng tranh nghệ thuật chọn lọc, phòng ngủ sang trọng với tủ quần áo walk-in và phòng tắm lấy cảm hứng từ spa. Bao gồm liệu trình spa miễn phí và đưa đón sân bay."
     },
     "presidential": {
-      "name": "Suite Tổng Thống",
-      "shortDesc": "Đỉnh cao sang trọng — tư gia riêng với hồ bơi, bếp đầy đủ và dịch vụ tối thượng.",
-      "description": "Suite Tổng Thống là biểu hiện tối thượng của sự sang trọng tại HASANA Hotel. Tư gia rộng lớn này có hồ bơi riêng, bếp đầy đủ tiện nghi, phòng ăn chính thức và phòng ngủ chính với tầm nhìn toàn cảnh vịnh Hạ Long. Tận hưởng dịch vụ quản gia 24/7, xe đưa đón sân bay riêng, và chuyên viên spa riêng phục vụ theo yêu cầu."
+      "name": "Presidential Suite",
+      "shortDesc": "Đỉnh cao của sự sang trọng — dinh thự riêng với hồ bơi, bếp đầy đủ và dịch vụ đẳng cấp.",
+      "description": "Presidential Suite là biểu tượng cao nhất của sự xa hoa tại Lullaby Sky Villa. Dinh thự riêng rộng lớn này sở hữu hồ bơi riêng, bếp đầy đủ tiện nghi, phòng ăn trang trọng và phòng ngủ chính với tầm nhìn toàn cảnh Vịnh Hạ Long. Tận hưởng dịch vụ quản gia 24/7, đưa đón sân bay riêng và chuyên viên spa túc trực phục vụ."
     }
   },
   "roomDetail": {
     "overview": "Tổng Quan",
     "highlights": "Điểm Nổi Bật",
-    "otherRooms": "Phòng Khác Bạn Có Thể Thích",
-    "roomSize": "Diện Tích",
-    "maxOccupancy": "Sức Chứa",
+    "otherRooms": "Phòng Khác Có Thể Bạn Thích",
+    "roomSize": "Diện Tích Phòng",
+    "maxOccupancy": "Sức Chứa Tối Đa",
     "bedTypeLabel": "Loại Giường",
-    "viewLabel": "Tầm Nhìn",
+    "viewLabel": "Hướng Nhìn",
     "floorLabel": "Tầng",
     "beds": {
       "king": "Giường King",
@@ -115,30 +115,30 @@
       "sea": "Hướng Biển",
       "bay": "Hướng Vịnh",
       "ocean": "Hướng Đại Dương",
-      "panoramic": "Toàn Cảnh"
+      "panoramic": "Tầm Nhìn Toàn Cảnh"
     },
     "amenities": {
       "wifi": "WiFi Tốc Độ Cao",
-      "ac": "Điều Hòa",
+      "ac": "Điều Hòa Nhiệt Độ",
       "minibar": "Minibar Cao Cấp",
       "safe": "Két An Toàn",
       "tv": "TV Thông Minh 55\"",
       "hairdryer": "Máy Sấy Tóc",
       "bathrobe": "Áo Choàng Tắm",
       "slippers": "Dép Phòng",
-      "coffee": "Máy Pha Nespresso",
+      "coffee": "Máy Pha Cà Phê Nespresso",
       "turndown": "Dịch Vụ Dọn Phòng Tối",
       "lounge": "Executive Lounge",
       "breakfast": "Bữa Sáng Hàng Ngày",
-      "spa": "Truy Cập Spa",
+      "spa": "Sử Dụng Spa",
       "transfer": "Đưa Đón Sân Bay",
       "kitchen": "Bếp Đầy Đủ",
       "jacuzzi": "Jacuzzi Riêng"
     },
     "highlightsList": {
       "seaView": "Tầm nhìn biển tuyệt đẹp từ ban công riêng",
-      "bayView": "Tầm nhìn bao quát vịnh Hạ Long",
-      "oceanView": "Tầm nhìn đại dương bao quanh",
+      "bayView": "Tầm nhìn bao quát Vịnh Hạ Long",
+      "oceanView": "Tầm nhìn toàn cảnh đại dương",
       "panoramicView": "Tầm nhìn toàn cảnh 360°",
       "balcony": "Ban công riêng",
       "bathtub": "Bồn tắm ngâm sâu",
@@ -149,47 +149,47 @@
       "privatePool": "Hồ bơi riêng",
       "kitchen": "Bếp đầy đủ tiện nghi",
       "jacuzzi": "Jacuzzi riêng",
-      "airportTransfer": "Xe đưa đón sân bay riêng"
+      "airportTransfer": "Đưa đón sân bay riêng"
     }
   },
   "gallery": {
     "title": "Thư Viện Ảnh",
-    "subtitle": "Khám phá vẻ đẹp của HASANA Hotel",
+    "subtitle": "Khám phá vẻ đẹp của Lullaby Sky Villa",
     "all": "Tất Cả",
     "categories": {
       "rooms": "Phòng",
-      "views": "Cảnh Đẹp",
+      "views": "Cảnh Quan",
       "dining": "Ẩm Thực",
       "spa": "Spa & Sức Khỏe",
       "facilities": "Tiện Ích"
     }
   },
   "about": {
-    "title": "Về HASANA",
-    "subtitle": "Câu chuyện về sang trọng, thiên nhiên và lòng hiếu khách",
+    "title": "Về Lullaby",
+    "subtitle": "Câu chuyện về sự sang trọng, thiên nhiên và lòng hiếu khách",
     "story": {
       "title": "Câu Chuyện Của Chúng Tôi",
-      "p1": "Ra đời từ tầm nhìn tạo nên một nơi ẩn náu nơi sự sang trọng hiện đại hòa quyện với vẻ đẹp vĩnh cửu của vịnh Hạ Long, HASANA Hotel mở cửa đón khách năm 2020. Mọi chi tiết — từ kiến trúc phản ánh những cột đá vôi của vịnh đến triết lý phục vụ bắt nguồn từ sự ấm áp Việt Nam — đều được thiết kế để tạo nên trải nghiệm khó quên.",
-      "p2": "Chúng tôi tin rằng sự sang trọng không phải là sự dư thừa, mà là sự dụng tâm. Mỗi không gian trong khách sạn được chăm chút kỹ lưỡng để đưa khách gần hơn với thiên nhiên trong khi vẫn cung cấp mọi tiện nghi hiện đại. Kết quả là một nơi bạn có thể thực sự ngắt kết nối với thế giới và kết nối lại với những gì quan trọng."
+      "p1": "Khởi nguồn từ tầm nhìn tạo nên một thiên đường nơi sự sang trọng hiện đại hòa quyện với vẻ đẹp vĩnh cửu của Vịnh Hạ Long, Lullaby Sky Villa mở cửa đón khách vào năm 2020. Mọi chi tiết — từ kiến trúc phản chiếu những cột đá vôi của vịnh đến triết lý phục vụ bắt nguồn từ sự nồng hậu Việt Nam — đều được thiết kế để tạo nên trải nghiệm khó quên.",
+      "p2": "Chúng tôi tin rằng sự sang trọng không nằm ở sự thừa thãi mà ở sự chỉn chu. Mỗi không gian trong khách sạn được chế tác cẩn thận để đưa khách đến gần hơn với thiên nhiên đồng thời mang đến mọi tiện nghi hiện đại. Kết quả là một nơi bạn thực sự có thể tách khỏi thế giới và kết nối lại với những điều quan trọng."
     },
     "values": {
-      "title": "Giá Trị Của Chúng Tôi",
+      "title": "Giá Trị Cốt Lõi",
       "excellence": {
         "title": "Xuất Sắc",
-        "description": "Chúng tôi theo đuổi sự hoàn hảo trong mọi chi tiết, từ chất lượng ga giường đến sự ấm áp của lời chào đón."
+        "description": "Chúng tôi theo đuổi sự hoàn hảo trong từng chi tiết, từ chất lượng ga giường đến sự nồng ấm trong lời chào đón."
       },
       "hospitality": {
-        "title": "Lòng Hiếu Khách",
-        "description": "Sang trọng thực sự là sự cá nhân hóa. Đội ngũ của chúng tôi dự đoán nhu cầu của bạn trước khi bạn nhận ra."
+        "title": "Lòng Hiếu Khách Chân Thành",
+        "description": "Sự sang trọng đích thực mang tính cá nhân. Đội ngũ của chúng tôi thấu hiểu nhu cầu của bạn trước khi bạn nhận ra."
       },
       "sustainability": {
-        "title": "Bền Vững",
-        "description": "Chúng tôi là người gìn giữ di sản thiên nhiên vịnh Hạ Long, cam kết bảo tồn vẻ đẹp cho thế hệ mai sau."
+        "title": "Phát Triển Bền Vững",
+        "description": "Chúng tôi là những người gìn giữ di sản thiên nhiên Vịnh Hạ Long, cam kết bảo tồn vẻ đẹp cho muôn đời sau."
       }
     },
     "stats": {
       "rooms": "Phòng Sang Trọng",
-      "rating": "Xếp Hạng Sao",
+      "rating": "Hạng Sao",
       "service": "Dịch Vụ",
       "established": "Thành Lập"
     }
@@ -201,21 +201,21 @@
     "phone": "Điện Thoại",
     "email": "Email",
     "sendMessage": "Gửi Tin Nhắn",
-    "yourName": "Tên của bạn",
+    "yourName": "Họ và Tên",
     "yourEmail": "Email của bạn",
-    "subject": "Chủ đề",
-    "message": "Nội dung"
+    "subject": "Tiêu Đề",
+    "message": "Nội Dung"
   },
   "booking": {
     "title": "Đặt Phòng",
-    "subtitle": "Tìm phòng hoàn hảo cho kỳ nghỉ tại Hạ Long",
+    "subtitle": "Tìm phòng hoàn hảo cho kỳ nghỉ của bạn tại Vịnh Hạ Long",
     "checkIn": "Nhận phòng",
     "checkOut": "Trả phòng",
     "guests": "Số khách",
     "guestUnit": "khách",
     "roomType": "Loại Phòng",
     "checkAvailability": "Kiểm Tra Phòng Trống",
-    "checking": "Đang kiểm tra...",
+    "checking": "Đang kiểm tra phòng trống...",
     "guestInfo": "Thông Tin Khách",
     "name": "Họ và Tên",
     "email": "Email",
@@ -223,62 +223,62 @@
     "specialRequests": "Yêu Cầu Đặc Biệt",
     "confirmBooking": "Xác Nhận Đặt Phòng",
     "bookingSuccess": "Đặt Phòng Thành Công!",
-    "successMessage": "Yêu cầu đặt phòng đã được ghi nhận. Vui lòng lưu mã đặt phòng.",
+    "successMessage": "Yêu cầu đặt phòng của bạn đã được tiếp nhận. Vui lòng lưu lại mã đặt phòng.",
     "bookingCode": "Mã Đặt Phòng",
-    "totalPrice": "Tổng Tiền",
+    "totalPrice": "Tổng Cộng",
     "nights": "{count} đêm",
-    "duration": "Thời gian",
-    "selectRoom": "Chọn Phòng",
+    "duration": "Thời Gian Lưu Trú",
+    "selectRoom": "Chọn",
     "continue": "Tiếp Tục",
-    "back": "Quay lại",
+    "back": "Quay Lại",
     "processing": "Đang xử lý...",
     "copied": "Đã sao chép!",
     "onlyLeft": "Chỉ còn {count} phòng",
     "availableFor": "Lưu trú {nights} đêm",
     "totalFor": "tổng cho {nights} đêm",
-    "policyNotice": "Bằng việc xác nhận, bạn đồng ý với chính sách đặt phòng. Đặt phòng chờ sẽ hết hạn sau 48 giờ nếu chưa thanh toán.",
-    "expirationNotice": "Đặt phòng này đang chờ xử lý. Vui lòng hoàn tất thanh toán trong 48 giờ để xác nhận. Đặt phòng sẽ tự động hết hạn nếu không được xác nhận.",
+    "policyNotice": "Bằng việc xác nhận, bạn đồng ý với chính sách đặt phòng của chúng tôi. Đặt phòng chờ xác nhận sẽ hết hạn sau 48 giờ nếu không được xác nhận.",
+    "expirationNotice": "Đặt phòng này đang chờ xác nhận. Vui lòng hoàn tất thanh toán trong vòng 48 giờ để xác nhận đặt phòng. Đặt phòng sẽ tự động hết hạn nếu không được xác nhận.",
     "checkStatus": "Kiểm Tra Trạng Thái",
     "backToHome": "Về Trang Chủ",
     "steps": {
       "dates": "Ngày",
       "rooms": "Phòng",
-      "guest": "Chi tiết",
-      "confirmation": "Xác nhận",
+      "guest": "Chi Tiết",
+      "confirmation": "Xác Nhận",
       "datesTitle": "Bạn đến khi nào?",
       "datesSubtitle": "Chọn ngày nhận phòng và trả phòng",
-      "roomsTitle": "Chọn Phòng",
+      "roomsTitle": "Chọn Phòng Của Bạn",
       "guestTitle": "Thông Tin Khách",
       "guestSubtitle": "Cho chúng tôi biết ai sẽ lưu trú",
       "confirmTitle": "Xác Nhận Đặt Phòng",
-      "confirmSubtitle": "Xem lại thông tin đặt phòng của bạn"
+      "confirmSubtitle": "Kiểm tra lại thông tin đặt phòng của bạn"
     },
     "placeholders": {
       "name": "VD: Nguyễn Văn A",
       "email": "VD: khach@email.com",
       "phone": "VD: 0901234567",
-      "specialRequests": "Yêu cầu đặc biệt? (nhận phòng sớm, giường phụ, v.v.)"
+      "specialRequests": "Bạn có yêu cầu đặc biệt? (nhận phòng sớm, thêm giường, v.v.)"
     },
     "validation": {
-      "nameRequired": "Vui lòng nhập họ tên (ít nhất 2 ký tự)",
+      "nameRequired": "Vui lòng nhập họ tên đầy đủ (ít nhất 2 ký tự)",
       "emailInvalid": "Vui lòng nhập địa chỉ email hợp lệ",
-      "phoneRequired": "Vui lòng nhập số điện thoại hợp lệ (ít nhất 8 số)"
+      "phoneRequired": "Vui lòng nhập số điện thoại hợp lệ (ít nhất 8 chữ số)"
     },
     "errors": {
       "checkFailed": "Không thể kiểm tra phòng trống. Vui lòng thử lại.",
-      "noRooms": "Không có phòng trống cho ngày đã chọn. Vui lòng thử ngày khác.",
+      "noRooms": "Không còn phòng trống cho ngày đã chọn. Vui lòng thử ngày khác.",
       "bookingFailed": "Không thể tạo đặt phòng. Vui lòng thử lại.",
-      "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối."
+      "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn."
     },
     "status": {
       "title": "Kiểm Tra Trạng Thái Đặt Phòng",
-      "subtitle": "Nhập mã đặt phòng để xem thông tin đặt chỗ",
-      "placeholder": "HASANA-XXXXXX",
-      "search": "Tìm",
-      "notFound": "Không tìm thấy đặt phòng với mã này. Vui lòng kiểm tra lại.",
+      "subtitle": "Nhập mã đặt phòng để xem thông tin đặt phòng của bạn",
+      "placeholder": "LULLABY-XXXXXX",
+      "search": "Tìm Kiếm",
+      "notFound": "Không tìm thấy đặt phòng với mã này. Vui lòng kiểm tra và thử lại.",
       "expiresAt": "Hết hạn: {date}",
       "statuses": {
-        "PENDING": "Đang Chờ Xác Nhận",
+        "PENDING": "Chờ Xác Nhận",
         "CONFIRMED": "Đã Xác Nhận",
         "CANCELLED": "Đã Hủy",
         "EXPIRED": "Đã Hết Hạn"
@@ -286,36 +286,36 @@
     }
   },
   "attractions": {
-    "title": "Điểm Tham Quan Hạ Long",
+    "title": "Điểm Tham Quan Vịnh Hạ Long",
     "subtitle": "Kỳ quan thiên nhiên ngay trước cửa nhà bạn",
-    "intro": "Vịnh Hạ Long, Di sản Thế giới UNESCO, là nơi có gần 2.000 hòn đảo và núi đá vôi nhô lên từ mặt nước ngọc bích. Là khách của HASANA Hotel, bạn có quyền truy cập đặc biệt để khám phá kiệt tác thiên nhiên này qua những trải nghiệm được tuyển chọn.",
+    "intro": "Vịnh Hạ Long, Di sản Thế giới UNESCO, là nơi có gần 2.000 hòn đảo và núi đá vôi nhô lên từ mặt nước ngọc bích. Là khách của Lullaby Sky Villa, bạn có đặc quyền khám phá kiệt tác thiên nhiên này qua những trải nghiệm được sắp đặt riêng.",
     "sungSot": {
       "title": "Hang Sửng Sốt",
-      "description": "Một trong những hang động lớn nhất và đẹp nhất vịnh Hạ Long, Hang Sửng Sốt có những nhũ đá và măng đá ngoạn mục trong những gian phòng rộng lớn. Hang nằm trên đảo Bồ Hòn và mang đến tầm nhìn tuyệt đẹp từ cửa hang."
+      "description": "Một trong những hang động lớn và đẹp nhất Vịnh Hạ Long, Hang Sửng Sốt sở hữu những nhũ đá và măng đá ngoạn mục trong những gian phòng rộng lớn. Hang nằm trên đảo Bồ Hòn và mang đến tầm nhìn ngoạn mục từ cửa hang."
     },
     "tiTop": {
       "title": "Đảo Ti Tốp",
-      "description": "Được đặt theo tên một phi hành gia Liên Xô, đảo Ti Tốp có bãi biển hình lưỡi liềm với cát trắng mịn. Leo 427 bậc thang lên đỉnh để ngắm toàn cảnh vịnh khiến bạn phải ngỡ ngàng."
+      "description": "Được đặt tên theo nhà du hành vũ trụ Liên Xô, đảo Ti Tốp có bãi biển hình lưỡi liềm với cát trắng mịn. Leo 427 bậc lên đỉnh để ngắm toàn cảnh vịnh sẽ khiến bạn ngỡ ngàng."
     },
     "cruise": {
       "title": "Du Thuyền Sang Trọng",
-      "description": "Lướt trên mặt nước ngọc bích trên thuyền buồm truyền thống hoặc du thuyền hiện đại sang trọng. Trải nghiệm du thuyền của chúng tôi bao gồm cocktail hoàng hôn, ẩm thực hải sản tươi sống, và nghỉ đêm giữa những đảo đá."
+      "description": "Lướt trên mặt nước ngọc bích trên thuyền gỗ truyền thống hoặc du thuyền hiện đại sang trọng. Trải nghiệm du thuyền của chúng tôi bao gồm cocktail hoàng hôn, tiệc hải sản tươi sống và nghỉ đêm giữa những ngọn núi đá."
     },
     "kayaking": {
       "title": "Chèo Kayak Khám Phá",
-      "description": "Chèo thuyền qua những đầm phá ẩn giấu, hang động hẻo lánh và làng chài nổi. Chèo kayak tại vịnh Hạ Long mang đến sự kết nối thân mật với thiên nhiên mà tàu lớn không thể có được."
+      "description": "Chèo kayak qua những đầm phá ẩn giấu, hang động hoang sơ và làng chài nổi. Chèo kayak tại Vịnh Hạ Long mang đến sự kết nối thân mật với thiên nhiên mà tàu lớn không thể có được."
     },
     "fishing": {
       "title": "Làng Chài Nổi",
-      "description": "Thăm những làng chài nổi truyền thống nơi các gia đình đã sống trên mặt nước qua nhiều thế hệ. Tìm hiểu về kỹ thuật đánh bắt địa phương và thưởng thức hải sản tươi ngon nhất trực tiếp từ nguồn."
+      "description": "Ghé thăm những làng chài nổi truyền thống nơi các gia đình đã sống trên mặt nước qua nhiều thế hệ. Tìm hiểu kỹ thuật đánh cá địa phương và thưởng thức hải sản tươi sống nhất ngay từ nguồn."
     },
     "sunset": {
       "title": "Hoàng Hôn Trên Vịnh",
-      "description": "Không gì sánh được với việc ngắm mặt trời lặn sau những trụ đá vôi khi bầu trời chuyển thành bức tranh vàng, hồng và tím. Tận hưởng tốt nhất từ sân thượng của chúng tôi với ly cocktail trên tay."
+      "description": "Không gì sánh được với việc ngắm mặt trời lặn sau những cột đá vôi khi bầu trời chuyển thành bức tranh vàng, hồng và tím. Tuyệt nhất khi thưởng thức từ sân thượng của chúng tôi với ly cocktail trên tay."
     },
     "cta": {
       "title": "Trải Nghiệm Vịnh Hạ Long Cùng Chúng Tôi",
-      "subtitle": "Đội ngũ concierge có thể sắp xếp tour riêng phù hợp với sở thích của bạn"
+      "subtitle": "Đội ngũ concierge có thể sắp xếp các tour và trải nghiệm riêng theo sở thích của bạn"
     }
   },
   "blog": {
@@ -324,67 +324,67 @@
     "readMore": "Đọc Thêm",
     "publishedOn": "Đăng ngày {date}",
     "by": "Bởi {author}",
-    "category": "Danh mục",
-    "backToBlog": "Quay lại Blog",
-    "noPosts": "Chưa có bài viết nào.",
+    "category": "Danh Mục",
+    "backToBlog": "Quay Lại Blog",
+    "noPosts": "Hiện chưa có bài viết nào.",
     "relatedPosts": "Bài Viết Liên Quan",
     "categories": {
-      "Travel Guide": "Hướng Dẫn Du Lịch",
+      "Travel Guide": "Cẩm Nang Du Lịch",
       "News": "Tin Tức",
       "Food & Dining": "Ẩm Thực",
-      "Wellness": "Sức Khỏe"
+      "Wellness": "Sức Khỏe & Thư Giãn"
     }
   },
   "reviews": {
     "title": "Đánh Giá Từ Khách",
     "subtitle": "Khách hàng nói gì về kỳ nghỉ của họ",
-    "averageRating": "Đánh Giá Trung Bình",
+    "averageRating": "Điểm Trung Bình",
     "basedOn": "Dựa trên {count} đánh giá",
-    "stayedIn": "Ở tại {room}",
-    "stayDate": "Ngày lưu trú: {date}",
+    "stayedIn": "Đã ở phòng {room}",
+    "stayDate": "Lưu trú: {date}",
     "hotelResponse": "Phản Hồi Từ Khách Sạn",
     "writeReview": "Viết Đánh Giá",
     "submitTitle": "Chia Sẻ Trải Nghiệm",
-    "submitSubtitle": "Hãy kể cho chúng tôi về kỳ nghỉ của bạn tại HASANA Hotel",
+    "submitSubtitle": "Kể cho chúng tôi về kỳ nghỉ của bạn tại Lullaby Sky Villa",
     "form": {
       "name": "Họ và Tên",
-      "email": "Email",
+      "email": "Email của bạn",
       "roomType": "Loại Phòng",
       "stayDate": "Ngày Lưu Trú",
-      "rating": "Đánh Giá",
-      "reviewTitle": "Tiêu Đề",
-      "comment": "Nhận Xét",
+      "rating": "Đánh Giá Của Bạn",
+      "reviewTitle": "Tiêu Đề Đánh Giá",
+      "comment": "Nội Dung Đánh Giá",
       "submit": "Gửi Đánh Giá",
       "submitting": "Đang gửi...",
-      "success": "Cảm ơn bạn! Đánh giá đã được gửi và đang chờ duyệt.",
+      "success": "Cảm ơn bạn! Đánh giá đã được gửi và đang chờ phê duyệt.",
       "namePlaceholder": "VD: Nguyễn Văn A",
-      "emailPlaceholder": "VD: nguyen@email.com",
+      "emailPlaceholder": "VD: nguyenvana@email.com",
       "titlePlaceholder": "VD: Kỳ nghỉ tuyệt vời!",
-      "commentPlaceholder": "Chia sẻ trải nghiệm của bạn với các khách hàng khác..."
+      "commentPlaceholder": "Chia sẻ trải nghiệm của bạn với những khách khác..."
     },
     "selectRoom": "Chọn loại phòng",
     "stars": "{count} sao"
   },
   "promotions": {
     "title": "Ưu Đãi Đặc Biệt",
-    "subtitle": "Những ưu đãi hấp dẫn cho kỳ nghỉ khó quên",
+    "subtitle": "Ưu đãi độc quyền cho kỳ nghỉ khó quên",
     "validUntil": "Có hiệu lực đến {date}",
     "discount": "Giảm {value}%",
     "discountFixed": "Giảm {value}",
     "applicableRooms": "Phòng Áp Dụng",
-    "useCode": "Mã ưu đãi",
-    "bookWithOffer": "Đặt Phòng Với Ưu Đãi",
-    "noPromotions": "Hiện chưa có ưu đãi nào. Hãy quay lại sau!",
+    "useCode": "Sử dụng mã",
+    "bookWithOffer": "Đặt Với Ưu Đãi Này",
+    "noPromotions": "Hiện không có ưu đãi nào. Hãy quay lại sau!",
     "limited": "Số lượng có hạn",
     "usesLeft": "Còn {count} lượt sử dụng"
   },
   "footer": {
-    "description": "Khách sạn sang trọng tại Hạ Long với tầm nhìn hướng biển tuyệt đẹp.",
+    "description": "Khách sạn sang trọng tại Hạ Long với tầm nhìn ra biển tuyệt đẹp.",
     "quickLinks": "Liên Kết Nhanh",
     "contactInfo": "Thông Tin Liên Hệ",
     "followUs": "Theo Dõi Chúng Tôi",
-    "copyright": "© {year} HASANA Hotel. Mọi quyền được bảo lưu.",
+    "copyright": "© {year} Lullaby Sky Villa. Mọi quyền được bảo lưu.",
     "privacy": "Chính Sách Bảo Mật",
-    "terms": "Điều Khoản Sử Dụng"
+    "terms": "Điều Khoản Dịch Vụ"
   }
 }

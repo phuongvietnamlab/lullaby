@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Admin Panel Mock Data
  * TODO: Replace all mock data with Prisma queries in production
  */
@@ -130,29 +130,29 @@ export const mockAdminUsers: AdminUser[] = [
   {
     id: "admin-1",
     name: "Nguyen Van Admin",
-    email: "admin@hasana.com",
+    email: "admin@lullaby.com",
     role: "super_admin",
     createdAt: "2024-01-01T00:00:00Z",
   },
   {
     id: "admin-2",
     name: "Tran Thi Manager",
-    email: "manager@hasana.com",
+    email: "manager@lullaby.com",
     role: "manager",
     createdAt: "2024-02-15T00:00:00Z",
   },
   {
     id: "admin-3",
     name: "Le Van Reception",
-    email: "reception@hasana.com",
+    email: "reception@lullaby.com",
     role: "receptionist",
     createdAt: "2024-03-01T00:00:00Z",
   },
 ];
 
-// Mock credentials: admin@hasana.com / admin123
+// Mock credentials: admin@lullaby.com / admin123
 export const MOCK_ADMIN_CREDENTIALS = {
-  email: "admin@hasana.com",
+  email: "admin@lullaby.com",
   password: "admin123",
 };
 
@@ -262,7 +262,7 @@ export const mockRooms: IndividualRoom[] = [
 export const mockBookings: BookingAdmin[] = [
   {
     id: "b-001",
-    bookingCode: "HASANA-A1B2C3",
+    bookingCode: "LULLABY-A1B2C3",
     guestName: "John Smith",
     guestEmail: "john.smith@email.com",
     guestPhone: "+1-555-0101",
@@ -278,7 +278,7 @@ export const mockBookings: BookingAdmin[] = [
   },
   {
     id: "b-002",
-    bookingCode: "HASANA-D4E5F6",
+    bookingCode: "LULLABY-D4E5F6",
     guestName: "Nguyen Thi Lan",
     guestEmail: "lan.nguyen@email.com",
     guestPhone: "+84-905-123-456",
@@ -293,7 +293,7 @@ export const mockBookings: BookingAdmin[] = [
   },
   {
     id: "b-003",
-    bookingCode: "HASANA-G7H8I9",
+    bookingCode: "LULLABY-G7H8I9",
     guestName: "Tanaka Yuki",
     guestEmail: "yuki.tanaka@email.com",
     guestPhone: "+81-90-1234-5678",
@@ -309,7 +309,7 @@ export const mockBookings: BookingAdmin[] = [
   },
   {
     id: "b-004",
-    bookingCode: "HASANA-J1K2L3",
+    bookingCode: "LULLABY-J1K2L3",
     guestName: "Emma Wilson",
     guestEmail: "emma.wilson@email.com",
     guestPhone: "+44-7700-900123",
@@ -324,7 +324,7 @@ export const mockBookings: BookingAdmin[] = [
   },
   {
     id: "b-005",
-    bookingCode: "HASANA-M4N5O6",
+    bookingCode: "LULLABY-M4N5O6",
     guestName: "Park Min-jun",
     guestEmail: "minjun.park@email.com",
     guestPhone: "+82-10-1234-5678",
@@ -340,7 +340,7 @@ export const mockBookings: BookingAdmin[] = [
   },
   {
     id: "b-006",
-    bookingCode: "HASANA-P7Q8R9",
+    bookingCode: "LULLABY-P7Q8R9",
     guestName: "Maria Garcia",
     guestEmail: "maria.garcia@email.com",
     guestPhone: "+34-612-345-678",
@@ -355,7 +355,7 @@ export const mockBookings: BookingAdmin[] = [
   },
   {
     id: "b-007",
-    bookingCode: "HASANA-S1T2U3",
+    bookingCode: "LULLABY-S1T2U3",
     guestName: "Li Wei",
     guestEmail: "li.wei@email.com",
     guestPhone: "+86-138-0013-8000",
@@ -391,7 +391,7 @@ export const mockGuests: GuestAdmin[] = [
 export const mockBlogPosts: BlogPostAdmin[] = [
   { id: "bp-001", title: "Top 10 Things to Do in Ha Long Bay", slug: "top-10-ha-long-bay", locale: "en", status: "published", author: "Nguyen Van Admin", category: "Travel Guide", createdAt: "2024-11-15T10:00:00Z", publishedAt: "2024-11-16T08:00:00Z", excerpt: "Discover the must-see attractions and activities in Ha Long Bay..." },
   { id: "bp-002", title: "10 Điều Nên Làm Tại Vịnh Hạ Long", slug: "10-dieu-nen-lam-ha-long", locale: "vi", status: "published", author: "Nguyen Van Admin", category: "Travel Guide", createdAt: "2024-11-15T10:00:00Z", publishedAt: "2024-11-16T08:00:00Z", excerpt: "Khám phá những điểm đến và hoạt động không thể bỏ qua tại Vịnh Hạ Long..." },
-  { id: "bp-003", title: "Hasana Hotel: A Year in Review", slug: "hasana-year-review", locale: "en", status: "published", author: "Tran Thi Manager", category: "News", createdAt: "2024-12-01T09:00:00Z", publishedAt: "2024-12-02T06:00:00Z", excerpt: "Looking back at an incredible year of hospitality excellence..." },
+  { id: "bp-003", title: "Lullaby Sky Villa: A Year in Review", slug: "LULLABY-year-review", locale: "en", status: "published", author: "Tran Thi Manager", category: "News", createdAt: "2024-12-01T09:00:00Z", publishedAt: "2024-12-02T06:00:00Z", excerpt: "Looking back at an incredible year of hospitality excellence..." },
   { id: "bp-004", title: "Best Seafood Restaurants Near Ha Long", slug: "best-seafood-ha-long", locale: "en", status: "draft", author: "Nguyen Van Admin", category: "Food & Dining", createdAt: "2024-12-10T14:00:00Z", excerpt: "A curated guide to the freshest seafood experiences..." },
   { id: "bp-005", title: "Spa Wellness Guide: Finding Your Balance", slug: "spa-wellness-guide", locale: "en", status: "draft", author: "Tran Thi Manager", category: "Wellness", createdAt: "2024-12-18T11:00:00Z", excerpt: "Explore our comprehensive spa and wellness offerings..." },
   { id: "bp-006", title: "Cẩm Nang Du Lịch Mùa Đông Hạ Long", slug: "cam-nang-du-lich-mua-dong", locale: "vi", status: "archived", author: "Nguyen Van Admin", category: "Travel Guide", createdAt: "2024-10-01T08:00:00Z", publishedAt: "2024-10-02T06:00:00Z", excerpt: "Hướng dẫn chi tiết cho chuyến du lịch mùa đông..." },
@@ -464,9 +464,9 @@ export const mockDashboardStats = {
 // ============================================
 
 export const mockSiteSettings = {
-  hotelName: "Hasana Hotel & Spa",
+  hotelName: "Lullaby Sky Villa & Spa",
   tagline: "Luxury Living by the Bay",
-  email: "info@hasana.com",
+  email: "info@lullaby.com",
   phone: "+84-203-123-4567",
   address: "Ha Long Bay, Quang Ninh, Vietnam",
   checkInTime: "14:00",
@@ -475,13 +475,13 @@ export const mockSiteSettings = {
   defaultLocale: "vi",
   supportedLocales: ["vi", "en"],
   socialMedia: {
-    facebook: "https://facebook.com/hasanahotel",
-    instagram: "https://instagram.com/hasanahotel",
-    twitter: "https://twitter.com/hasanahotel",
+    facebook: "https://facebook.com/Lullabyhotel",
+    instagram: "https://instagram.com/Lullabyhotel",
+    twitter: "https://twitter.com/Lullabyhotel",
   },
   seo: {
-    metaTitle: "Hasana Hotel & Spa - Luxury in Ha Long Bay",
-    metaDescription: "Experience luxury hospitality with stunning views of Ha Long Bay. Book your stay at Hasana Hotel & Spa.",
+    metaTitle: "Lullaby Sky Villa & Spa - Luxury in Ha Long Bay",
+    metaDescription: "Experience luxury hospitality with stunning views of Ha Long Bay. Book your stay at Lullaby Sky Villa & Spa.",
     ogImage: "/images/og-image.jpg",
   },
   bookingPolicy: {

@@ -35,7 +35,7 @@
       "cta": "Explore Rooms"
     },
     "features": {
-      "title": "The HASANA Experience",
+      "title": "The Lullaby Experience",
       "subtitle": "Where every moment becomes extraordinary",
       "location": {
         "title": "Prime Location",
@@ -94,7 +94,7 @@
     "presidential": {
       "name": "Presidential Suite",
       "shortDesc": "The pinnacle of luxury — a private residence with pool, full kitchen, and white-glove service.",
-      "description": "The Presidential Suite represents the ultimate expression of luxury at HASANA Hotel. This expansive private residence features a plunge pool, fully equipped kitchen, formal dining room, and a master bedroom with panoramic views across Ha Long Bay. Enjoy round-the-clock butler service, private airport transfers, and a dedicated spa therapist on call."
+      "description": "The Presidential Suite represents the ultimate expression of luxury at Lullaby Sky Villa. This expansive private residence features a plunge pool, fully equipped kitchen, formal dining room, and a master bedroom with panoramic views across Ha Long Bay. Enjoy round-the-clock butler service, private airport transfers, and a dedicated spa therapist on call."
     }
   },
   "roomDetail": {
@@ -154,7 +154,7 @@
   },
   "gallery": {
     "title": "Photo Gallery",
-    "subtitle": "Discover the beauty of HASANA Hotel",
+    "subtitle": "Discover the beauty of Lullaby Sky Villa",
     "all": "All",
     "categories": {
       "rooms": "Rooms",
@@ -165,11 +165,11 @@
     }
   },
   "about": {
-    "title": "About HASANA",
+    "title": "About Lullaby",
     "subtitle": "A story of luxury, nature, and hospitality",
     "story": {
       "title": "Our Story",
-      "p1": "Born from a vision to create a sanctuary where modern luxury meets the timeless beauty of Ha Long Bay, HASANA Hotel opened its doors in 2020. Every detail — from the architecture that mirrors the bay's limestone pillars to the service philosophy rooted in Vietnamese warmth — was designed to create an unforgettable experience.",
+      "p1": "Born from a vision to create a sanctuary where modern luxury meets the timeless beauty of Ha Long Bay, Lullaby Sky Villa opened its doors in 2020. Every detail — from the architecture that mirrors the bay's limestone pillars to the service philosophy rooted in Vietnamese warmth — was designed to create an unforgettable experience.",
       "p2": "We believe luxury isn't about excess; it's about intention. Each space in our hotel is thoughtfully crafted to bring guests closer to nature while providing every modern comfort. The result is a place where you can truly disconnect from the world and reconnect with what matters."
     },
     "values": {
@@ -273,7 +273,7 @@
     "status": {
       "title": "Check Booking Status",
       "subtitle": "Enter your booking code to view your reservation",
-      "placeholder": "HASANA-XXXXXX",
+      "placeholder": "LULLABY-XXXXXX",
       "search": "Search",
       "notFound": "No booking found with this code. Please check and try again.",
       "expiresAt": "Expires: {date}",
@@ -288,7 +288,7 @@
   "attractions": {
     "title": "Ha Long Bay Attractions",
     "subtitle": "A natural wonder awaits at your doorstep",
-    "intro": "Ha Long Bay, a UNESCO World Heritage Site, is home to nearly 2,000 limestone karsts and islands rising from emerald waters. As a guest of HASANA Hotel, you have privileged access to explore this natural masterpiece through curated experiences.",
+    "intro": "Ha Long Bay, a UNESCO World Heritage Site, is home to nearly 2,000 limestone karsts and islands rising from emerald waters. As a guest of Lullaby Sky Villa, you have privileged access to explore this natural masterpiece through curated experiences.",
     "sungSot": {
       "title": "Sung Sot Cave",
       "description": "One of the largest and most beautiful caves in Ha Long Bay, Sung Sot (Surprise Cave) features spectacular stalactites and stalagmites in vast chambers. The cave sits on Bo Hon Island and offers breathtaking views from its entrance."
@@ -345,7 +345,7 @@
     "hotelResponse": "Hotel Response",
     "writeReview": "Write a Review",
     "submitTitle": "Share Your Experience",
-    "submitSubtitle": "Tell us about your stay at HASANA Hotel",
+    "submitSubtitle": "Tell us about your stay at Lullaby Sky Villa",
     "form": {
       "name": "Your Name",
       "email": "Your Email",
@@ -383,7 +383,7 @@
     "quickLinks": "Quick Links",
     "contactInfo": "Contact Info",
     "followUs": "Follow Us",
-    "copyright": "© {year} HASANA Hotel. All rights reserved.",
+    "copyright": "© {year} Lullaby Sky Villa. All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service"
   }

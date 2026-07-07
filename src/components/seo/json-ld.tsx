@@ -1,4 +1,4 @@
-import { type RoomType } from "@/lib/data/rooms";
+﻿import { type RoomType } from "@/lib/data/rooms";
 
 type HotelJsonLdProps = {
   locale: string;
@@ -8,14 +8,14 @@ export function HotelJsonLd({ locale }: HotelJsonLdProps) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Hotel",
-    name: "HASANA Hotel",
+    name: "Lullaby Sky Villa",
     description:
       locale === "vi"
         ? "Khách sạn sang trọng tại Hạ Long với tầm nhìn hướng biển tuyệt đẹp"
         : "Luxury hotel in Ha Long Bay with stunning ocean views",
-    url: "https://hasanahotel.com",
+    url: "https://lullabyskyvillahahalong.com",
     telephone: "+84-203-xxx-xxxx",
-    email: "info@hasanahotel.com",
+    email: "info@lullabyskyvillahahalong.com",
     address: {
       "@type": "PostalAddress",
       streetAddress: "Ha Long",
@@ -67,7 +67,7 @@ export function RoomJsonLd({ room, locale, roomName, roomDescription }: RoomJson
     "@type": "HotelRoom",
     name: roomName,
     description: roomDescription,
-    url: `https://hasanahotel.com/${locale}/rooms/${room.slug}`,
+    url: `https://lullabyskyvillahahalong.com/${locale}/rooms/${room.slug}`,
     image: room.images.map((img) => img.src),
     occupancy: {
       "@type": "QuantitativeValue",
@@ -102,12 +102,12 @@ export function LodgingBusinessJsonLd({ locale }: { locale: string }) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "LodgingBusiness",
-    name: "HASANA Hotel",
+    name: "Lullaby Sky Villa",
     description:
       locale === "vi"
         ? "Khách sạn sang trọng tại Hạ Long"
         : "Luxury hotel in Ha Long Bay",
-    url: "https://hasanahotel.com",
+    url: "https://lullabyskyvillahahalong.com",
     telephone: "+84-203-xxx-xxxx",
     address: {
       "@type": "PostalAddress",

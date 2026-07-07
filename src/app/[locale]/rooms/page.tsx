@@ -17,10 +17,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: locale === "vi" ? "Phòng & Suite" : "Rooms & Suites",
     description:
       locale === "vi"
-        ? "Khám phá các loại phòng sang trọng tại HASANA Hotel - từ Superior đến Presidential Suite với tầm nhìn vịnh Hạ Long"
-        : "Discover luxury room types at HASANA Hotel - from Superior to Presidential Suite with Ha Long Bay views",
+        ? "Khám phá các loại phòng sang trọng tại Lullaby Sky Villa - từ Superior đến Presidential Suite với tầm nhìn vịnh Hạ Long"
+        : "Discover luxury room types at Lullaby Sky Villa - from Superior to Presidential Suite with Ha Long Bay views",
     openGraph: {
-      title: locale === "vi" ? "Phòng & Suite | HASANA Hotel" : "Rooms & Suites | HASANA Hotel",
+      title: locale === "vi" ? "Phòng & Suite | Lullaby Sky Villa" : "Rooms & Suites | Lullaby Sky Villa",
       description:
         locale === "vi"
           ? "Phòng nghỉ sang trọng với tầm nhìn vịnh Hạ Long"

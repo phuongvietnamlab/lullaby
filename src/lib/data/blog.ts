@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Blog data helpers
  * Provides published blog posts with full content for public pages
  */
@@ -67,7 +67,7 @@ Visit a pearl farm to learn about the delicate process of cultivating pearls in 
 
 Venture beyond the main tourist routes to the quieter Bai Tu Long Bay for a more intimate experience with nature.
 
-## 10. Relax at HASANA Hotel
+## 10. Relax at Lullaby Sky Villa
 
 End each day of adventure in the comfort of your luxury room, watching the bay from your private balcony.
 
@@ -125,7 +125,7 @@ Tìm hiểu quy trình nuôi cấy ngọc trai tinh tế trong vùng nước tro
 
 Vượt ra ngoài các tuyến du lịch chính đến Vịnh Bái Tử Long yên tĩnh hơn để trải nghiệm thân mật với thiên nhiên.
 
-## 10. Thư Giãn Tại HASANA Hotel
+## 10. Thư Giãn Tại Lullaby Sky Villa
 
 Kết thúc mỗi ngày phiêu lưu trong sự thoải mái của phòng sang trọng, ngắm vịnh từ ban công riêng.
 
@@ -135,8 +135,8 @@ Kết thúc mỗi ngày phiêu lưu trong sự thoải mái của phòng sang tr
   },
   {
     id: "bp-003",
-    title: "Hasana Hotel: A Year in Review",
-    slug: "hasana-year-review",
+    title: "Lullaby Sky Villa: A Year in Review",
+    slug: "LULLABY-year-review",
     locale: "en",
     category: "News",
     author: "Tran Thi Manager",
@@ -145,7 +145,7 @@ Kết thúc mỗi ngày phiêu lưu trong sự thoải mái của phòng sang tr
       "Looking back at an incredible year of hospitality excellence and unforgettable guest experiences.",
     coverImage:
       "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
-    content: `As we approach the end of another remarkable year, we're taking a moment to reflect on the milestones, memories, and magic that made 2024 truly special at HASANA Hotel.
+    content: `As we approach the end of another remarkable year, we're taking a moment to reflect on the milestones, memories, and magic that made 2024 truly special at Lullaby Sky Villa.
 
 ## A Year of Growth
 
@@ -170,12 +170,12 @@ We're proud to have received recognition from the hospitality industry:
 
 As we step into 2025, we're excited about upcoming renovations to our spa wing, new culinary partnerships, and expanded tour offerings. Our commitment to providing an extraordinary Ha Long Bay experience remains unwavering.
 
-Thank you to every guest who has chosen HASANA Hotel as their home away from home. Your trust inspires us every day.
+Thank you to every guest who has chosen Lullaby Sky Villa as their home away from home. Your trust inspires us every day.
 
 ---
 
 *Warm regards,*
-*The HASANA Hotel Team*`,
+*The Lullaby Sky Villa Team*`,
   },
 ];
 

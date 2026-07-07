@@ -10,13 +10,13 @@ import "../globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "HASANA Hotel | Luxury Hotel in Ha Long Bay",
-    template: "%s | HASANA Hotel",
+    default: "Lullaby Sky Villa | Luxury Hotel in Ha Long Bay",
+    template: "%s | Lullaby Sky Villa",
   },
   description:
-    "Experience luxury amidst Ha Long Bay's natural wonder. HASANA Hotel offers premium rooms, stunning views, and world-class service.",
+    "Experience luxury amidst Ha Long Bay's natural wonder. Lullaby Sky Villa offers premium rooms, stunning views, and world-class service.",
   keywords: [
-    "HASANA Hotel",
+    "Lullaby Sky Villa",
     "Ha Long Bay hotel",
     "luxury hotel Vietnam",
     "khách sạn Hạ Long",

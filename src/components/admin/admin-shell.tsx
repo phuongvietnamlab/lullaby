@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
@@ -93,7 +93,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-700">
-          <span className="text-lg font-bold tracking-wide">HASANA</span>
+          <span className="text-lg font-bold tracking-wide">Lullaby</span>
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden text-slate-400 hover:text-white"

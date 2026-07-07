@@ -1,4 +1,4 @@
-import { rooms, type RoomType } from "@/lib/data/rooms";
+﻿import { rooms, type RoomType } from "@/lib/data/rooms";
 
 /**
  * Mock room inventory - in production this would come from the database.
@@ -93,7 +93,7 @@ export function isRoomTypeAvailable(
 }
 
 /**
- * Generate a unique booking code: HASANA-XXXXXX
+ * Generate a unique booking code: LULLABY-XXXXXX
  */
 export function generateBookingCode(): string {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -101,7 +101,7 @@ export function generateBookingCode(): string {
   for (let i = 0; i < 6; i++) {
     code += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return `HASANA-${code}`;
+  return `LULLABY-${code}`;
 }
 
 /**

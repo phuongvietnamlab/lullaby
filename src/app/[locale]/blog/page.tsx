@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: locale === "vi" ? "Blog - Câu Chuyện & Khám Phá" : "Blog - Stories & Insights",
     description:
       locale === "vi"
-        ? "Cảm hứng du lịch, tin tức khách sạn và khám phá địa phương từ HASANA Hotel"
-        : "Travel inspiration, hotel news, and local discoveries from HASANA Hotel",
+        ? "Cảm hứng du lịch, tin tức khách sạn và khám phá địa phương từ Lullaby Sky Villa"
+        : "Travel inspiration, hotel news, and local discoveries from Lullaby Sky Villa",
   };
 }
 

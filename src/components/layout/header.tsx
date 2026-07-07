@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -47,7 +47,7 @@ export function Header() {
                 isScrolled ? "text-[var(--color-primary)]" : "text-white"
               }`}
             >
-              HASANA
+              Lullaby
             </span>
           </Link>
 

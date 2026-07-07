@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: locale === "vi" ? "Liên Hệ" : "Contact Us",
     description:
       locale === "vi"
-        ? "Liên hệ HASANA Hotel - Địa chỉ, điện thoại, email và bản đồ đến khách sạn tại Hạ Long"
-        : "Contact HASANA Hotel - Address, phone, email and directions to our hotel in Ha Long Bay",
+        ? "Liên hệ Lullaby Sky Villa - Địa chỉ, điện thoại, email và bản đồ đến khách sạn tại Hạ Long"
+        : "Contact Lullaby Sky Villa - Address, phone, email and directions to our hotel in Ha Long Bay",
   };
 }
 
@@ -156,7 +156,7 @@ function ContactContent() {
                     </div>
                     <div>
                       <h3 className="font-[family-name:var(--font-heading)] text-lg mb-1">{t("email")}</h3>
-                      <p className="text-[var(--color-text-light)] text-sm">info@hasanahotel.com</p>
+                      <p className="text-[var(--color-text-light)] text-sm">info@lullabyskyvillahahalong.com</p>
                     </div>
                   </div>
                 </div>
@@ -171,7 +171,7 @@ function ContactContent() {
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="HASANA Hotel location on Google Maps"
+                    title="Lullaby Sky Villa location on Google Maps"
                     className="absolute inset-0"
                   />
                 </div>

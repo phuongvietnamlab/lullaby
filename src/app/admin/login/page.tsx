@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 // TODO: Replace with Better Auth session check in production
 const MOCK_CREDENTIALS = {
-  email: "admin@hasana.com",
+  email: "admin@lullaby.com",
   password: "admin123",
 };
 
@@ -33,7 +33,7 @@ export default function AdminLoginPage() {
         localStorage.setItem("admin_authenticated", "true");
         localStorage.setItem("admin_user", JSON.stringify({
           name: "Nguyen Van Admin",
-          email: "admin@hasana.com",
+          email: "admin@lullaby.com",
           role: "super_admin",
         }));
       }
@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
         <div className="bg-white rounded-lg shadow-md p-8">
           {/* Logo / Header */}
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">HASANA</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Lullaby</h1>
             <p className="text-sm text-gray-500 mt-1">Hotel Management System</p>
           </div>
 
@@ -70,7 +70,7 @@ export default function AdminLoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
-                placeholder="admin@hasana.com"
+                placeholder="admin@lullaby.com"
               />
             </div>
 
@@ -111,7 +111,7 @@ export default function AdminLoginPage() {
           <div className="mt-6 p-3 bg-blue-50 rounded-md">
             <p className="text-xs text-blue-700 font-medium">Demo Credentials:</p>
             <p className="text-xs text-blue-600 mt-1">
-              Email: admin@hasana.com<br />
+              Email: admin@lullaby.com<br />
               Password: admin123
             </p>
           </div>

@@ -1,7 +1,7 @@
-import type { MetadataRoute } from "next";
+﻿import type { MetadataRoute } from "next";
 import { getAllRoomSlugs } from "@/lib/data/rooms";
 
-const BASE_URL = "https://hasanahotel.com";
+const BASE_URL = "https://lullabyskyvillahahalong.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const locales = ["vi", "en"];

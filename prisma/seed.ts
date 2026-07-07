@@ -3,7 +3,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
 
 const pool = new pg.Pool({
-  connectionString: "postgresql://hasana:hasana123@localhost:5432/hasana_hotel?schema=public",
+  connectionString: "postgresql://lullaby:lullaby123@localhost:5432/lullaby_hotel?schema=public",
 });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
@@ -15,11 +15,11 @@ async function main() {
   // Admin Users
   // ============================================
   const admin = await prisma.user.upsert({
-    where: { email: "admin@hasana.com" },
+    where: { email: "admin@lullaby.com" },
     update: {},
     create: {
       name: "Nguyen Van Admin",
-      email: "admin@hasana.com",
+      email: "admin@lullaby.com",
       emailVerified: true,
       role: "SUPER_ADMIN",
       accounts: {
@@ -33,11 +33,11 @@ async function main() {
   });
 
   const manager = await prisma.user.upsert({
-    where: { email: "manager@hasana.com" },
+    where: { email: "manager@lullaby.com" },
     update: {},
     create: {
       name: "Tran Thi Manager",
-      email: "manager@hasana.com",
+      email: "manager@lullaby.com",
       emailVerified: true,
       role: "MANAGER",
       accounts: {
@@ -249,7 +249,7 @@ async function main() {
   await prisma.booking.createMany({
     data: [
       {
-        bookingCode: "HASANA-A1B2C3",
+        bookingCode: "LULLABY-A1B2C3",
         guestId: guests[0].id,
         roomTypeId: deluxeRT.id,
         checkIn: new Date("2026-07-15"),
@@ -261,7 +261,7 @@ async function main() {
         specialRequests: "Late check-in, extra pillows",
       },
       {
-        bookingCode: "HASANA-D4E5F6",
+        bookingCode: "LULLABY-D4E5F6",
         guestId: guests[1].id,
         roomTypeId: superiorRT.id,
         checkIn: new Date("2026-07-10"),
@@ -272,7 +272,7 @@ async function main() {
         createdAt: new Date("2026-07-03"),
       },
       {
-        bookingCode: "HASANA-G7H8I9",
+        bookingCode: "LULLABY-G7H8I9",
         guestId: guests[2].id,
         roomTypeId: premiumRT.id,
         checkIn: new Date("2026-07-20"),
@@ -285,7 +285,7 @@ async function main() {
         specialRequests: "Anniversary celebration, champagne",
       },
       {
-        bookingCode: "HASANA-J1K2L3",
+        bookingCode: "LULLABY-J1K2L3",
         guestId: guests[3].id,
         roomTypeId: superiorRT.id,
         checkIn: new Date("2026-07-08"),
@@ -297,7 +297,7 @@ async function main() {
         createdAt: new Date("2026-07-01"),
       },
       {
-        bookingCode: "HASANA-M4N5O6",
+        bookingCode: "LULLABY-M4N5O6",
         guestId: guests[4].id,
         roomTypeId: superiorRT.id,
         checkIn: new Date("2026-07-12"),
@@ -423,9 +423,9 @@ async function main() {
   // Site Config
   // ============================================
   const configs = [
-    { key: "hotel_name", value: JSON.stringify("HASANA Hotel & Spa"), category: "general" },
+    { key: "hotel_name", value: JSON.stringify("Lullaby Sky Villa & Spa"), category: "general" },
     { key: "hotel_phone", value: JSON.stringify("+84-203-123-4567"), category: "general" },
-    { key: "hotel_email", value: JSON.stringify("info@hasana.com"), category: "general" },
+    { key: "hotel_email", value: JSON.stringify("info@lullaby.com"), category: "general" },
     { key: "hotel_address", value: JSON.stringify("Ha Long Bay, Quang Ninh, Vietnam"), category: "general" },
     { key: "check_in_time", value: JSON.stringify("14:00"), category: "operations" },
     { key: "check_out_time", value: JSON.stringify("12:00"), category: "operations" },

@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "Hasana Admin Panel",
+  title: "Lullaby Admin Panel",
   description: "Hotel management dashboard",
 };
 

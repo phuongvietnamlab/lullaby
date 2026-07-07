@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   CalendarDays,
@@ -199,10 +199,10 @@ export default function AdminDashboardPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {[
-                { code: "HASANA-G7H8I9", guest: "Tanaka Yuki", room: "Premium Ocean Suite", dates: "Dec 24-28", status: "pending" },
-                { code: "HASANA-A1B2C3", guest: "John Smith", room: "Deluxe Bay View", dates: "Dec 22-25", status: "confirmed" },
-                { code: "HASANA-M4N5O6", guest: "Park Min-jun", room: "Presidential Suite", dates: "Dec 26-31", status: "confirmed" },
-                { code: "HASANA-D4E5F6", guest: "Nguyen Thi Lan", room: "Superior Sea View", dates: "Dec 21-23", status: "checked_in" },
+                { code: "LULLABY-G7H8I9", guest: "Tanaka Yuki", room: "Premium Ocean Suite", dates: "Dec 24-28", status: "pending" },
+                { code: "LULLABY-A1B2C3", guest: "John Smith", room: "Deluxe Bay View", dates: "Dec 22-25", status: "confirmed" },
+                { code: "LULLABY-M4N5O6", guest: "Park Min-jun", room: "Presidential Suite", dates: "Dec 26-31", status: "confirmed" },
+                { code: "LULLABY-D4E5F6", guest: "Nguyen Thi Lan", room: "Superior Sea View", dates: "Dec 21-23", status: "checked_in" },
               ].map((booking) => (
                 <tr key={booking.code} className="hover:bg-gray-50">
                   <td className="py-3 px-4 font-mono text-xs">{booking.code}</td>

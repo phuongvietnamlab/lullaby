@@ -36,10 +36,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: name,
     description:
       locale === "vi"
-        ? `${name} - ${room.size}m², tối đa ${room.maxGuests} khách, tầm nhìn tuyệt đẹp tại HASANA Hotel`
-        : `${name} - ${room.size}m², up to ${room.maxGuests} guests, stunning views at HASANA Hotel`,
+        ? `${name} - ${room.size}m², tối đa ${room.maxGuests} khách, tầm nhìn tuyệt đẹp tại Lullaby Sky Villa`
+        : `${name} - ${room.size}m², up to ${room.maxGuests} guests, stunning views at Lullaby Sky Villa`,
     openGraph: {
-      title: `${name} | HASANA Hotel`,
+      title: `${name} | Lullaby Sky Villa`,
       images: room.images.map((img) => img.src),
     },
   };
