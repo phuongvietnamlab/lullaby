@@ -1,39 +1,46 @@
 import { NextResponse } from "next/server";
-import { bookingsStore, expirePendingBookings } from "@/lib/booking";
-import { mockBookings } from "@/lib/admin/mock-data";
-import { rooms } from "@/lib/data/rooms";
+import { db } from "@/lib/db";
 
 export async function GET() {
-  // Expire old pending bookings
-  expirePendingBookings();
+  try {
+    // Fetch all bookings from database, ordered by newest first
+    const bookings = await db.booking.findMany({
+      include: {
+        guest: true,
+        roomType: true,
+        room: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
 
-  // Merge real bookings from the in-memory store with mock data
-  const realBookings = bookingsStore.map((b) => {
-    const roomType = rooms.find((r) => r.id === b.roomTypeId);
-    const nights = Math.ceil(
-      (new Date(b.checkOut).getTime() - new Date(b.checkIn).getTime()) /
-        (1000 * 60 * 60 * 24)
+    const formatted = bookings.map((b) => {
+      const nights = Math.ceil(
+        (b.checkOut.getTime() - b.checkIn.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      return {
+        id: b.id,
+        bookingCode: b.bookingCode,
+        guestName: b.guest.name,
+        guestEmail: b.guest.email,
+        guestPhone: b.guest.phone || "",
+        roomTypeName: b.roomType.nameEn,
+        roomNumber: b.room?.roomNumber || "-",
+        checkIn: b.checkIn.toISOString().split("T")[0],
+        checkOut: b.checkOut.toISOString().split("T")[0],
+        nights,
+        totalPrice: Number(b.totalPrice),
+        status: b.status.toLowerCase(),
+        createdAt: b.createdAt.toISOString(),
+        specialRequests: b.specialRequests || "",
+      };
+    });
+
+    return NextResponse.json({ bookings: formatted });
+  } catch (error) {
+    console.error("Admin bookings fetch error:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch bookings" },
+      { status: 500 }
     );
-    return {
-      id: b.id,
-      bookingCode: b.bookingCode,
-      guestName: b.guestName,
-      guestEmail: b.guestEmail,
-      guestPhone: b.guestPhone,
-      roomTypeName: roomType?.nameKey || "Unknown",
-      roomNumber: "-",
-      checkIn: b.checkIn.split("T")[0],
-      checkOut: b.checkOut.split("T")[0],
-      nights,
-      totalPrice: b.totalPrice,
-      status: b.status.toLowerCase(),
-      createdAt: b.createdAt,
-      specialRequests: b.specialRequests || "",
-    };
-  });
-
-  // Combine: real bookings first (newest), then mock data
-  const allBookings = [...realBookings.reverse(), ...mockBookings];
-
-  return NextResponse.json({ bookings: allBookings });
+  }
 }

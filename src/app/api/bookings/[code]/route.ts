@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { bookingsStore, expirePendingBookings } from "@/lib/booking";
-import { rooms } from "@/lib/data/rooms";
+import { db } from "@/lib/db";
 
 export async function GET(
   _request: NextRequest,
@@ -9,13 +8,16 @@ export async function GET(
   try {
     const { code } = await params;
 
-    // Expire old pending bookings first
-    expirePendingBookings();
-
-    // Find booking by code
-    const booking = bookingsStore.find(
-      (b) => b.bookingCode.toLowerCase() === code.toLowerCase()
-    );
+    // Find booking by code in database
+    const booking = await db.booking.findFirst({
+      where: {
+        bookingCode: { equals: code, mode: "insensitive" },
+      },
+      include: {
+        guest: true,
+        roomType: true,
+      },
+    });
 
     if (!booking) {
       return NextResponse.json(
@@ -24,27 +26,37 @@ export async function GET(
       );
     }
 
-    // Get room info
-    const room = rooms.find((r) => r.id === booking.roomTypeId);
+    // Auto-expire if needed
+    if (
+      booking.status === "PENDING" &&
+      booking.expiresAt &&
+      new Date() > booking.expiresAt
+    ) {
+      await db.booking.update({
+        where: { id: booking.id },
+        data: { status: "EXPIRED" },
+      });
+      booking.status = "EXPIRED";
+    }
 
     return NextResponse.json({
       booking: {
         bookingCode: booking.bookingCode,
         status: booking.status,
-        checkIn: booking.checkIn,
-        checkOut: booking.checkOut,
+        checkIn: booking.checkIn.toISOString(),
+        checkOut: booking.checkOut.toISOString(),
         guestCount: booking.guestCount,
-        guestName: booking.guestName,
-        guestEmail: booking.guestEmail,
-        totalPrice: booking.totalPrice,
+        guestName: booking.guest.name,
+        guestEmail: booking.guest.email,
+        totalPrice: Number(booking.totalPrice),
         specialRequests: booking.specialRequests,
-        createdAt: booking.createdAt,
-        expiresAt: booking.expiresAt,
-        room: room
+        createdAt: booking.createdAt.toISOString(),
+        expiresAt: booking.expiresAt?.toISOString(),
+        room: booking.roomType
           ? {
-              name: room.nameKey,
-              slug: room.slug,
-              images: room.images,
+              name: booking.roomType.slug,
+              slug: booking.roomType.slug,
+              images: [{ src: (booking.roomType.images as string[])?.[0] || "", alt: booking.roomType.nameEn }],
             }
           : null,
       },

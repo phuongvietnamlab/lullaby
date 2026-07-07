@@ -1,19 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
 import {
   createBookingSchema,
   validateDates,
-  isRoomTypeAvailable,
   generateBookingCode,
   calculateTotalPrice,
-  bookingsStore,
-  expirePendingBookings,
 } from "@/lib/booking";
 
 export async function POST(request: NextRequest) {
   try {
-    // Expire old pending bookings first
-    expirePendingBookings();
-
     const body = await request.json();
     const parsed = createBookingSchema.safeParse(body);
 
@@ -44,8 +39,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check availability (prevent double-booking)
-    if (!isRoomTypeAvailable(roomTypeId, checkIn, checkOut)) {
+    // Check availability via DB (prevent double-booking)
+    const roomType = await db.roomType.findFirst({
+      where: { slug: roomTypeId },
+      include: { rooms: true },
+    });
+
+    // Also try by id if slug not found
+    const rt = roomType || await db.roomType.findUnique({
+      where: { id: roomTypeId },
+      include: { rooms: true },
+    });
+
+    if (!rt) {
+      return NextResponse.json(
+        { error: "Room type not found" },
+        { status: 404 }
+      );
+    }
+
+    // Count overlapping active bookings
+    const overlappingBookings = await db.booking.count({
+      where: {
+        roomTypeId: rt.id,
+        status: { in: ["PENDING", "CONFIRMED", "CHECK_IN"] },
+        checkIn: { lt: new Date(checkOut) },
+        checkOut: { gt: new Date(checkIn) },
+      },
+    });
+
+    const totalRooms = rt.rooms.length;
+    if (overlappingBookings >= totalRooms) {
       return NextResponse.json(
         { error: "Room is no longer available for the selected dates" },
         { status: 409 }
@@ -62,42 +86,49 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 48);
 
-    // Create booking record
-    const booking = {
-      id: crypto.randomUUID(),
-      bookingCode,
-      roomId: roomTypeId,
-      roomTypeId,
-      checkIn,
-      checkOut,
-      guestCount,
-      guestName,
-      guestEmail,
-      guestPhone,
-      specialRequests: specialRequests || "",
-      totalPrice: pricing.total,
-      status: "PENDING" as const,
-      createdAt: new Date().toISOString(),
-      expiresAt: expiresAt.toISOString(),
-    };
+    // Find or create guest
+    let guest = await db.guest.findUnique({ where: { email: guestEmail } });
+    if (!guest) {
+      guest = await db.guest.create({
+        data: {
+          name: guestName,
+          email: guestEmail,
+          phone: guestPhone,
+        },
+      });
+    }
 
-    // Store booking (TODO: Replace with Prisma create in production)
-    bookingsStore.push(booking);
+    // Create booking in database
+    const booking = await db.booking.create({
+      data: {
+        bookingCode,
+        guestId: guest.id,
+        roomTypeId: rt.id,
+        checkIn: new Date(checkIn),
+        checkOut: new Date(checkOut),
+        guestCount,
+        totalPrice: pricing.total,
+        status: "PENDING",
+        specialRequests: specialRequests || null,
+        expiresAt,
+      },
+    });
 
-    // TODO: Send confirmation email via Resend
-    // await sendBookingConfirmationEmail(booking);
+    const nights = Math.ceil(
+      (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)
+    );
 
     return NextResponse.json({
       success: true,
       booking: {
         bookingCode: booking.bookingCode,
         status: booking.status,
-        checkIn: booking.checkIn,
-        checkOut: booking.checkOut,
+        checkIn: checkIn,
+        checkOut: checkOut,
         guestCount: booking.guestCount,
-        totalPrice: booking.totalPrice,
-        nights: pricing.nights,
-        expiresAt: booking.expiresAt,
+        totalPrice: Number(booking.totalPrice),
+        nights,
+        expiresAt: booking.expiresAt?.toISOString(),
       },
     });
   } catch (error) {
