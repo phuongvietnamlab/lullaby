@@ -39,7 +39,7 @@ export function StepConfirmation({ bookingData, onConfirm, onBack }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          roomTypeId: selectedRoom.roomId,
+          roomTypeId: selectedRoom.roomSlug,
           checkIn: bookingData.checkIn,
           checkOut: bookingData.checkOut,
           guestCount: bookingData.guestCount,

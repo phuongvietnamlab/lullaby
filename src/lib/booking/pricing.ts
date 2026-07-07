@@ -60,7 +60,7 @@ export function calculateTotalPrice(
   checkIn: Date,
   checkOut: Date
 ): { total: number; nights: number; breakdown: { date: string; price: number }[] } {
-  const room = rooms.find((r) => r.id === roomId);
+  const room = rooms.find((r) => r.id === roomId || r.slug === roomId);
   if (!room) throw new Error(`Room not found: ${roomId}`);
 
   const breakdown: { date: string; price: number }[] = [];
