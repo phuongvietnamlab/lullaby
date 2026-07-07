@@ -3,61 +3,65 @@
 @theme {
   /* ============================================
    * HASANA Hotel Design Tokens
-   * Minimal Luxury Aesthetic
+   * Minimal Luxury - Soft & Elegant
    * ============================================ */
 
   /* Colors - OKLCH for richer luxury tones */
-  --color-primary: oklch(0.25 0.02 260);       /* Deep navy/charcoal */
-  --color-primary-light: oklch(0.40 0.02 260);
-  --color-primary-dark: oklch(0.15 0.02 260);
+  --color-primary: oklch(0.22 0.02 260);       /* Deep navy/charcoal */
+  --color-primary-light: oklch(0.38 0.02 260);
+  --color-primary-dark: oklch(0.14 0.015 260);
   
-  --color-accent: oklch(0.65 0.08 80);          /* Warm gold */
-  --color-accent-light: oklch(0.75 0.06 80);
-  --color-accent-dark: oklch(0.55 0.10 80);
+  --color-accent: oklch(0.68 0.09 75);          /* Warm champagne gold */
+  --color-accent-light: oklch(0.78 0.06 75);
+  --color-accent-dark: oklch(0.55 0.10 75);
   
-  --color-surface: oklch(0.98 0.002 80);        /* Warm white */
-  --color-surface-dim: oklch(0.95 0.004 80);    /* Slightly dimmer */
+  --color-surface: oklch(0.985 0.002 80);       /* Warm white */
+  --color-surface-dim: oklch(0.96 0.003 75);    /* Soft cream */
   --color-surface-bright: oklch(1.0 0 0);       /* Pure white */
   
-  --color-muted: oklch(0.70 0.01 260);          /* Soft gray */
-  --color-muted-light: oklch(0.85 0.005 260);
+  --color-muted: oklch(0.68 0.008 260);         /* Soft gray */
+  --color-muted-light: oklch(0.88 0.004 260);
   
-  --color-text: oklch(0.20 0.02 260);           /* Near black */
-  --color-text-light: oklch(0.45 0.01 260);     /* Secondary text */
+  --color-text: oklch(0.18 0.015 260);          /* Near black */
+  --color-text-light: oklch(0.48 0.008 260);    /* Secondary text */
   --color-text-inverse: oklch(0.98 0.002 80);   /* White text */
   
-  --color-border: oklch(0.90 0.005 80);         /* Subtle borders */
-  --color-border-hover: oklch(0.80 0.01 80);
+  --color-border: oklch(0.92 0.004 75);         /* Soft warm borders */
+  --color-border-hover: oklch(0.82 0.008 75);
   
-  --color-success: oklch(0.60 0.15 145);
-  --color-warning: oklch(0.70 0.15 80);
-  --color-error: oklch(0.55 0.20 25);
+  --color-success: oklch(0.62 0.14 150);
+  --color-warning: oklch(0.72 0.14 80);
+  --color-error: oklch(0.58 0.18 25);
 
-  /* Typography */
+  /* Typography - Geist for body (modern, clean) */
   --font-heading: "Playfair Display", Georgia, serif;
   --font-body: "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
   /* Spacing scale */
-  --spacing-section: 6rem;
-  --spacing-section-sm: 4rem;
+  --spacing-section: 7rem;
+  --spacing-section-sm: 4.5rem;
 
-  /* Border radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
+  /* Border radius - SOFT & ELEGANT */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-2xl: 2.25rem;
+  --radius-full: 9999px;
 
-  /* Shadows */
-  --shadow-soft: 0 2px 20px oklch(0.20 0.02 260 / 0.06);
-  --shadow-medium: 0 4px 30px oklch(0.20 0.02 260 / 0.10);
-  --shadow-elevated: 0 8px 40px oklch(0.20 0.02 260 / 0.14);
+  /* Shadows - Softer, more diffused */
+  --shadow-soft: 0 4px 24px oklch(0.20 0.015 260 / 0.05);
+  --shadow-medium: 0 8px 40px oklch(0.20 0.015 260 / 0.08);
+  --shadow-elevated: 0 16px 56px oklch(0.20 0.015 260 / 0.12);
+  --shadow-glow: 0 0 40px oklch(0.68 0.09 75 / 0.15);
 
   /* Transitions */
   --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-normal: 300ms;
-  --duration-slow: 500ms;
-  --duration-slower: 700ms;
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-normal: 350ms;
+  --duration-slow: 550ms;
+  --duration-slower: 800ms;
 }
 
 /* ============================================
@@ -92,8 +96,13 @@
 
   /* Selection color */
   ::selection {
-    background-color: var(--color-accent);
+    background-color: oklch(0.68 0.09 75 / 0.3);
     color: var(--color-primary-dark);
+  }
+
+  /* Smooth image rendering */
+  img {
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -110,12 +119,51 @@
 
 @utility luxury-divider {
   width: 60px;
-  height: 1px;
+  height: 2px;
   background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  border-radius: var(--radius-full);
 }
 
 @utility glass-effect {
-  background: oklch(1.0 0 0 / 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: oklch(1.0 0 0 / 0.75);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  border: 1px solid oklch(1.0 0 0 / 0.2);
+  border-radius: var(--radius-xl);
+}
+
+@utility luxury-card {
+  background: var(--color-surface-bright);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+  transition: box-shadow var(--duration-normal) var(--ease-luxury),
+              transform var(--duration-normal) var(--ease-luxury);
+}
+
+@utility luxury-card-hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+@utility luxury-button {
+  border-radius: var(--radius-full);
+  padding: 0.875rem 2rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  transition: all var(--duration-normal) var(--ease-luxury);
+}
+
+@utility luxury-input {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  padding: 0.875rem 1.25rem;
+  transition: border-color var(--duration-normal) var(--ease-luxury),
+              box-shadow var(--duration-normal) var(--ease-luxury);
+}
+
+@utility luxury-input-focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px oklch(0.68 0.09 75 / 0.1);
+  outline: none;
 }

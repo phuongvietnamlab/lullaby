@@ -50,7 +50,7 @@ function HomeContent({ locale }: { locale: string }) {
           </p>
           <Link
             href="/rooms"
-            className="inline-flex items-center px-8 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-sm hover:bg-[var(--color-accent-light)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest"
+            className="inline-flex items-center px-10 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest"
           >
             {t("hero.cta")}
           </Link>
@@ -152,7 +152,7 @@ function HomeContent({ locale }: { locale: string }) {
                 <ScrollReveal key={room.id} delay={idx * 0.15}>
                   <Link
                     href={{ pathname: "/rooms/[slug]", params: { slug: room.slug } }}
-                    className="group block overflow-hidden rounded-sm bg-white border border-[var(--color-border)] hover:shadow-[var(--shadow-medium)] transition-shadow duration-[var(--duration-slow)]"
+                    className="group block overflow-hidden rounded-2xl bg-white border border-[var(--color-border)] hover:shadow-[var(--shadow-medium)] transition-all duration-[var(--duration-slow)] hover:-translate-y-1"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <Image
@@ -194,7 +194,7 @@ function HomeContent({ locale }: { locale: string }) {
             <div className="text-center mt-12">
               <Link
                 href="/rooms"
-                className="inline-flex items-center px-8 py-4 border border-[var(--color-primary)] text-[var(--color-primary)] text-xs uppercase tracking-widest hover:bg-[var(--color-primary)] hover:text-white transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)]"
+                className="inline-flex items-center px-8 py-4 border border-[var(--color-primary)] text-[var(--color-primary)] text-xs uppercase tracking-widest rounded-full hover:bg-[var(--color-primary)] hover:text-white transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)]"
               >
                 {t("rooms.viewAll")}
               </Link>
@@ -213,7 +213,7 @@ function HomeContent({ locale }: { locale: string }) {
             <p className="text-white/70 mb-10 text-lg">{t("cta.subtitle")}</p>
             <Link
               href="/booking"
-              className="inline-flex items-center px-8 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-sm hover:bg-[var(--color-accent-light)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest"
+              className="inline-flex items-center px-10 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest"
             >
               {t("cta.button")}
             </Link>

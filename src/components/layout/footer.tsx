@@ -8,7 +8,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[var(--color-primary)] text-white/80">
+    <footer className="bg-[var(--color-primary)] text-white/80 rounded-t-3xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid md:grid-cols-4 gap-12">
           {/* Brand */}
@@ -80,7 +80,7 @@ export function Footer() {
             <div className="flex space-x-4">
               <a
                 href="#"
-                className="w-10 h-10 flex items-center justify-center border border-white/20 rounded-full hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
+                className="w-10 h-10 flex items-center justify-center border border-white/20 rounded-xl hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
                 aria-label="Facebook"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@ export function Footer() {
               </a>
               <a
                 href="#"
-                className="w-10 h-10 flex items-center justify-center border border-white/20 rounded-full hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
+                className="w-10 h-10 flex items-center justify-center border border-white/20 rounded-xl hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
                 aria-label="Instagram"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
