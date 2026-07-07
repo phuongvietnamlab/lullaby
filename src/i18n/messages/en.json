@@ -22,6 +22,8 @@
     "dining": "Dining",
     "experiences": "Experiences",
     "blog": "Blog",
+    "promotions": "Offers",
+    "reviews": "Reviews",
     "contact": "Contact",
     "booking": "Book",
     "about": "About"
@@ -50,7 +52,8 @@
     },
     "rooms": {
       "title": "Rooms & Suites",
-      "subtitle": "Your perfect retreat awaits"
+      "subtitle": "Your perfect retreat awaits",
+      "viewAll": "View All Rooms"
     },
     "cta": {
       "title": "Ready for the Perfect Getaway?",
@@ -67,23 +70,129 @@
     "amenities": "Amenities",
     "priceFrom": "From {price}"
   },
-  "booking": {
-    "title": "Book a Room",
-    "checkIn": "Check-in Date",
-    "checkOut": "Check-out Date",
-    "guests": "Guests",
-    "roomType": "Room Type",
-    "checkAvailability": "Check Availability",
-    "guestInfo": "Guest Information",
-    "name": "Full Name",
-    "email": "Email",
-    "phone": "Phone Number",
-    "specialRequests": "Special Requests",
-    "confirmBooking": "Confirm Booking",
-    "bookingSuccess": "Booking confirmed!",
-    "bookingCode": "Booking code",
-    "totalPrice": "Total",
-    "nights": "{count} nights"
+  "roomTypes": {
+    "superior": {
+      "name": "Superior Sea View",
+      "shortDesc": "A refined retreat with panoramic ocean views, designed for discerning travelers seeking comfort and elegance.",
+      "description": "Our Superior Sea View rooms offer a sophisticated escape with floor-to-ceiling windows framing the azure waters of Ha Long Bay. Each room features premium bedding, a spacious marble bathroom with rain shower, and a private balcony where you can watch the sunrise paint the limestone karsts in golden light. The minimalist design lets nature take center stage."
+    },
+    "deluxe": {
+      "name": "Deluxe Bay View",
+      "shortDesc": "Spacious luxury with sweeping bay views, premium amenities, and an atmosphere of refined tranquility.",
+      "description": "The Deluxe Bay View room elevates your stay with expanded living space and unobstructed views of Ha Long Bay's iconic limestone formations. Featuring a king-size bed with the finest linens, a deep soaking bathtub, and a generous balcony, this room is your private sanctuary. Enjoy complimentary evening turndown service and premium coffee amenities."
+    },
+    "premium": {
+      "name": "Premium Ocean Suite",
+      "shortDesc": "A distinguished suite with separate living area, ocean panorama, and exclusive butler service.",
+      "description": "The Premium Ocean Suite offers an elevated experience with a separate living area, wraparound ocean views, and personalized butler service. Wake up to endless blue horizons, unwind in the oversized marble bathroom, and enjoy exclusive access to our Executive Lounge. Every detail has been curated for guests who appreciate the art of luxury living."
+    },
+    "suite": {
+      "name": "Executive Suite",
+      "shortDesc": "Expansive suite with panoramic views, private dining area, and bespoke concierge services.",
+      "description": "Our Executive Suite is a masterpiece of space and style, offering panoramic views from every window, a private dining area for intimate gatherings, and a dedicated concierge team. The suite features hand-selected art, a luxurious bedroom with walk-in closet, and a spa-inspired bathroom. Includes complimentary spa treatments and airport transfers."
+    },
+    "presidential": {
+      "name": "Presidential Suite",
+      "shortDesc": "The pinnacle of luxury — a private residence with pool, full kitchen, and white-glove service.",
+      "description": "The Presidential Suite represents the ultimate expression of luxury at HASANA Hotel. This expansive private residence features a plunge pool, fully equipped kitchen, formal dining room, and a master bedroom with panoramic views across Ha Long Bay. Enjoy round-the-clock butler service, private airport transfers, and a dedicated spa therapist on call."
+    }
+  },
+  "roomDetail": {
+    "overview": "Overview",
+    "highlights": "Room Highlights",
+    "otherRooms": "Other Rooms You May Like",
+    "roomSize": "Room Size",
+    "maxOccupancy": "Max Occupancy",
+    "bedTypeLabel": "Bed Type",
+    "viewLabel": "View",
+    "floorLabel": "Floor",
+    "beds": {
+      "king": "King Bed",
+      "twin": "Twin Beds",
+      "queen": "Queen Bed"
+    },
+    "views": {
+      "sea": "Sea View",
+      "bay": "Bay View",
+      "ocean": "Ocean View",
+      "panoramic": "Panoramic View"
+    },
+    "amenities": {
+      "wifi": "High-Speed WiFi",
+      "ac": "Climate Control",
+      "minibar": "Premium Minibar",
+      "safe": "In-Room Safe",
+      "tv": "55\" Smart TV",
+      "hairdryer": "Hairdryer",
+      "bathrobe": "Plush Bathrobe",
+      "slippers": "Slippers",
+      "coffee": "Nespresso Machine",
+      "turndown": "Turndown Service",
+      "lounge": "Executive Lounge",
+      "breakfast": "Daily Breakfast",
+      "spa": "Spa Access",
+      "transfer": "Airport Transfer",
+      "kitchen": "Full Kitchen",
+      "jacuzzi": "Private Jacuzzi"
+    },
+    "highlightsList": {
+      "seaView": "Stunning sea view from private balcony",
+      "bayView": "Sweeping views of Ha Long Bay",
+      "oceanView": "Wraparound ocean panorama",
+      "panoramicView": "360° panoramic views",
+      "balcony": "Private balcony",
+      "bathtub": "Deep soaking bathtub",
+      "rainShower": "Rainfall shower",
+      "separateLiving": "Separate living area",
+      "diningArea": "Private dining area",
+      "butlerService": "24/7 butler service",
+      "privatePool": "Private plunge pool",
+      "kitchen": "Fully equipped kitchen",
+      "jacuzzi": "Private jacuzzi",
+      "airportTransfer": "Private airport transfer"
+    }
+  },
+  "gallery": {
+    "title": "Photo Gallery",
+    "subtitle": "Discover the beauty of HASANA Hotel",
+    "all": "All",
+    "categories": {
+      "rooms": "Rooms",
+      "views": "Views",
+      "dining": "Dining",
+      "spa": "Spa & Wellness",
+      "facilities": "Facilities"
+    }
+  },
+  "about": {
+    "title": "About HASANA",
+    "subtitle": "A story of luxury, nature, and hospitality",
+    "story": {
+      "title": "Our Story",
+      "p1": "Born from a vision to create a sanctuary where modern luxury meets the timeless beauty of Ha Long Bay, HASANA Hotel opened its doors in 2020. Every detail — from the architecture that mirrors the bay's limestone pillars to the service philosophy rooted in Vietnamese warmth — was designed to create an unforgettable experience.",
+      "p2": "We believe luxury isn't about excess; it's about intention. Each space in our hotel is thoughtfully crafted to bring guests closer to nature while providing every modern comfort. The result is a place where you can truly disconnect from the world and reconnect with what matters."
+    },
+    "values": {
+      "title": "Our Values",
+      "excellence": {
+        "title": "Excellence",
+        "description": "We pursue perfection in every detail, from the thread count of our linens to the warmth of our welcome."
+      },
+      "hospitality": {
+        "title": "Heartfelt Hospitality",
+        "description": "True luxury is personal. Our team anticipates your needs before you even know them yourself."
+      },
+      "sustainability": {
+        "title": "Sustainability",
+        "description": "We are stewards of Ha Long Bay's natural heritage, committed to preserving its beauty for generations."
+      }
+    },
+    "stats": {
+      "rooms": "Luxury Rooms",
+      "rating": "Star Rating",
+      "service": "Service",
+      "established": "Established"
+    }
   },
   "contact": {
     "title": "Contact Us",
@@ -96,6 +205,178 @@
     "yourEmail": "Your Email",
     "subject": "Subject",
     "message": "Message"
+  },
+  "booking": {
+    "title": "Book a Room",
+    "subtitle": "Find the perfect room for your stay in Ha Long Bay",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "guests": "Guests",
+    "guestUnit": "guests",
+    "roomType": "Room Type",
+    "checkAvailability": "Check Availability",
+    "checking": "Checking availability...",
+    "guestInfo": "Guest Information",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "specialRequests": "Special Requests",
+    "confirmBooking": "Confirm Booking",
+    "bookingSuccess": "Booking Confirmed!",
+    "successMessage": "Your reservation has been received. Please save your booking code.",
+    "bookingCode": "Booking Code",
+    "totalPrice": "Total",
+    "nights": "{count} nights",
+    "duration": "Duration",
+    "selectRoom": "Select",
+    "continue": "Continue",
+    "back": "Back",
+    "processing": "Processing...",
+    "copied": "Copied!",
+    "onlyLeft": "Only {count} left",
+    "availableFor": "{nights} nights stay",
+    "totalFor": "total for {nights} nights",
+    "policyNotice": "By confirming, you agree to our booking policy. Pending bookings expire after 48 hours if not confirmed.",
+    "expirationNotice": "This booking is pending. Please complete payment within 48 hours to confirm your reservation. The booking will expire automatically if not confirmed.",
+    "checkStatus": "Check Status",
+    "backToHome": "Back to Home",
+    "steps": {
+      "dates": "Dates",
+      "rooms": "Room",
+      "guest": "Details",
+      "confirmation": "Confirm",
+      "datesTitle": "When are you visiting?",
+      "datesSubtitle": "Select your check-in and check-out dates",
+      "roomsTitle": "Choose Your Room",
+      "guestTitle": "Guest Details",
+      "guestSubtitle": "Tell us who's staying",
+      "confirmTitle": "Confirm Booking",
+      "confirmSubtitle": "Review your reservation details"
+    },
+    "placeholders": {
+      "name": "e.g. Nguyen Van A",
+      "email": "e.g. guest@email.com",
+      "phone": "e.g. 0901234567",
+      "specialRequests": "Any special requests? (early check-in, extra bed, etc.)"
+    },
+    "validation": {
+      "nameRequired": "Please enter your full name (at least 2 characters)",
+      "emailInvalid": "Please enter a valid email address",
+      "phoneRequired": "Please enter a valid phone number (at least 8 digits)"
+    },
+    "errors": {
+      "checkFailed": "Failed to check availability. Please try again.",
+      "noRooms": "No rooms available for the selected dates. Please try different dates.",
+      "bookingFailed": "Failed to create booking. Please try again.",
+      "networkError": "Network error. Please check your connection."
+    },
+    "status": {
+      "title": "Check Booking Status",
+      "subtitle": "Enter your booking code to view your reservation",
+      "placeholder": "HASANA-XXXXXX",
+      "search": "Search",
+      "notFound": "No booking found with this code. Please check and try again.",
+      "expiresAt": "Expires: {date}",
+      "statuses": {
+        "PENDING": "Pending Confirmation",
+        "CONFIRMED": "Confirmed",
+        "CANCELLED": "Cancelled",
+        "EXPIRED": "Expired"
+      }
+    }
+  },
+  "attractions": {
+    "title": "Ha Long Bay Attractions",
+    "subtitle": "A natural wonder awaits at your doorstep",
+    "intro": "Ha Long Bay, a UNESCO World Heritage Site, is home to nearly 2,000 limestone karsts and islands rising from emerald waters. As a guest of HASANA Hotel, you have privileged access to explore this natural masterpiece through curated experiences.",
+    "sungSot": {
+      "title": "Sung Sot Cave",
+      "description": "One of the largest and most beautiful caves in Ha Long Bay, Sung Sot (Surprise Cave) features spectacular stalactites and stalagmites in vast chambers. The cave sits on Bo Hon Island and offers breathtaking views from its entrance."
+    },
+    "tiTop": {
+      "title": "Ti Top Island",
+      "description": "Named after a Soviet cosmonaut, Ti Top Island features a crescent-shaped beach with powdery white sand. Climb the 427 steps to the summit for panoramic views of the bay that will take your breath away."
+    },
+    "cruise": {
+      "title": "Luxury Bay Cruise",
+      "description": "Glide through the emerald waters aboard a traditional wooden junk or modern luxury yacht. Our curated cruise experiences include sunset cocktails, fresh seafood dining, and overnight stays among the karsts."
+    },
+    "kayaking": {
+      "title": "Kayaking Adventures",
+      "description": "Paddle through hidden lagoons, secluded caves, and floating fishing villages. Kayaking in Ha Long Bay offers an intimate connection with nature that larger vessels simply cannot provide."
+    },
+    "fishing": {
+      "title": "Floating Villages",
+      "description": "Visit the traditional floating fishing villages where families have lived on the water for generations. Learn about local fishing techniques and enjoy the freshest seafood directly from the source."
+    },
+    "sunset": {
+      "title": "Sunset at the Bay",
+      "description": "Nothing compares to watching the sun dip behind the limestone pillars as the sky transforms into a canvas of gold, pink, and purple. Best enjoyed from our rooftop terrace with a cocktail in hand."
+    },
+    "cta": {
+      "title": "Experience Ha Long Bay with Us",
+      "subtitle": "Our concierge team can arrange bespoke tours and experiences tailored to your interests"
+    }
+  },
+  "blog": {
+    "title": "Stories & Insights",
+    "subtitle": "Travel inspiration, hotel news, and local discoveries",
+    "readMore": "Read More",
+    "publishedOn": "Published on {date}",
+    "by": "By {author}",
+    "category": "Category",
+    "backToBlog": "Back to Blog",
+    "noPosts": "No articles available at this time.",
+    "relatedPosts": "Related Articles",
+    "categories": {
+      "Travel Guide": "Travel Guide",
+      "News": "News",
+      "Food & Dining": "Food & Dining",
+      "Wellness": "Wellness"
+    }
+  },
+  "reviews": {
+    "title": "Guest Reviews",
+    "subtitle": "What our guests say about their stay",
+    "averageRating": "Average Rating",
+    "basedOn": "Based on {count} reviews",
+    "stayedIn": "Stayed in {room}",
+    "stayDate": "Stay: {date}",
+    "hotelResponse": "Hotel Response",
+    "writeReview": "Write a Review",
+    "submitTitle": "Share Your Experience",
+    "submitSubtitle": "Tell us about your stay at HASANA Hotel",
+    "form": {
+      "name": "Your Name",
+      "email": "Your Email",
+      "roomType": "Room Type",
+      "stayDate": "Stay Date",
+      "rating": "Your Rating",
+      "reviewTitle": "Review Title",
+      "comment": "Your Review",
+      "submit": "Submit Review",
+      "submitting": "Submitting...",
+      "success": "Thank you! Your review has been submitted and is pending approval.",
+      "namePlaceholder": "e.g. John Smith",
+      "emailPlaceholder": "e.g. john@email.com",
+      "titlePlaceholder": "e.g. Amazing stay!",
+      "commentPlaceholder": "Share your experience with other guests..."
+    },
+    "selectRoom": "Select room type",
+    "stars": "{count} stars"
+  },
+  "promotions": {
+    "title": "Special Offers",
+    "subtitle": "Exclusive deals for an unforgettable stay",
+    "validUntil": "Valid until {date}",
+    "discount": "{value}% off",
+    "discountFixed": "{value} off",
+    "applicableRooms": "Applicable Rooms",
+    "useCode": "Use code",
+    "bookWithOffer": "Book with This Offer",
+    "noPromotions": "No active promotions at the moment. Check back soon!",
+    "limited": "Limited availability",
+    "usesLeft": "{count} uses remaining"
   },
   "footer": {
     "description": "Luxury hotel in Ha Long with stunning ocean views.",

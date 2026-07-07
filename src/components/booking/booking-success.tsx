@@ -1,0 +1,124 @@
+"use client";
+
+import { useTranslations, useLocale } from "next-intl";
+import { CheckCircle, Copy, Calendar, Clock } from "lucide-react";
+import { useState } from "react";
+import { formatPrice } from "@/lib/data/rooms";
+import type { BookingData, BookingResult } from "./booking-wizard";
+
+type Props = {
+  result: BookingResult;
+  bookingData: BookingData;
+};
+
+export function BookingSuccess({ result, bookingData }: Props) {
+  const t = useTranslations("booking");
+  const locale = useLocale();
+  const [copied, setCopied] = useState(false);
+
+  const copyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(result.bookingCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for older browsers
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(locale === "vi" ? "vi-VN" : "en-US", {
+      weekday: "short",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  return (
+    <div className="max-w-lg mx-auto text-center space-y-6">
+      {/* Success icon */}
+      <div className="flex justify-center">
+        <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center">
+          <CheckCircle className="w-10 h-10 text-success" />
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-2xl md:text-3xl font-heading text-primary mb-2">
+          {t("bookingSuccess")}
+        </h2>
+        <p className="text-text-light">{t("successMessage")}</p>
+      </div>
+
+      {/* Booking Code */}
+      <div className="bg-surface-dim rounded-xl p-6">
+        <p className="text-sm text-text-light mb-2">{t("bookingCode")}</p>
+        <div className="flex items-center justify-center gap-3">
+          <span className="text-2xl md:text-3xl font-mono font-bold text-primary tracking-wider">
+            {result.bookingCode}
+          </span>
+          <button
+            onClick={copyCode}
+            className="p-2 rounded-lg hover:bg-surface transition-colors"
+            aria-label="Copy booking code"
+          >
+            <Copy className={`w-5 h-5 ${copied ? "text-success" : "text-muted"}`} />
+          </button>
+        </div>
+        {copied && (
+          <p className="text-xs text-success mt-1">{t("copied")}</p>
+        )}
+      </div>
+
+      {/* Booking Details */}
+      <div className="border border-border rounded-xl p-4 md:p-6 text-left space-y-3">
+        <div className="flex items-center gap-3">
+          <Calendar className="w-4 h-4 text-accent" />
+          <div>
+            <span className="text-sm">
+              {formatDate(result.checkIn)} → {formatDate(result.checkOut)}
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <Clock className="w-4 h-4 text-accent" />
+          <span className="text-sm text-text-light">
+            {t("nights", { count: result.nights })} • {result.guestCount} {t("guestUnit")}
+          </span>
+        </div>
+        <hr className="border-border" />
+        <div className="flex justify-between items-center">
+          <span className="text-text-light">{t("totalPrice")}</span>
+          <span className="text-xl font-heading text-primary">
+            {formatPrice(result.totalPrice, locale)}
+          </span>
+        </div>
+      </div>
+
+      {/* Expiration notice */}
+      <div className="bg-warning/10 border border-warning/20 rounded-lg p-4 text-sm text-text-light">
+        {t("expirationNotice")}
+      </div>
+
+      {/* Actions */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <a
+          href={`/${locale}/booking/status?code=${result.bookingCode}`}
+          className="flex-1 py-3 px-6 border border-border rounded-lg font-medium
+                     hover:bg-surface-dim transition-all text-center"
+        >
+          {t("checkStatus")}
+        </a>
+        <a
+          href={`/${locale}`}
+          className="flex-1 py-3 px-6 bg-primary text-text-inverse rounded-lg font-medium
+                     hover:bg-primary-light transition-all text-center"
+        >
+          {t("backToHome")}
+        </a>
+      </div>
+    </div>
+  );
+}

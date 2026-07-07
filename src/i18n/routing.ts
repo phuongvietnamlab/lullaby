@@ -22,9 +22,29 @@ export const routing = defineRouting({
       vi: "/dat-phong",
       en: "/booking",
     },
+    "/booking/status": {
+      vi: "/dat-phong/trang-thai",
+      en: "/booking/status",
+    },
     "/blog": {
       vi: "/blog",
       en: "/blog",
+    },
+    "/blog/[slug]": {
+      vi: "/blog/[slug]",
+      en: "/blog/[slug]",
+    },
+    "/reviews": {
+      vi: "/danh-gia",
+      en: "/reviews",
+    },
+    "/reviews/submit": {
+      vi: "/danh-gia/gui",
+      en: "/reviews/submit",
+    },
+    "/promotions": {
+      vi: "/khuyen-mai",
+      en: "/promotions",
     },
     "/contact": {
       vi: "/lien-he",
@@ -33,6 +53,10 @@ export const routing = defineRouting({
     "/about": {
       vi: "/gioi-thieu",
       en: "/about",
+    },
+    "/attractions": {
+      vi: "/diem-tham-quan",
+      en: "/attractions",
     },
   },
 });

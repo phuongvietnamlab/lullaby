@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { LiveChat } from "@/components/ui/live-chat";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -63,6 +64,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
+          <LiveChat />
         </NextIntlClientProvider>
       </body>
     </html>

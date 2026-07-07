@@ -26,6 +26,7 @@ export function Header() {
     { href: "/rooms" as const, label: t("rooms") },
     { href: "/gallery" as const, label: t("gallery") },
     { href: "/blog" as const, label: t("blog") },
+    { href: "/promotions" as const, label: t("promotions") },
     { href: "/contact" as const, label: t("contact") },
   ];
 
