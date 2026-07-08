@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { useEffect, useState, useCallback } from "react";
 import {
   CalendarDays,
   BedDouble,
@@ -8,11 +9,48 @@ import {
   Clock,
   Star,
   AlertCircle,
+  RefreshCw,
 } from "lucide-react";
-import { mockDashboardStats } from "@/lib/admin/mock-data";
 
-// TODO: Replace with real-time data from database
-const stats = mockDashboardStats;
+// ============================================
+// Types
+// ============================================
+
+type RecentBooking = {
+  id: string;
+  bookingCode: string;
+  guestName: string;
+  roomTypeName: string;
+  checkIn: string;
+  checkOut: string;
+  status: string;
+  totalPrice: number;
+  createdAt: string;
+};
+
+type DashboardStats = {
+  bookingsToday: number;
+  checkInsToday: number;
+  checkOutsToday: number;
+  occupancyRate: number;
+  totalRooms: number;
+  occupiedRooms: number;
+  availableRooms: number;
+  maintenanceRooms: number;
+  revenueToday: number;
+  revenueThisMonth: number;
+  revenueLastMonth: number;
+  pendingBookings: number;
+  pendingReviews: number;
+  averageRating: number;
+  totalGuests: number;
+  recentBookings: RecentBooking[];
+  lastUpdated: string;
+};
+
+// ============================================
+// Components
+// ============================================
 
 function StatCard({
   label,
@@ -43,6 +81,59 @@ function StatCard({
   );
 }
 
+function StatusBadge({ status }: { status: string }) {
+  const styles: Record<string, string> = {
+    pending: "bg-yellow-100 text-yellow-800",
+    confirmed: "bg-green-100 text-green-800",
+    check_in: "bg-blue-100 text-blue-800",
+    check_out: "bg-gray-100 text-gray-800",
+    completed: "bg-gray-100 text-gray-800",
+    cancelled: "bg-red-100 text-red-800",
+    no_show: "bg-orange-100 text-orange-800",
+    expired: "bg-gray-100 text-gray-600",
+  };
+
+  return (
+    <span
+      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
+        styles[status] || "bg-gray-100 text-gray-800"
+      }`}
+    >
+      {status.replace(/_/g, " ")}
+    </span>
+  );
+}
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div>
+        <div className="h-8 w-40 bg-gray-200 rounded" />
+        <div className="h-4 w-60 bg-gray-100 rounded mt-2" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
+            <div className="h-4 w-24 bg-gray-200 rounded" />
+            <div className="h-8 w-16 bg-gray-200 rounded mt-2" />
+            <div className="h-3 w-32 bg-gray-100 rounded mt-2" />
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm h-40" />
+        ))}
+      </div>
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm h-64" />
+    </div>
+  );
+}
+
+// ============================================
+// Helpers
+// ============================================
+
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
@@ -51,14 +142,107 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+}
+
+function formatDateTime(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+// ============================================
+// Page
+// ============================================
+
 export default function AdminDashboardPage() {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchDashboard = useCallback(async (isRefresh = false) => {
+    try {
+      if (isRefresh) setRefreshing(true);
+      else setLoading(true);
+      setError(null);
+
+      const res = await fetch("/api/admin/dashboard");
+      if (!res.ok) throw new Error("Failed to fetch dashboard data");
+
+      const data: DashboardStats = await res.json();
+      setStats(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
+
+  if (loading) return <LoadingSkeleton />;
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">Overview of hotel operations</p>
+        </div>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <AlertCircle className="mx-auto text-red-500 mb-2" size={32} />
+          <p className="text-red-700 font-medium">Failed to load dashboard</p>
+          <p className="text-red-600 text-sm mt-1">{error}</p>
+          <button
+            onClick={() => fetchDashboard()}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!stats) return null;
+
+  const revenueChange = stats.revenueLastMonth > 0
+    ? Math.round(((stats.revenueThisMonth - stats.revenueLastMonth) / stats.revenueLastMonth) * 100)
+    : 0;
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Overview of hotel operations
-        </p>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Overview of hotel operations
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-gray-400">
+            Updated {formatDateTime(stats.lastUpdated)}
+          </span>
+          <button
+            onClick={() => fetchDashboard(true)}
+            disabled={refreshing}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -151,7 +335,7 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* Quick Stats */}
+        {/* Performance */}
         <div className="bg-white rounded-lg border border-gray-200 p-5 shadow-sm">
           <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
             <Star size={16} className="text-yellow-500" />
@@ -160,18 +344,22 @@ export default function AdminDashboardPage() {
           <div className="mt-3 space-y-2">
             <div className="flex justify-between items-center text-sm">
               <span className="text-gray-600">Average rating</span>
-              <span className="text-gray-900 font-medium">{stats.averageRating}/5</span>
-            </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-600">Revenue vs last month</span>
-              <span className="text-green-600 font-medium">
-                +{Math.round(((stats.revenueThisMonth - stats.revenueLastMonth) / stats.revenueLastMonth) * 100)}%
+              <span className="text-gray-900 font-medium">
+                {stats.averageRating > 0 ? `${stats.averageRating}/5` : "N/A"}
               </span>
             </div>
             <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-600">Avg. stay duration</span>
+              <span className="text-gray-600">Revenue vs last month</span>
+              <span className={`font-medium ${revenueChange >= 0 ? "text-green-600" : "text-red-600"}`}>
+                {stats.revenueLastMonth > 0
+                  ? `${revenueChange >= 0 ? "+" : ""}${revenueChange}%`
+                  : "N/A"}
+              </span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-gray-600">Last month revenue</span>
               <span className="text-gray-900 font-medium flex items-center gap-1">
-                <Clock size={12} /> 2.8 nights
+                <Clock size={12} /> {formatCurrency(stats.revenueLastMonth)}
               </span>
             </div>
           </div>
@@ -198,46 +386,31 @@ export default function AdminDashboardPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {[
-                { code: "LULLABY-G7H8I9", guest: "Tanaka Yuki", room: "Premium Ocean Suite", dates: "Dec 24-28", status: "pending" },
-                { code: "LULLABY-A1B2C3", guest: "John Smith", room: "Deluxe Bay View", dates: "Dec 22-25", status: "confirmed" },
-                { code: "LULLABY-M4N5O6", guest: "Park Min-jun", room: "Presidential Suite", dates: "Dec 26-31", status: "confirmed" },
-                { code: "LULLABY-D4E5F6", guest: "Nguyen Thi Lan", room: "Superior Sea View", dates: "Dec 21-23", status: "checked_in" },
-              ].map((booking) => (
-                <tr key={booking.code} className="hover:bg-gray-50">
-                  <td className="py-3 px-4 font-mono text-xs">{booking.code}</td>
-                  <td className="py-3 px-4">{booking.guest}</td>
-                  <td className="py-3 px-4 text-gray-600">{booking.room}</td>
-                  <td className="py-3 px-4 text-gray-600">{booking.dates}</td>
-                  <td className="py-3 px-4">
-                    <StatusBadge status={booking.status} />
+              {stats.recentBookings.length > 0 ? (
+                stats.recentBookings.map((booking) => (
+                  <tr key={booking.id} className="hover:bg-gray-50">
+                    <td className="py-3 px-4 font-mono text-xs">{booking.bookingCode}</td>
+                    <td className="py-3 px-4">{booking.guestName}</td>
+                    <td className="py-3 px-4 text-gray-600">{booking.roomTypeName}</td>
+                    <td className="py-3 px-4 text-gray-600">
+                      {formatDate(booking.checkIn)} – {formatDate(booking.checkOut)}
+                    </td>
+                    <td className="py-3 px-4">
+                      <StatusBadge status={booking.status} />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-gray-400">
+                    No bookings found
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
       </div>
     </div>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    pending: "bg-yellow-100 text-yellow-800",
-    confirmed: "bg-green-100 text-green-800",
-    checked_in: "bg-blue-100 text-blue-800",
-    checked_out: "bg-gray-100 text-gray-800",
-    cancelled: "bg-red-100 text-red-800",
-  };
-
-  return (
-    <span
-      className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${
-        styles[status] || "bg-gray-100 text-gray-800"
-      }`}
-    >
-      {status.replace("_", " ")}
-    </span>
   );
 }
