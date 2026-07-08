@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Calendar, Users, Search } from "lucide-react";
+import { format } from "date-fns";
+import { vi, enUS } from "date-fns/locale";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 import type { BookingData, AvailableRoom } from "./booking-wizard";
 
 type Props = {
@@ -17,30 +20,59 @@ type Props = {
 
 export function StepDates({ initialData, onSubmit }: Props) {
   const t = useTranslations("booking");
-  const [checkIn, setCheckIn] = useState(initialData.checkIn);
-  const [checkOut, setCheckOut] = useState(initialData.checkOut);
+  const locale = useLocale();
+
+  const [checkIn, setCheckIn] = useState<Date | undefined>(
+    initialData.checkIn ? new Date(initialData.checkIn) : undefined
+  );
+  const [checkOut, setCheckOut] = useState<Date | undefined>(
+    initialData.checkOut ? new Date(initialData.checkOut) : undefined
+  );
   const [guestCount, setGuestCount] = useState(initialData.guestCount);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Minimum date is today
-  const today = new Date().toISOString().split("T")[0];
+  const dateLocale = locale === "vi" ? vi : enUS;
 
-  // Minimum checkout is day after check-in
-  const minCheckOut = checkIn
-    ? new Date(new Date(checkIn).getTime() + 86400000).toISOString().split("T")[0]
-    : today;
+  const formatDate = (date: Date | undefined) => {
+    if (!date) return "—";
+    return format(date, "EEEE, d MMMM yyyy", { locale: dateLocale });
+  };
+
+  const toDateStr = (date: Date | undefined): string => {
+    if (!date) return "";
+    return format(date, "yyyy-MM-dd");
+  };
+
+  const nights =
+    checkIn && checkOut
+      ? Math.ceil(
+          (checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24)
+        )
+      : 0;
+
+  const handleSelect = (from: Date | undefined, to: Date | undefined) => {
+    setCheckIn(from);
+    setCheckOut(to);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
+    const checkInStr = toDateStr(checkIn);
+    const checkOutStr = toDateStr(checkOut);
+
     try {
       const res = await fetch("/api/bookings/check-availability", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ checkIn, checkOut, guestCount }),
+        body: JSON.stringify({
+          checkIn: checkInStr,
+          checkOut: checkOutStr,
+          guestCount,
+        }),
       });
 
       const data = await res.json();
@@ -56,8 +88,8 @@ export function StepDates({ initialData, onSubmit }: Props) {
       }
 
       onSubmit({
-        checkIn,
-        checkOut,
+        checkIn: checkInStr,
+        checkOut: checkOutStr,
         guestCount,
         rooms: data.rooms,
       });
@@ -77,57 +109,48 @@ export function StepDates({ initialData, onSubmit }: Props) {
         <p className="text-text-light">{t("steps.datesSubtitle")}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-        {/* Check-in Date */}
-        <div className="space-y-2">
-          <label
-            htmlFor="checkIn"
-            className="flex items-center gap-2 text-sm font-medium text-text"
-          >
-            <Calendar className="w-4 h-4 text-accent" />
-            {t("checkIn")}
-          </label>
-          <input
-            type="date"
-            id="checkIn"
-            value={checkIn}
-            min={today}
-            onChange={(e) => {
-              setCheckIn(e.target.value);
-              // Reset checkout if it's before new check-in
-              if (checkOut && e.target.value >= checkOut) {
-                setCheckOut("");
-              }
-            }}
-            required
-            className="w-full px-4 py-3 border border-border rounded-lg bg-surface-bright
-                       focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent
-                       transition-all text-text"
-          />
+      {/* Selected dates display */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-surface-dim border border-border">
+          <Calendar className="w-4 h-4 text-accent shrink-0" />
+          <div className="min-w-0">
+            <p className="text-xs text-text-light uppercase tracking-wider">
+              {t("checkIn")}
+            </p>
+            <p className="text-sm font-medium text-text truncate">
+              {formatDate(checkIn)}
+            </p>
+          </div>
         </div>
-
-        {/* Check-out Date */}
-        <div className="space-y-2">
-          <label
-            htmlFor="checkOut"
-            className="flex items-center gap-2 text-sm font-medium text-text"
-          >
-            <Calendar className="w-4 h-4 text-accent" />
-            {t("checkOut")}
-          </label>
-          <input
-            type="date"
-            id="checkOut"
-            value={checkOut}
-            min={minCheckOut}
-            onChange={(e) => setCheckOut(e.target.value)}
-            required
-            className="w-full px-4 py-3 border border-border rounded-lg bg-surface-bright
-                       focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent
-                       transition-all text-text"
-          />
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-surface-dim border border-border">
+          <Calendar className="w-4 h-4 text-accent shrink-0" />
+          <div className="min-w-0">
+            <p className="text-xs text-text-light uppercase tracking-wider">
+              {t("checkOut")}
+            </p>
+            <p className="text-sm font-medium text-text truncate">
+              {formatDate(checkOut)}
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Date Range Picker */}
+      <DateRangePicker
+        checkIn={checkIn}
+        checkOut={checkOut}
+        onSelect={handleSelect}
+        locale={locale}
+      />
+
+      {/* Nights display */}
+      {nights > 0 && (
+        <div className="text-center py-3 bg-surface-dim rounded-lg">
+          <span className="text-text-light">
+            {t("nights", { count: nights })}
+          </span>
+        </div>
+      )}
 
       {/* Guest Count */}
       <div className="space-y-2">
@@ -153,20 +176,6 @@ export function StepDates({ initialData, onSubmit }: Props) {
           ))}
         </select>
       </div>
-
-      {/* Nights display */}
-      {checkIn && checkOut && (
-        <div className="text-center py-3 bg-surface-dim rounded-lg">
-          <span className="text-text-light">
-            {t("nights", {
-              count: Math.ceil(
-                (new Date(checkOut).getTime() - new Date(checkIn).getTime()) /
-                  (1000 * 60 * 60 * 24)
-              ),
-            })}
-          </span>
-        </div>
-      )}
 
       {/* Error message */}
       {error && (
