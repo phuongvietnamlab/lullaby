@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Plus, Trash2, Filter, Save, X, Loader2, Edit2 } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Plus, Trash2, Filter, Save, X, Loader2, Edit2, Upload } from "lucide-react";
+import { uploadImage } from "@/lib/upload";
 
 type GalleryImage = {
   id: string;
@@ -27,6 +28,8 @@ export default function AdminGalleryPage() {
   const [newAlt, setNewAlt] = useState("");
   const [newAltEn, setNewAltEn] = useState("");
   const [newCategory, setNewCategory] = useState("rooms");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Edit form state
   const [editAlt, setEditAlt] = useState("");
@@ -57,6 +60,24 @@ export default function AdminGalleryPage() {
     setLoading(true);
     fetchImages();
   }, [fetchImages]);
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const url = await uploadImage(file, "gallery");
+      setNewUrl(url);
+      setMessage({ type: "success", text: "Image uploaded! Fill in details and click Add." });
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Upload failed";
+      setMessage({ type: "error", text: msg });
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  }
 
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -192,13 +213,47 @@ export default function AdminGalleryPage() {
           </div>
           <form onSubmit={handleAdd} className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Upload Image</label>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Uploading...
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={16} />
+                      Choose File
+                    </>
+                  )}
+                </button>
+                <span className="text-xs text-gray-500">Max 5MB. JPG, PNG, WebP, GIF</span>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleFileUpload}
+                className="hidden"
+                aria-label="Upload gallery image"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Image URL <span className="text-gray-400 font-normal">(or paste URL directly)</span>
+              </label>
               <input
                 type="text"
                 value={newUrl}
                 onChange={(e) => setNewUrl(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                placeholder="https://images.unsplash.com/..."
+                placeholder="Upload a file above or paste a URL here..."
                 required
               />
             </div>

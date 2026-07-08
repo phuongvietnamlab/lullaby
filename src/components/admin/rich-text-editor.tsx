@@ -5,7 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   Bold,
   Italic,
@@ -20,7 +20,9 @@ import {
   Undo,
   Redo,
   RemoveFormatting,
+  Loader2,
 } from "lucide-react";
+import { uploadImage } from "@/lib/upload";
 
 type RichTextEditorProps = {
   content: string;
@@ -34,6 +36,7 @@ export function RichTextEditor({
   placeholder = "Start writing...",
 }: RichTextEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -72,18 +75,21 @@ export function RichTextEditor({
   }, []);
 
   const handleImageUpload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file || !editor) return;
 
-      // TODO: Replace with Cloudinary upload
-      // For now, convert to data URL for preview purposes
-      const reader = new FileReader();
-      reader.onload = () => {
-        const url = reader.result as string;
+      setUploading(true);
+      try {
+        const url = await uploadImage(file, "blog");
         editor.chain().focus().setImage({ src: url }).run();
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Upload failed";
+        alert(message);
+      } finally {
+        setUploading(false);
+      }
 
       // Reset input
       e.target.value = "";
@@ -116,12 +122,23 @@ export function RichTextEditor({
 
   return (
     <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
-      <Toolbar editor={editor} onImageClick={addImage} onLinkClick={setLink} />
+      <Toolbar
+        editor={editor}
+        onImageClick={addImage}
+        onLinkClick={setLink}
+        uploading={uploading}
+      />
       <EditorContent editor={editor} />
+      {uploading && (
+        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border-t border-blue-100 text-sm text-blue-700">
+          <Loader2 size={14} className="animate-spin" />
+          Uploading image...
+        </div>
+      )}
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp,image/gif"
         onChange={handleImageUpload}
         className="hidden"
         aria-label="Upload image"
@@ -134,10 +151,12 @@ function Toolbar({
   editor,
   onImageClick,
   onLinkClick,
+  uploading,
 }: {
   editor: Editor;
   onImageClick: () => void;
   onLinkClick: () => void;
+  uploading?: boolean;
 }) {
   return (
     <div className="flex flex-wrap items-center gap-0.5 p-2 border-b border-gray-200 bg-gray-50">
@@ -213,8 +232,8 @@ function Toolbar({
       >
         <LinkIcon size={16} />
       </ToolbarButton>
-      <ToolbarButton onClick={onImageClick} title="Insert Image">
-        <ImageIcon size={16} />
+      <ToolbarButton onClick={onImageClick} disabled={uploading} title="Insert Image">
+        {uploading ? <Loader2 size={16} className="animate-spin" /> : <ImageIcon size={16} />}
       </ToolbarButton>
 
       <ToolbarDivider />

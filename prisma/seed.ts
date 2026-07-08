@@ -4,7 +4,7 @@ import { hashPassword } from "better-auth/crypto";
 import pg from "pg";
 
 const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL || "postgresql://hasana:hasana123@localhost:5432/hasana_hotel?schema=public",
+  connectionString: process.env.DATABASE_URL || "postgresql://postgres.lushbogwdyiuwjdaqnhn:0e8CNgtV5GHw6a3k@aws-0-ap-southeast-2.pooler.supabase.com:5432/postgres",
 });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
