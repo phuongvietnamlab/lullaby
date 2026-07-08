@@ -61,24 +61,24 @@ function AboutContent({ locale, dbContent }: { locale: string; dbContent: AboutD
   return (
     <>
       {/* Hero */}
-      <section className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[60vh] min-h-[350px] sm:min-h-[400px] flex items-center justify-center overflow-hidden">
         <Image
           src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1400&q=80"
           alt="Lullaby Sky Villa exterior"
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          className="object-cover !rounded-none"
         />
         <div className="absolute inset-0 bg-black/40" />
-        <div className="relative z-10 text-center text-white px-4">
-          <h1 className="font-[family-name:var(--font-heading)] text-4xl md:text-6xl lg:text-7xl font-medium mb-4">
+        <div className="relative z-10 text-center text-white px-6 py-12">
+          <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-medium mb-4">
             {t("title")}
           </h1>
-          <p className="text-lg text-white/70 max-w-xl mx-auto">
+          <p className="text-base sm:text-lg text-white/70 max-w-xl mx-auto">
             {t("subtitle")}
           </p>
-          <div className="luxury-divider mx-auto mt-8" />
+          <div className="luxury-divider mx-auto mt-6 sm:mt-8" />
         </div>
       </section>
 
@@ -99,7 +99,7 @@ function AboutContent({ locale, dbContent }: { locale: string; dbContent: AboutD
                   {storyP2}
                 </p>
               </div>
-              <div className="relative aspect-[3/4] overflow-hidden rounded-sm">
+              <div className="relative aspect-[3/4] overflow-hidden rounded-[var(--radius-xl)]">
                 <Image
                   src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80"
                   alt="Lullaby Sky Villa pool area"

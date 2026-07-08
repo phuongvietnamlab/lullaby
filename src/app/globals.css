@@ -107,7 +107,6 @@
 
   /* Smooth image rendering */
   img {
-    border-radius: var(--radius-lg);
     max-width: 100%;
     height: auto;
   }

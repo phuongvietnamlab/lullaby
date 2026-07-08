@@ -9,51 +9,51 @@ export function Footer() {
 
   return (
     <footer className="bg-[var(--color-primary)] text-white/80 rounded-t-3xl safe-bottom">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+      <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 py-14 sm:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 sm:gap-12 text-center sm:text-left">
           {/* Brand */}
-          <div className="sm:col-span-2 md:col-span-1">
+          <div className="sm:col-span-2 md:col-span-1 pb-6 sm:pb-0 border-b border-white/10 sm:border-b-0">
             <h3 className="font-[family-name:var(--font-heading)] text-2xl text-white mb-4 tracking-wider">
               Lullaby
             </h3>
-            <p className="text-sm leading-relaxed text-white/60">
+            <p className="text-xs sm:text-sm leading-relaxed text-white/60">
               {t("description")}
             </p>
           </div>
 
           {/* Quick Links */}
-          <div>
-            <h4 className="text-xs uppercase tracking-widest text-white/40 mb-6">
+          <div className="pt-2 sm:pt-0">
+            <h4 className="text-xs uppercase tracking-widest text-white/40 mb-4 sm:mb-6">
               {t("quickLinks")}
             </h4>
-            <nav className="space-y-1" aria-label="Footer navigation">
+            <nav className="space-y-0" aria-label="Footer navigation">
               <Link
                 href="/rooms"
-                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2 min-h-[44px] flex items-center justify-center sm:justify-start"
+                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2.5 min-h-[44px] flex items-center justify-center sm:justify-start"
               >
                 {tNav("rooms")}
               </Link>
               <Link
                 href="/gallery"
-                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2 min-h-[44px] flex items-center justify-center sm:justify-start"
+                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2.5 min-h-[44px] flex items-center justify-center sm:justify-start"
               >
                 {tNav("gallery")}
               </Link>
               <Link
                 href="/booking"
-                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2 min-h-[44px] flex items-center justify-center sm:justify-start"
+                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2.5 min-h-[44px] flex items-center justify-center sm:justify-start"
               >
                 {tNav("booking")}
               </Link>
               <Link
                 href="/blog"
-                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2 min-h-[44px] flex items-center justify-center sm:justify-start"
+                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2.5 min-h-[44px] flex items-center justify-center sm:justify-start"
               >
                 {tNav("blog")}
               </Link>
               <Link
                 href="/about"
-                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2 min-h-[44px] flex items-center justify-center sm:justify-start"
+                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2.5 min-h-[44px] flex items-center justify-center sm:justify-start"
               >
                 {tNav("about")}
               </Link>
@@ -101,7 +101,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/10 mt-10 sm:mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-white/40 gap-4 pb-4">
+        <div className="border-t border-white/10 mt-12 sm:mt-12 pt-8 sm:pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-white/40 gap-4 pb-4">
           <p>{t("copyright", { year: currentYear })}</p>
           <div className="flex space-x-6">
             <a href="#" className="hover:text-white/70 transition-colors min-h-[44px] flex items-center">

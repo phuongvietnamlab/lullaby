@@ -90,7 +90,7 @@ function HomeContent({ locale, dbContent }: { locale: string; dbContent: Homepag
           </p>
           <Link
             href="/rooms"
-            className="inline-flex items-center justify-center w-full sm:w-auto px-8 sm:px-10 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest min-h-[48px]"
+            className="inline-flex items-center justify-center px-8 sm:px-10 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest min-h-[48px]"
           >
             {heroCta}
           </Link>
@@ -234,7 +234,7 @@ function HomeContent({ locale, dbContent }: { locale: string; dbContent: Homepag
             <div className="text-center mt-10 sm:mt-12">
               <Link
                 href="/rooms"
-                className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 border border-[var(--color-primary)] text-[var(--color-primary)] text-xs uppercase tracking-widest rounded-full hover:bg-[var(--color-primary)] hover:text-white transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] min-h-[48px]"
+                className="inline-flex items-center justify-center px-8 py-4 border border-[var(--color-primary)] text-[var(--color-primary)] text-xs uppercase tracking-widest rounded-full hover:bg-[var(--color-primary)] hover:text-white transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] min-h-[48px]"
               >
                 {t("rooms.viewAll")}
               </Link>
@@ -253,7 +253,7 @@ function HomeContent({ locale, dbContent }: { locale: string; dbContent: Homepag
             <p className="text-white/70 mb-8 sm:mb-10 text-base sm:text-lg">{ctaSubtitle}</p>
             <Link
               href="/booking"
-              className="inline-flex items-center justify-center w-full sm:w-auto px-8 sm:px-10 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest min-h-[48px]"
+              className="inline-flex items-center justify-center px-8 sm:px-10 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest min-h-[48px]"
             >
               {t("cta.button")}
             </Link>
