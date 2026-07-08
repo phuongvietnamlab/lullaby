@@ -224,7 +224,7 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
                         <span className="text-xs sm:text-sm">
-                          {tRoomDetail(`amenities.${amenity}` as never)}
+                          {amenity.match(/^[a-z_]+$/) ? tRoomDetail(`amenities.${amenity}` as never) : amenity}
                         </span>
                       </div>
                     ))}
@@ -292,7 +292,7 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
                   </div>
                   <div className="flex justify-between">
                     <span>{tRoomDetail("bedTypeLabel")}</span>
-                    <span className="text-[var(--color-text)]">{tRoomDetail(`beds.${bedType}` as never)}</span>
+                    <span className="text-[var(--color-text)]">{bedType.match(/^[a-z_]+$/) ? tRoomDetail(`beds.${bedType}` as never) : bedType}</span>
                   </div>
                   {view && (
                     <div className="flex justify-between">
