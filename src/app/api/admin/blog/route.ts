@@ -38,7 +38,7 @@ export async function GET() {
     });
 
     // Add status field to each post
-    const postsWithStatus = posts.map((post) => ({
+    const postsWithStatus = posts.map((post: { isPublished: boolean; scheduledAt: Date | null; [key: string]: unknown }) => ({
       ...post,
       status: getPostStatus(post),
     }));
