@@ -6,9 +6,21 @@ import {
   calculateTotalPrice,
   expirePendingBookings,
 } from "@/lib/booking";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 20 checks per IP per hour
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") || "unknown";
+    const { allowed } = rateLimit(`check-avail:${ip}`, 20, 60 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     // Expire old pending bookings first
     expirePendingBookings();
 

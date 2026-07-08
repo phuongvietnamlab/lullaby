@@ -10,9 +10,9 @@ export function Footer() {
   return (
     <footer className="bg-[var(--color-primary)] text-white/80 rounded-t-3xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid md:grid-cols-4 gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 text-center sm:text-left">
           {/* Brand */}
-          <div className="md:col-span-1">
+          <div className="sm:col-span-2 md:col-span-1">
             <h3 className="font-[family-name:var(--font-heading)] text-2xl text-white mb-4 tracking-wider">
               Lullaby
             </h3>
@@ -77,7 +77,7 @@ export function Footer() {
             <h4 className="text-xs uppercase tracking-widest text-white/40 mb-6">
               {t("followUs")}
             </h4>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 justify-center sm:justify-start">
               <a
                 href="#"
                 className="w-10 h-10 flex items-center justify-center border border-white/20 rounded-xl hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"

@@ -6,9 +6,21 @@ import {
   generateBookingCode,
   calculateTotalPrice,
 } from "@/lib/booking";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting: 5 bookings per IP per hour
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") || "unknown";
+    const { allowed } = rateLimit(`booking:${ip}`, 5, 60 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const parsed = createBookingSchema.safeParse(body);
 

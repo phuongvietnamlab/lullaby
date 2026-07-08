@@ -34,6 +34,43 @@ export default function AdminBookingsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  const showFeedback = (type: "success" | "error", message: string) => {
+    setFeedback({ type, message });
+    setTimeout(() => setFeedback(null), 4000);
+  };
+
+  const handleUpdateStatus = async (bookingId: string, status: "CONFIRMED" | "CANCELLED") => {
+    if (status === "CANCELLED") {
+      const confirmed = window.confirm("Are you sure you want to cancel this booking?");
+      if (!confirmed) return;
+    }
+
+    setActionLoading(bookingId);
+    try {
+      const res = await fetch(`/api/admin/bookings/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        showFeedback("error", data.error || "Failed to update booking");
+        return;
+      }
+
+      showFeedback("success", `Booking ${status === "CONFIRMED" ? "confirmed" : "cancelled"} successfully`);
+      fetchBookings();
+    } catch {
+      showFeedback("error", "Network error. Please try again.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -84,6 +121,19 @@ export default function AdminBookingsPage() {
           Refresh
         </button>
       </div>
+
+      {/* Feedback Toast */}
+      {feedback && (
+        <div
+          className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium transition-all ${
+            feedback.type === "success"
+              ? "bg-green-50 border border-green-200 text-green-800"
+              : "bg-red-50 border border-red-200 text-red-800"
+          }`}
+        >
+          {feedback.message}
+        </div>
+      )}
 
       {/* Status Filter Tabs */}
       <div className="flex items-center gap-2 flex-wrap">
@@ -159,10 +209,20 @@ export default function AdminBookingsPage() {
                         </button>
                         {booking.status === "pending" && (
                           <>
-                            <button className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded" title="Confirm">
+                            <button
+                              onClick={() => handleUpdateStatus(booking.id, "CONFIRMED")}
+                              disabled={actionLoading === booking.id}
+                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded disabled:opacity-50"
+                              title="Confirm"
+                            >
                               <Check size={15} />
                             </button>
-                            <button className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded" title="Cancel">
+                            <button
+                              onClick={() => handleUpdateStatus(booking.id, "CANCELLED")}
+                              disabled={actionLoading === booking.id}
+                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
+                              title="Cancel"
+                            >
                               <X size={15} />
                             </button>
                           </>

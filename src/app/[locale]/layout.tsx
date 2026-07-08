@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { LiveChat } from "@/components/ui/live-chat";
+import { RegisterSW } from "@/components/pwa/register-sw";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -48,6 +49,9 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale} className="scroll-smooth">
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#1a1a2e" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -65,6 +69,7 @@ export default async function LocaleLayout({ children, params }: Props) {
           <main className="flex-1">{children}</main>
           <Footer />
           <LiveChat />
+          <RegisterSW />
         </NextIntlClientProvider>
       </body>
     </html>

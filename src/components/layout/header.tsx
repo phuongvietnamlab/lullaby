@@ -34,7 +34,7 @@ export function Header() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-[var(--duration-slow)] ease-[var(--ease-luxury)] ${
         isScrolled
-          ? "bg-white/90 backdrop-blur-xl shadow-[var(--shadow-soft)] py-3 mx-4 mt-3 rounded-2xl"
+          ? "bg-white/90 backdrop-blur-xl shadow-[var(--shadow-soft)] py-3 sm:mx-4 mt-3 rounded-2xl"
           : "bg-transparent py-6"
       }`}
     >
@@ -111,7 +111,7 @@ export function Header() {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-xl shadow-[var(--shadow-elevated)] border-t border-[var(--color-border)] rounded-b-2xl mt-2 mx-4 overflow-hidden">
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-xl shadow-[var(--shadow-elevated)] border-t border-[var(--color-border)] rounded-b-2xl mt-2 sm:mx-4 overflow-hidden">
           <nav className="max-w-7xl mx-auto px-4 py-6 space-y-4" role="navigation" aria-label="Mobile navigation">
             {navLinks.map((link) => (
               <Link
@@ -128,7 +128,7 @@ export function Header() {
             </div>
             <Link
               href="/booking"
-              className="block text-center px-6 py-3 bg-[var(--color-accent)] text-[var(--color-primary-dark)] text-xs uppercase tracking-widest font-medium rounded-full"
+              className="block w-full text-center px-6 py-3 bg-[var(--color-accent)] text-[var(--color-primary-dark)] text-xs uppercase tracking-widest font-medium rounded-full"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {tCommon("bookNow")}
