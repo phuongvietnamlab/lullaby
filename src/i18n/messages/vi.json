@@ -238,6 +238,10 @@
     "totalFor": "tổng cho {nights} đêm",
     "policyNotice": "Bằng việc xác nhận, bạn đồng ý với chính sách đặt phòng của chúng tôi. Đặt phòng chờ xác nhận sẽ hết hạn sau 48 giờ nếu không được xác nhận.",
     "expirationNotice": "Đặt phòng này đang chờ xác nhận. Vui lòng hoàn tất thanh toán trong vòng 48 giờ để xác nhận đặt phòng. Đặt phòng sẽ tự động hết hạn nếu không được xác nhận.",
+    "payOnlineTitle": "Thanh Toán Online",
+    "payOnlineDescription": "Thanh toán ngay để xác nhận đặt phòng của bạn qua VNPay.",
+    "payNow": "Thanh Toán Ngay",
+    "paymentExpirationNotice": "Vui lòng thanh toán trong vòng 48 giờ để giữ đặt phòng. Đặt phòng sẽ tự động hết hạn nếu không được thanh toán.",
     "checkStatus": "Kiểm Tra Trạng Thái",
     "backToHome": "Về Trang Chủ",
     "steps": {
@@ -386,5 +390,17 @@
     "copyright": "© {year} Lullaby Sky Villa. Mọi quyền được bảo lưu.",
     "privacy": "Chính Sách Bảo Mật",
     "terms": "Điều Khoản Dịch Vụ"
+  },
+  "payment": {
+    "successTitle": "Thanh Toán Thành Công!",
+    "failedTitle": "Thanh Toán Thất Bại",
+    "unknownTitle": "Trạng Thái Không Xác Định",
+    "successDescription": "Đặt phòng của bạn đã được xác nhận. Chúng tôi sẽ gửi email xác nhận trong ít phút.",
+    "failedDescription": "Thanh toán không thành công. Vui lòng thử lại hoặc liên hệ với chúng tôi để được hỗ trợ.",
+    "unknownDescription": "Không thể xác định trạng thái thanh toán. Vui lòng kiểm tra trạng thái đặt phòng.",
+    "bookingCode": "Mã Đặt Phòng",
+    "errorCode": "Mã lỗi",
+    "checkBookingStatus": "Kiểm Tra Trạng Thái Đặt Phòng",
+    "backToHome": "Về Trang Chủ"
   }
 }

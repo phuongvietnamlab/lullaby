@@ -26,6 +26,10 @@ export const routing = defineRouting({
       vi: "/dat-phong/trang-thai",
       en: "/booking/status",
     },
+    "/booking/payment": {
+      vi: "/dat-phong/thanh-toan",
+      en: "/booking/payment",
+    },
     "/blog": {
       vi: "/blog",
       en: "/blog",

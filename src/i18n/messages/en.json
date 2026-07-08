@@ -238,6 +238,10 @@
     "totalFor": "total for {nights} nights",
     "policyNotice": "By confirming, you agree to our booking policy. Pending bookings expire after 48 hours if not confirmed.",
     "expirationNotice": "This booking is pending. Please complete payment within 48 hours to confirm your reservation. The booking will expire automatically if not confirmed.",
+    "payOnlineTitle": "Pay Online",
+    "payOnlineDescription": "Pay now to confirm your booking via VNPay.",
+    "payNow": "Pay Now",
+    "paymentExpirationNotice": "Please complete payment within 48 hours to secure your booking. The booking will expire automatically if not paid.",
     "checkStatus": "Check Status",
     "backToHome": "Back to Home",
     "steps": {
@@ -386,5 +390,17 @@
     "copyright": "© {year} Lullaby Sky Villa. All rights reserved.",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service"
+  },
+  "payment": {
+    "successTitle": "Payment Successful!",
+    "failedTitle": "Payment Failed",
+    "unknownTitle": "Unknown Status",
+    "successDescription": "Your booking has been confirmed. We will send a confirmation email shortly.",
+    "failedDescription": "Payment was not successful. Please try again or contact us for assistance.",
+    "unknownDescription": "Unable to determine payment status. Please check your booking status.",
+    "bookingCode": "Booking Code",
+    "errorCode": "Error code",
+    "checkBookingStatus": "Check Booking Status",
+    "backToHome": "Back to Home"
   }
 }

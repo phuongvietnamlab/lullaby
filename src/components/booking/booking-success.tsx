@@ -1,8 +1,8 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import { CheckCircle, Copy, Calendar, Clock } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle, Copy, Calendar, Clock, CreditCard } from "lucide-react";
+import { useState, useEffect } from "react";
 import { formatPrice } from "@/lib/data/rooms";
 import type { BookingData, BookingResult } from "./booking-wizard";
 
@@ -15,6 +15,32 @@ export function BookingSuccess({ result, bookingData }: Props) {
   const t = useTranslations("booking");
   const locale = useLocale();
   const [copied, setCopied] = useState(false);
+  const [paymentEnabled, setPaymentEnabled] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/payment/config")
+      .then((res) => res.json())
+      .then((data) => setPaymentEnabled(data.enabled))
+      .catch(() => setPaymentEnabled(false));
+  }, []);
+
+  const handlePayNow = async () => {
+    setPaymentLoading(true);
+    try {
+      const res = await fetch("/api/payment/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingCode: result.bookingCode }),
+      });
+      const data = await res.json();
+      if (data.paymentUrl) {
+        window.location.href = data.paymentUrl;
+      }
+    } catch {
+      setPaymentLoading(false);
+    }
+  };
 
   const copyCode = async () => {
     try {
@@ -97,10 +123,39 @@ export function BookingSuccess({ result, bookingData }: Props) {
         </div>
       </div>
 
+      {/* Payment Section */}
+      {paymentEnabled && result.status === "PENDING" && (
+        <div className="bg-accent/10 border border-accent/20 rounded-xl p-5 space-y-3">
+          <div className="flex items-center justify-center gap-2 text-primary font-medium">
+            <CreditCard className="w-5 h-5" />
+            <span>{t("payOnlineTitle")}</span>
+          </div>
+          <p className="text-sm text-text-light">
+            {t("payOnlineDescription")}
+          </p>
+          <button
+            onClick={handlePayNow}
+            disabled={paymentLoading}
+            className="w-full py-3 px-6 bg-accent text-primary-dark rounded-lg font-semibold
+                       hover:bg-accent/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {paymentLoading ? t("processing") : t("payNow")}
+          </button>
+        </div>
+      )}
+
       {/* Expiration notice */}
-      <div className="bg-warning/10 border border-warning/20 rounded-lg p-4 text-sm text-text-light">
-        {t("expirationNotice")}
-      </div>
+      {!paymentEnabled && (
+        <div className="bg-warning/10 border border-warning/20 rounded-lg p-4 text-sm text-text-light">
+          {t("expirationNotice")}
+        </div>
+      )}
+
+      {paymentEnabled && result.status === "PENDING" && (
+        <div className="bg-warning/10 border border-warning/20 rounded-lg p-4 text-sm text-text-light">
+          {t("paymentExpirationNotice")}
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex flex-col sm:flex-row gap-3">
