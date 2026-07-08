@@ -42,7 +42,7 @@ export default async function GalleryPage({ params }: Props) {
   // Map DB images to GalleryImage format, fall back to static if DB is empty
   let images: GalleryImage[];
   if (dbImages && dbImages.length > 0) {
-    images = dbImages.map((img) => ({
+    images = dbImages.map((img: { url: string; alt: string | null; category: string }) => ({
       src: img.url,
       alt: img.alt || "Gallery image",
       category: (img.category || "rooms") as GalleryCategory,
