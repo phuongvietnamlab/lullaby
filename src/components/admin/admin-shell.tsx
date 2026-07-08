@@ -16,6 +16,7 @@ import {
   Menu,
   X,
   ChevronDown,
+  PanelTop,
 } from "lucide-react";
 
 type NavItem = {
@@ -27,6 +28,7 @@ type NavItem = {
 const navItems: NavItem[] = [
   { label: "Dashboard", href: "/admin", icon: <LayoutDashboard size={20} /> },
   { label: "Rooms", href: "/admin/rooms", icon: <BedDouble size={20} /> },
+  { label: "Content", href: "/admin/content", icon: <PanelTop size={20} /> },
   { label: "Bookings", href: "/admin/bookings", icon: <CalendarDays size={20} /> },
   { label: "Guests", href: "/admin/guests", icon: <Users size={20} /> },
   { label: "Blog", href: "/admin/blog", icon: <FileText size={20} /> },

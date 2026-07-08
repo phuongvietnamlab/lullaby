@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Edit, Trash2, BedDouble } from "lucide-react";
+import Link from "next/link";
 import { mockRoomTypes, mockRooms } from "@/lib/admin/mock-data";
 
 type Tab = "types" | "rooms";
@@ -26,10 +27,13 @@ export default function AdminRoomsPage() {
             Manage room types and individual rooms
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition-colors">
+        <Link
+          href="/admin/rooms/edit"
+          className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition-colors"
+        >
           <Plus size={16} />
-          {activeTab === "types" ? "Add Room Type" : "Add Room"}
-        </button>
+          {activeTab === "types" ? "Manage Room Types" : "Add Room"}
+        </Link>
       </div>
 
       {/* Tabs */}
@@ -103,9 +107,9 @@ export default function AdminRoomsPage() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="Edit">
+                        <Link href="/admin/rooms/edit" className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="Edit">
                           <Edit size={15} />
-                        </button>
+                        </Link>
                         <button className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded" title="Delete">
                           <Trash2 size={15} />
                         </button>

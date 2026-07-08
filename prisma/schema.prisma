@@ -241,6 +241,7 @@ model BlogPost {
   categoryId  String?
   isPublished Boolean  @default(false)
   publishedAt DateTime?
+  scheduledAt DateTime? // If set and in future, auto-publish at this time
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -345,4 +346,21 @@ model SeasonalPrice {
   createdAt  DateTime @default(now())
 
   @@map("seasonal_prices")
+}
+
+// ============================================
+// Content Revision History
+// ============================================
+
+model ContentRevision {
+  id         String   @id @default(cuid())
+  entityType String   // "blog_post", "room_type", "site_config"
+  entityId   String
+  data       Json     // snapshot of the content at this point
+  createdBy  String?
+  createdAt  DateTime @default(now())
+  note       String?  // e.g. "Published", "Reverted from v3"
+
+  @@index([entityType, entityId])
+  @@map("content_revisions")
 }
