@@ -36,7 +36,7 @@ export function LanguageSwitcher({ isScrolled }: Props) {
           )}
           <button
             onClick={() => switchLocale(loc)}
-            className={`transition-colors duration-[var(--duration-normal)] ${
+            className={`min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors duration-[var(--duration-normal)] ${
               locale === loc
                 ? "text-[var(--color-accent)] font-medium"
                 : isScrolled

@@ -57,14 +57,14 @@ function RoomsContent({ locale, dbRooms }: { locale: string; dbRooms: RoomTypeFr
   return (
     <>
       {/* Hero */}
-      <section className="relative h-[60vh] min-h-[400px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[60vh] min-h-[350px] sm:min-h-[400px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-primary-dark)] via-[var(--color-primary)] to-[var(--color-primary-light)]" />
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 text-center text-white px-4">
-          <h1 className="font-[family-name:var(--font-heading)] text-4xl md:text-6xl lg:text-7xl font-medium mb-4">
+        <div className="relative z-10 text-center text-white px-4 sm:px-6">
+          <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-medium mb-4">
             {t("title")}
           </h1>
-          <p className="text-lg text-white/70 max-w-xl mx-auto">
+          <p className="text-base sm:text-lg text-white/70 max-w-xl mx-auto">
             {t("subtitle")}
           </p>
           <div className="luxury-divider mx-auto mt-8" />
@@ -72,9 +72,9 @@ function RoomsContent({ locale, dbRooms }: { locale: string; dbRooms: RoomTypeFr
       </section>
 
       {/* Rooms Grid */}
-      <section className="py-[var(--spacing-section)] px-4">
+      <section className="py-[var(--spacing-section-sm)] sm:py-[var(--spacing-section)] px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="space-y-24">
+          <div className="space-y-16 sm:space-y-24">
             {dbRooms.map((room, index) => {
               // Display name: use DB name based on locale, fall back to i18n
               const roomName = locale === "vi" ? room.name : room.nameEn;
@@ -87,7 +87,7 @@ function RoomsContent({ locale, dbRooms }: { locale: string; dbRooms: RoomTypeFr
 
               return (
                 <ScrollReveal key={room.id} delay={index * 0.1}>
-                  <article className="grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
+                  <article className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-16 items-center">
                     {/* Image */}
                     <div className={`relative aspect-[4/3] overflow-hidden rounded-sm ${index % 2 === 1 ? "md:order-2" : ""}`}>
                       {imageUrl && (
@@ -102,9 +102,9 @@ function RoomsContent({ locale, dbRooms }: { locale: string; dbRooms: RoomTypeFr
                     </div>
 
                     {/* Info */}
-                    <div className={`space-y-6 ${index % 2 === 1 ? "md:order-1" : ""}`}>
+                    <div className={`space-y-4 sm:space-y-6 ${index % 2 === 1 ? "md:order-1" : ""}`}>
                       <div>
-                        <h2 className="font-[family-name:var(--font-heading)] text-3xl md:text-4xl mb-3">
+                        <h2 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl md:text-4xl mb-3">
                           {displayName}
                         </h2>
                         <p className="text-[var(--color-text-light)] leading-relaxed">
@@ -131,7 +131,7 @@ function RoomsContent({ locale, dbRooms }: { locale: string; dbRooms: RoomTypeFr
 
                       <div className="luxury-divider" />
 
-                      <div className="flex items-end justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
                         <div>
                           <span className="text-xs uppercase tracking-widest text-[var(--color-text-light)]">
                             {tCommon("from")}
@@ -145,7 +145,7 @@ function RoomsContent({ locale, dbRooms }: { locale: string; dbRooms: RoomTypeFr
                         </div>
                         <Link
                           href={{ pathname: "/rooms/[slug]", params: { slug: room.slug } }}
-                          className="inline-flex items-center px-6 py-3 border border-[var(--color-primary)] text-[var(--color-primary)] text-xs uppercase tracking-widest hover:bg-[var(--color-primary)] hover:text-white transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)]"
+                          className="inline-flex items-center justify-center w-full sm:w-auto px-6 py-3 border border-[var(--color-primary)] text-[var(--color-primary)] text-xs uppercase tracking-widest hover:bg-[var(--color-primary)] hover:text-white transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] min-h-[48px]"
                         >
                           {t("viewDetails")}
                         </Link>

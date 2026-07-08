@@ -61,14 +61,14 @@ function GalleryContent({ images }: { images: GalleryImage[] }) {
   return (
     <>
       {/* Hero */}
-      <section className="relative h-[50vh] min-h-[350px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[40vh] sm:h-[50vh] min-h-[300px] sm:min-h-[350px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-primary-dark)] via-[var(--color-primary)] to-[var(--color-primary-light)]" />
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 text-center text-white px-4">
-          <h1 className="font-[family-name:var(--font-heading)] text-4xl md:text-6xl lg:text-7xl font-medium mb-4">
+        <div className="relative z-10 text-center text-white px-4 sm:px-6">
+          <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-medium mb-4">
             {t("title")}
           </h1>
-          <p className="text-lg text-white/70 max-w-xl mx-auto">
+          <p className="text-base sm:text-lg text-white/70 max-w-xl mx-auto">
             {t("subtitle")}
           </p>
           <div className="luxury-divider mx-auto mt-8" />
@@ -76,7 +76,7 @@ function GalleryContent({ images }: { images: GalleryImage[] }) {
       </section>
 
       {/* Gallery */}
-      <section className="py-[var(--spacing-section)] px-4">
+      <section className="py-[var(--spacing-section-sm)] sm:py-[var(--spacing-section)] px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <GalleryGrid images={images} />
         </div>

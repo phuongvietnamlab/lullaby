@@ -131,7 +131,7 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
       <RoomJsonLd room={room || rooms[0]} locale={locale} roomName={roomName} roomDescription={roomDesc} />
 
       {/* Hero Gallery */}
-      <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
+      <section className="relative h-[50vh] sm:h-[70vh] min-h-[350px] sm:min-h-[500px] overflow-hidden">
         {heroImage && (
           <Image
             src={heroImage}
@@ -143,12 +143,12 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
+        <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-16">
           <div className="max-w-7xl mx-auto">
-            <h1 className="font-[family-name:var(--font-heading)] text-4xl md:text-6xl text-white mb-3">
+            <h1 className="font-[family-name:var(--font-heading)] text-2xl sm:text-4xl md:text-6xl text-white mb-2 sm:mb-3">
               {roomName}
             </h1>
-            <div className="flex flex-wrap gap-4 text-white/80 text-sm">
+            <div className="flex flex-wrap gap-2 sm:gap-4 text-white/80 text-xs sm:text-sm">
               {size > 0 && <span>{size} m²</span>}
               <span>•</span>
               <span>{t("maxGuests", { count: maxGuests })}</span>
@@ -164,17 +164,17 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
       </section>
 
       {/* Room Content */}
-      <section className="py-[var(--spacing-section)] px-4">
+      <section className="py-[var(--spacing-section-sm)] sm:py-[var(--spacing-section)] px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-3 gap-16">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 sm:gap-12 lg:gap-16">
             {/* Main content */}
-            <div className="lg:col-span-2 space-y-12">
+            <div className="lg:col-span-2 space-y-10 sm:space-y-12">
               <ScrollReveal>
                 <div>
-                  <h2 className="font-[family-name:var(--font-heading)] text-2xl mb-4">
+                  <h2 className="font-[family-name:var(--font-heading)] text-xl sm:text-2xl mb-4">
                     {tRoomDetail("overview")}
                   </h2>
-                  <p className="text-[var(--color-text-light)] leading-relaxed text-lg">
+                  <p className="text-[var(--color-text-light)] leading-relaxed text-base sm:text-lg">
                     {roomDesc}
                   </p>
                 </div>
@@ -183,7 +183,7 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
               {/* Image gallery grid */}
               {galleryImages.length > 0 && (
                 <ScrollReveal delay={0.1}>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {galleryImages.map((img, idx) => {
                       const imgSrc = typeof img === "string" ? img : img;
                       return (
@@ -192,7 +192,7 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
                             src={imgSrc}
                             alt={`${roomName} ${idx + 2}`}
                             fill
-                            sizes="(max-width: 768px) 100vw, 40vw"
+                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 40vw"
                             className="object-cover hover:scale-105 transition-transform duration-700"
                           />
                         </div>
@@ -205,17 +205,17 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
               {/* Amenities */}
               <ScrollReveal delay={0.2}>
                 <div>
-                  <h2 className="font-[family-name:var(--font-heading)] text-2xl mb-6">
+                  <h2 className="font-[family-name:var(--font-heading)] text-xl sm:text-2xl mb-6">
                     {t("amenities")}
                   </h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                     {amenities.map((amenity) => (
                       <div
                         key={amenity}
-                        className="flex items-center gap-3 p-3 rounded-sm border border-[var(--color-border)]"
+                        className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-sm border border-[var(--color-border)]"
                       >
                         <svg
-                          className="w-5 h-5 text-[var(--color-accent)] flex-shrink-0"
+                          className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--color-accent)] flex-shrink-0"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -223,7 +223,7 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
-                        <span className="text-sm">
+                        <span className="text-xs sm:text-sm">
                           {tRoomDetail(`amenities.${amenity}` as never)}
                         </span>
                       </div>
@@ -236,7 +236,7 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
               {highlights.length > 0 && (
                 <ScrollReveal delay={0.3}>
                   <div>
-                    <h2 className="font-[family-name:var(--font-heading)] text-2xl mb-6">
+                    <h2 className="font-[family-name:var(--font-heading)] text-xl sm:text-2xl mb-6">
                       {tRoomDetail("highlights")}
                     </h2>
                     <ul className="space-y-3">
@@ -263,13 +263,13 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
             </div>
 
             {/* Sidebar - Booking Card */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-32 p-8 border border-[var(--color-border)] rounded-sm bg-white shadow-[var(--shadow-soft)]">
+            <div className="lg:col-span-1 order-first lg:order-last">
+              <div className="lg:sticky lg:top-32 p-6 sm:p-8 border border-[var(--color-border)] rounded-sm bg-white shadow-[var(--shadow-soft)]">
                 <div className="text-center mb-6">
                   <span className="text-xs uppercase tracking-widest text-[var(--color-text-light)]">
                     {tCommon("from")}
                   </span>
-                  <p className="text-3xl font-[family-name:var(--font-heading)] mt-1">
+                  <p className="text-2xl sm:text-3xl font-[family-name:var(--font-heading)] mt-1">
                     {formatPrice(price, locale)}
                   </p>
                   <span className="text-sm text-[var(--color-text-light)]">
@@ -310,7 +310,7 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
 
                 <Link
                   href="/booking"
-                  className="block w-full text-center px-6 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] text-xs uppercase tracking-widest font-medium hover:bg-[var(--color-accent-light)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)]"
+                  className="block w-full text-center px-6 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] text-xs uppercase tracking-widest font-medium hover:bg-[var(--color-accent-light)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] min-h-[48px] flex items-center justify-center"
                 >
                   {tCommon("bookNow")}
                 </Link>
@@ -321,14 +321,14 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
       </section>
 
       {/* Other Rooms */}
-      <section className="py-[var(--spacing-section)] px-4 bg-[var(--color-surface-dim)]">
+      <section className="py-[var(--spacing-section-sm)] sm:py-[var(--spacing-section)] px-4 sm:px-6 bg-[var(--color-surface-dim)]">
         <div className="max-w-7xl mx-auto">
           <ScrollReveal>
-            <h2 className="font-[family-name:var(--font-heading)] text-3xl text-center mb-12">
+            <h2 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl text-center mb-8 sm:mb-12">
               {tRoomDetail("otherRooms")}
             </h2>
           </ScrollReveal>
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             {otherRooms.map((otherRoom, idx) => {
               const otherKey = getRoomI18nKey(otherRoom.slug);
               return (
@@ -348,8 +348,8 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
                         blurDataURL={otherRoom.images[0].blurDataURL}
                       />
                     </div>
-                    <div className="p-6">
-                      <h3 className="font-[family-name:var(--font-heading)] text-xl mb-2">
+                    <div className="p-4 sm:p-6">
+                      <h3 className="font-[family-name:var(--font-heading)] text-lg sm:text-xl mb-2">
                         {tRoomTypes(`${otherKey}.name` as never)}
                       </h3>
                       <p className="text-sm text-[var(--color-text-light)] mb-3">

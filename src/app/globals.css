@@ -73,6 +73,9 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+    /* Mobile viewport height fix */
+    min-height: 100dvh;
   }
 
   body {
@@ -80,6 +83,8 @@
     color: var(--color-text);
     background-color: var(--color-surface);
     line-height: 1.7;
+    /* Prevent horizontal overflow */
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -103,6 +108,64 @@
   /* Smooth image rendering */
   img {
     border-radius: var(--radius-lg);
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Better touch scrolling */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* ============================================
+ * Mobile & PWA Styles
+ * ============================================ */
+
+/* PWA standalone mode styles */
+@media (display-mode: standalone) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Safe area for notched phones */
+@supports (padding: env(safe-area-inset-top)) {
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Better touch scrolling utility */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-touch::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile form elements min height */
+@media (max-width: 640px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="date"],
+  input[type="number"],
+  select,
+  textarea {
+    min-height: 48px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  button, [role="button"], a {
+    min-height: 44px;
   }
 }
 

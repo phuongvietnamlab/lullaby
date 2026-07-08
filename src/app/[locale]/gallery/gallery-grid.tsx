@@ -24,35 +24,37 @@ export function GalleryGrid({ images }: GalleryGridProps) {
 
   return (
     <>
-      {/* Category Filter */}
-      <div className="flex flex-wrap justify-center gap-3 mb-12">
-        <button
-          onClick={() => setActiveCategory("all")}
-          className={`px-5 py-2 text-xs uppercase tracking-widest transition-all duration-[var(--duration-normal)] ${
-            activeCategory === "all"
-              ? "bg-[var(--color-primary)] text-white"
-              : "border border-[var(--color-border)] text-[var(--color-text-light)] hover:border-[var(--color-primary)]"
-          }`}
-        >
-          {t("all")}
-        </button>
-        {categories.map((cat) => (
+      {/* Category Filter - horizontal scrollable on mobile */}
+      <div className="mb-8 sm:mb-12 -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="flex sm:flex-wrap sm:justify-center gap-2 sm:gap-3 overflow-x-auto scroll-touch pb-2 sm:pb-0">
           <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={`px-5 py-2 text-xs uppercase tracking-widest transition-all duration-[var(--duration-normal)] ${
-              activeCategory === cat
+            onClick={() => setActiveCategory("all")}
+            className={`flex-shrink-0 px-4 sm:px-5 py-2.5 text-xs uppercase tracking-widest transition-all duration-[var(--duration-normal)] min-h-[44px] flex items-center ${
+              activeCategory === "all"
                 ? "bg-[var(--color-primary)] text-white"
                 : "border border-[var(--color-border)] text-[var(--color-text-light)] hover:border-[var(--color-primary)]"
             }`}
           >
-            {t(`categories.${cat}` as never)}
+            {t("all")}
           </button>
-        ))}
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`flex-shrink-0 px-4 sm:px-5 py-2.5 text-xs uppercase tracking-widest transition-all duration-[var(--duration-normal)] min-h-[44px] flex items-center ${
+                activeCategory === cat
+                  ? "bg-[var(--color-primary)] text-white"
+                  : "border border-[var(--color-border)] text-[var(--color-text-light)] hover:border-[var(--color-primary)]"
+              }`}
+            >
+              {t(`categories.${cat}` as never)}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Image Grid */}
-      <motion.div layout className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {/* Image Grid - 1 col mobile, 2 tablet, 3-4 desktop */}
+      <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         <AnimatePresence mode="popLayout">
           {filteredImages.map((image, idx) => (
             <motion.div
@@ -63,7 +65,7 @@ export function GalleryGrid({ images }: GalleryGridProps) {
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.3, delay: idx * 0.03 }}
               className={`relative cursor-pointer overflow-hidden rounded-sm ${
-                idx % 5 === 0 ? "col-span-2 row-span-2" : ""
+                idx % 5 === 0 ? "sm:col-span-2 sm:row-span-2" : ""
               }`}
             >
               <button
@@ -75,7 +77,7 @@ export function GalleryGrid({ images }: GalleryGridProps) {
                   src={image.src}
                   alt={image.alt}
                   fill
-                  sizes={idx % 5 === 0 ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw"}
+                  sizes={idx % 5 === 0 ? "(max-width: 640px) 100vw, (max-width: 768px) 100vw, 50vw" : "(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"}
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                   placeholder="blur"
                   blurDataURL={image.blurDataURL}
@@ -104,7 +106,7 @@ export function GalleryGrid({ images }: GalleryGridProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4"
+            className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-2 sm:p-4"
             onClick={() => setSelectedImage(null)}
             role="dialog"
             aria-modal="true"
@@ -127,7 +129,7 @@ export function GalleryGrid({ images }: GalleryGridProps) {
             </motion.div>
             <button
               onClick={() => setSelectedImage(null)}
-              className="absolute top-6 right-6 text-white/80 hover:text-white p-2"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/80 hover:text-white p-3 min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Close"
             >
               <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
