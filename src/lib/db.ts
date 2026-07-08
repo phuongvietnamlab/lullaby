@@ -7,9 +7,18 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
+  const connectionString = process.env.DATABASE_URL;
+
   const pool = new pg.Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
+    max: 5, // Limit connections for serverless
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+    ssl: connectionString?.includes("supabase.com")
+      ? { rejectUnauthorized: false }
+      : undefined,
   });
+
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 }
