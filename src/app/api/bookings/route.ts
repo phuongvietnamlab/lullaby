@@ -7,6 +7,11 @@ import {
   calculateTotalPrice,
 } from "@/lib/booking";
 import { rateLimit } from "@/lib/rate-limit";
+import {
+  sendBookingConfirmation,
+  sendAdminNotification,
+  type BookingEmailData,
+} from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   try {
@@ -129,6 +134,36 @@ export async function POST(request: NextRequest) {
     const nights = Math.ceil(
       (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)
     );
+
+    // Send emails (fire-and-forget, don't block booking response)
+    const emailData: BookingEmailData = {
+      bookingCode: booking.bookingCode,
+      guestName,
+      guestEmail,
+      guestPhone,
+      roomTypeName: rt.name,
+      checkIn,
+      checkOut,
+      guestCount,
+      totalPrice: Number(booking.totalPrice),
+      nights,
+      status: booking.status,
+      expiresAt: booking.expiresAt?.toISOString(),
+    };
+
+    Promise.allSettled([
+      sendBookingConfirmation(emailData),
+      sendAdminNotification(emailData),
+    ]).then((results) => {
+      results.forEach((result, index) => {
+        if (result.status === "rejected") {
+          console.error(
+            `[Email] ${index === 0 ? "Confirmation" : "Admin notification"} failed:`,
+            result.reason
+          );
+        }
+      });
+    });
 
     return NextResponse.json({
       success: true,
