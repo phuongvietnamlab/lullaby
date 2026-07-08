@@ -1,15 +1,19 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { hashPassword } from "better-auth/crypto";
 import pg from "pg";
 
 const pool = new pg.Pool({
-  connectionString: "postgresql://lullaby:lullaby123@localhost:5432/lullaby_hotel?schema=public",
+  connectionString: process.env.DATABASE_URL || "postgresql://hasana:hasana123@localhost:5432/hasana_hotel?schema=public",
 });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("Seeding database...");
+
+  // Hash password using Better Auth's scrypt algorithm
+  const adminPassword = await hashPassword("admin123");
 
   // ============================================
   // Admin Users
@@ -26,7 +30,7 @@ async function main() {
         create: {
           accountId: "admin-account-1",
           providerId: "credential",
-          password: "$2a$10$GQH3rKX3gBVwJoGCBi0jHOdLrNKfRCOIIregZvBUZwJgkEQuXati6", // admin123
+          password: adminPassword,
         },
       },
     },
@@ -44,7 +48,7 @@ async function main() {
         create: {
           accountId: "manager-account-1",
           providerId: "credential",
-          password: "$2a$10$GQH3rKX3gBVwJoGCBi0jHOdLrNKfRCOIIregZvBUZwJgkEQuXati6",
+          password: adminPassword,
         },
       },
     },

@@ -2,12 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-// TODO: Replace with Better Auth session check in production
-const MOCK_CREDENTIALS = {
-  email: "admin@lullaby.com",
-  password: "admin123",
-};
+import { authClient } from "@/lib/auth-client";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -21,27 +16,18 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    // TODO: Replace with actual Better Auth sign-in
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    const { error: signInError } = await authClient.signIn.email({
+      email,
+      password,
+    });
 
-    if (
-      email === MOCK_CREDENTIALS.email &&
-      password === MOCK_CREDENTIALS.password
-    ) {
-      // Set a simple cookie/localStorage flag for demo
-      if (typeof window !== "undefined") {
-        localStorage.setItem("admin_authenticated", "true");
-        localStorage.setItem("admin_user", JSON.stringify({
-          name: "Nguyen Van Admin",
-          email: "admin@lullaby.com",
-          role: "super_admin",
-        }));
-      }
-      router.push("/admin");
-    } else {
-      setError("Invalid email or password");
+    if (signInError) {
+      setError(signInError.message || "Invalid email or password");
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    router.push("/admin");
   }
 
   return (

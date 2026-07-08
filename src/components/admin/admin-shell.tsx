@@ -1,7 +1,8 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
 import {
   LayoutDashboard,
   BedDouble,
@@ -42,25 +43,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
-  useEffect(() => {
-    // TODO: Replace with actual session check via Better Auth
-    const isAuth = localStorage.getItem("admin_authenticated");
-    const userData = localStorage.getItem("admin_user");
-    if (!isAuth) {
-      router.push("/admin/login");
-      return;
-    }
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, [router]);
+  const { data: session, isPending } = authClient.useSession();
 
-  function handleLogout() {
-    localStorage.removeItem("admin_authenticated");
-    localStorage.removeItem("admin_user");
+  // Redirect to login if no session
+  if (!isPending && !session) {
+    router.push("/admin/login");
+    return null;
+  }
+
+  async function handleLogout() {
+    await authClient.signOut();
     router.push("/admin/login");
   }
 
@@ -69,13 +63,17 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     return pathname.startsWith(href);
   }
 
-  if (!user) {
+  if (isPending || !session) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-gray-500">Loading...</div>
       </div>
     );
   }
+
+  const user = session.user;
+  const displayName = user.name || user.email;
+  const displayRole = (user.role as string) || "RECEPTIONIST";
 
   return (
     <div className="min-h-screen flex">
@@ -127,11 +125,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-700">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-xs font-medium">
-              {user.name.charAt(0)}
+              {displayName.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{user.name}</p>
-              <p className="text-xs text-slate-400 capitalize">{user.role.replace("_", " ")}</p>
+              <p className="text-sm font-medium text-white truncate">{displayName}</p>
+              <p className="text-xs text-slate-400 capitalize">{displayRole.replace("_", " ").toLowerCase()}</p>
             </div>
           </div>
         </div>
@@ -162,16 +160,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
             >
               <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-medium">
-                {user.name.charAt(0)}
+                {displayName.charAt(0)}
               </div>
-              <span className="hidden sm:inline">{user.name}</span>
+              <span className="hidden sm:inline">{displayName}</span>
               <ChevronDown size={16} />
             </button>
 
             {userMenuOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50">
                 <div className="px-4 py-2 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                  <p className="text-sm font-medium text-gray-900">{displayName}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
                 <button
