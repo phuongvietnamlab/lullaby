@@ -4,21 +4,49 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { getRoomBySlug, getAllRoomSlugs, formatPrice, rooms, getRoomI18nKey } from "@/lib/data/rooms";
+import { getRoomTypeBySlugFromDB, getRoomTypesFromDB, type RoomTypeFromDB } from "@/lib/data/rooms-db";
 import { RoomJsonLd } from "@/components/seo/json-ld";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import type { Metadata } from "next";
+
+// ISR: revalidate every 5 minutes
+export const revalidate = 300;
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  // Try to get slugs from DB first, fall back to static
+  const dbRooms = await getRoomTypesFromDB();
+  if (dbRooms.length > 0) {
+    return dbRooms.map((room) => ({ slug: room.slug }));
+  }
   const slugs = getAllRoomSlugs();
   return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
+
+  // Try DB first
+  const dbRoom = await getRoomTypeBySlugFromDB(slug);
+  if (dbRoom) {
+    const name = locale === "vi" ? dbRoom.name : dbRoom.nameEn;
+    return {
+      title: name,
+      description:
+        locale === "vi"
+          ? `${name} - ${dbRoom.size || ""}m², tối đa ${dbRoom.maxGuests} khách, tầm nhìn tuyệt đẹp tại Lullaby Sky Villa`
+          : `${name} - ${dbRoom.size || ""}m², up to ${dbRoom.maxGuests} guests, stunning views at Lullaby Sky Villa`,
+      openGraph: {
+        title: `${name} | Lullaby Sky Villa`,
+        images: dbRoom.images.length > 0 ? dbRoom.images : undefined,
+      },
+    };
+  }
+
+  // Fallback to static data
   const room = getRoomBySlug(slug);
   if (!room) return {};
 
@@ -49,43 +77,71 @@ export default async function RoomDetailPage({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const room = getRoomBySlug(slug);
-  if (!room) notFound();
+  // Try DB first
+  const dbRoom = await getRoomTypeBySlugFromDB(slug);
 
-  return <RoomDetailContent locale={locale} slug={slug} />;
+  // Fall back to static data if not in DB
+  if (!dbRoom) {
+    const room = getRoomBySlug(slug);
+    if (!room) notFound();
+  }
+
+  return <RoomDetailContent locale={locale} slug={slug} dbRoom={dbRoom} />;
 }
 
-function RoomDetailContent({ locale, slug }: { locale: string; slug: string }) {
+function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: string; dbRoom: RoomTypeFromDB | null }) {
   const t = useTranslations("rooms");
   const tRoomTypes = useTranslations("roomTypes");
   const tRoomDetail = useTranslations("roomDetail");
   const tCommon = useTranslations("common");
 
-  const room = getRoomBySlug(slug)!;
+  const room = getRoomBySlug(slug);
   const key = getRoomI18nKey(slug);
 
-  const roomName = tRoomTypes(`${key}.name` as never);
-  const roomDesc = tRoomTypes(`${key}.description` as never);
+  // Determine display values: prefer DB, fall back to i18n/static
+  const roomName = dbRoom
+    ? (locale === "vi" ? dbRoom.name : dbRoom.nameEn)
+    : tRoomTypes(`${key}.name` as never);
+  const roomDesc = dbRoom
+    ? (locale === "vi" ? (dbRoom.description || tRoomTypes(`${key}.description` as never)) : (dbRoom.descriptionEn || tRoomTypes(`${key}.description` as never)))
+    : tRoomTypes(`${key}.description` as never);
+
+  const price = dbRoom?.basePrice || room?.price || 0;
+  const size = dbRoom?.size || room?.size || 0;
+  const maxGuests = dbRoom?.maxGuests || room?.maxGuests || 2;
+  const bedType = dbRoom?.bedType || room?.bedType || "king";
+  const amenities = dbRoom?.amenities.length ? dbRoom.amenities : (room?.amenities || []);
+  const highlights = room?.highlights || [];
+  const floor = room?.floor || "";
+  const view = room?.view || "";
+
+  // Images: prefer DB images, fall back to static
+  const dbImages = dbRoom?.images.length ? dbRoom.images : [];
+  const staticImages = room?.images || [];
+  const heroImage = dbImages[0] || staticImages[0]?.src || "";
+  const galleryImages = dbImages.length > 1
+    ? dbImages.slice(1)
+    : staticImages.slice(1).map(img => img.src);
 
   // Get other rooms for comparison
   const otherRooms = rooms.filter((r) => r.slug !== slug).slice(0, 2);
 
   return (
     <>
-      <RoomJsonLd room={room} locale={locale} roomName={roomName} roomDescription={roomDesc} />
+      <RoomJsonLd room={room || rooms[0]} locale={locale} roomName={roomName} roomDescription={roomDesc} />
 
       {/* Hero Gallery */}
       <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
-        <Image
-          src={room.images[0].src}
-          alt={room.images[0].alt}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-          placeholder="blur"
-          blurDataURL={room.images[0].blurDataURL}
-        />
+        {heroImage && (
+          <Image
+            src={heroImage}
+            alt={roomName}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16">
           <div className="max-w-7xl mx-auto">
@@ -93,11 +149,15 @@ function RoomDetailContent({ locale, slug }: { locale: string; slug: string }) {
               {roomName}
             </h1>
             <div className="flex flex-wrap gap-4 text-white/80 text-sm">
-              <span>{room.size} m²</span>
+              {size > 0 && <span>{size} m²</span>}
               <span>•</span>
-              <span>{t("maxGuests", { count: room.maxGuests })}</span>
-              <span>•</span>
-              <span>{tRoomDetail(`views.${room.view}` as never)}</span>
+              <span>{t("maxGuests", { count: maxGuests })}</span>
+              {view && (
+                <>
+                  <span>•</span>
+                  <span>{tRoomDetail(`views.${view}` as never)}</span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -121,23 +181,26 @@ function RoomDetailContent({ locale, slug }: { locale: string; slug: string }) {
               </ScrollReveal>
 
               {/* Image gallery grid */}
-              <ScrollReveal delay={0.1}>
-                <div className="grid grid-cols-2 gap-4">
-                  {room.images.slice(1).map((img, idx) => (
-                    <div key={idx} className="relative aspect-[4/3] overflow-hidden rounded-sm">
-                      <Image
-                        src={img.src}
-                        alt={img.alt}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 40vw"
-                        className="object-cover hover:scale-105 transition-transform duration-700"
-                        placeholder="blur"
-                        blurDataURL={img.blurDataURL}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </ScrollReveal>
+              {galleryImages.length > 0 && (
+                <ScrollReveal delay={0.1}>
+                  <div className="grid grid-cols-2 gap-4">
+                    {galleryImages.map((img, idx) => {
+                      const imgSrc = typeof img === "string" ? img : img;
+                      return (
+                        <div key={idx} className="relative aspect-[4/3] overflow-hidden rounded-sm">
+                          <Image
+                            src={imgSrc}
+                            alt={`${roomName} ${idx + 2}`}
+                            fill
+                            sizes="(max-width: 768px) 100vw, 40vw"
+                            className="object-cover hover:scale-105 transition-transform duration-700"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </ScrollReveal>
+              )}
 
               {/* Amenities */}
               <ScrollReveal delay={0.2}>
@@ -146,7 +209,7 @@ function RoomDetailContent({ locale, slug }: { locale: string; slug: string }) {
                     {t("amenities")}
                   </h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {room.amenities.map((amenity) => (
+                    {amenities.map((amenity) => (
                       <div
                         key={amenity}
                         className="flex items-center gap-3 p-3 rounded-sm border border-[var(--color-border)]"
@@ -170,31 +233,33 @@ function RoomDetailContent({ locale, slug }: { locale: string; slug: string }) {
               </ScrollReveal>
 
               {/* Highlights */}
-              <ScrollReveal delay={0.3}>
-                <div>
-                  <h2 className="font-[family-name:var(--font-heading)] text-2xl mb-6">
-                    {tRoomDetail("highlights")}
-                  </h2>
-                  <ul className="space-y-3">
-                    {room.highlights.map((highlight) => (
-                      <li key={highlight} className="flex items-start gap-3">
-                        <svg
-                          className="w-5 h-5 text-[var(--color-accent)] mt-0.5 flex-shrink-0"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={1.5}
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-                        </svg>
-                        <span className="text-[var(--color-text-light)]">
-                          {tRoomDetail(`highlightsList.${highlight}` as never)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </ScrollReveal>
+              {highlights.length > 0 && (
+                <ScrollReveal delay={0.3}>
+                  <div>
+                    <h2 className="font-[family-name:var(--font-heading)] text-2xl mb-6">
+                      {tRoomDetail("highlights")}
+                    </h2>
+                    <ul className="space-y-3">
+                      {highlights.map((highlight) => (
+                        <li key={highlight} className="flex items-start gap-3">
+                          <svg
+                            className="w-5 h-5 text-[var(--color-accent)] mt-0.5 flex-shrink-0"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={1.5}
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                          </svg>
+                          <span className="text-[var(--color-text-light)]">
+                            {tRoomDetail(`highlightsList.${highlight}` as never)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </ScrollReveal>
+              )}
             </div>
 
             {/* Sidebar - Booking Card */}
@@ -205,7 +270,7 @@ function RoomDetailContent({ locale, slug }: { locale: string; slug: string }) {
                     {tCommon("from")}
                   </span>
                   <p className="text-3xl font-[family-name:var(--font-heading)] mt-1">
-                    {formatPrice(room.price, locale)}
+                    {formatPrice(price, locale)}
                   </p>
                   <span className="text-sm text-[var(--color-text-light)]">
                     {tCommon("perNight")}
@@ -215,26 +280,32 @@ function RoomDetailContent({ locale, slug }: { locale: string; slug: string }) {
                 <div className="luxury-divider mx-auto mb-6" />
 
                 <div className="space-y-3 text-sm text-[var(--color-text-light)] mb-8">
-                  <div className="flex justify-between">
-                    <span>{tRoomDetail("roomSize")}</span>
-                    <span className="text-[var(--color-text)]">{room.size} m²</span>
-                  </div>
+                  {size > 0 && (
+                    <div className="flex justify-between">
+                      <span>{tRoomDetail("roomSize")}</span>
+                      <span className="text-[var(--color-text)]">{size} m²</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span>{tRoomDetail("maxOccupancy")}</span>
-                    <span className="text-[var(--color-text)]">{room.maxGuests}</span>
+                    <span className="text-[var(--color-text)]">{maxGuests}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>{tRoomDetail("bedTypeLabel")}</span>
-                    <span className="text-[var(--color-text)]">{tRoomDetail(`beds.${room.bedType}` as never)}</span>
+                    <span className="text-[var(--color-text)]">{tRoomDetail(`beds.${bedType}` as never)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>{tRoomDetail("viewLabel")}</span>
-                    <span className="text-[var(--color-text)]">{tRoomDetail(`views.${room.view}` as never)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{tRoomDetail("floorLabel")}</span>
-                    <span className="text-[var(--color-text)]">{room.floor}</span>
-                  </div>
+                  {view && (
+                    <div className="flex justify-between">
+                      <span>{tRoomDetail("viewLabel")}</span>
+                      <span className="text-[var(--color-text)]">{tRoomDetail(`views.${view}` as never)}</span>
+                    </div>
+                  )}
+                  {floor && (
+                    <div className="flex justify-between">
+                      <span>{tRoomDetail("floorLabel")}</span>
+                      <span className="text-[var(--color-text)]">{floor}</span>
+                    </div>
+                  )}
                 </div>
 
                 <Link

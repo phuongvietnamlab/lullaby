@@ -3,32 +3,72 @@ import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { getFeaturedRooms, formatPrice, getRoomI18nKey } from "@/lib/data/rooms";
+import { getHomepageContent } from "@/lib/data/rooms-db";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { HotelJsonLd } from "@/components/seo/json-ld";
+
+// ISR: revalidate every 5 minutes
+export const revalidate = 300;
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
 
+// Type for homepage DB content (JSON stored in site_config)
+type HomepageDBContent = {
+  hero?: {
+    title?: string;
+    titleEn?: string;
+    subtitle?: string;
+    subtitleEn?: string;
+    cta?: string;
+    ctaEn?: string;
+  };
+  features?: {
+    title?: string;
+    titleEn?: string;
+    subtitle?: string;
+    subtitleEn?: string;
+  };
+  cta?: {
+    title?: string;
+    titleEn?: string;
+    subtitle?: string;
+    subtitleEn?: string;
+  };
+} | null;
+
 export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
+  // Fetch homepage content from DB (admin-editable)
+  const dbContent = await getHomepageContent() as HomepageDBContent;
+
   return (
     <>
       <HotelJsonLd locale={locale} />
-      <HomeContent locale={locale} />
+      <HomeContent locale={locale} dbContent={dbContent} />
     </>
   );
 }
 
-function HomeContent({ locale }: { locale: string }) {
+function HomeContent({ locale, dbContent }: { locale: string; dbContent: HomepageDBContent }) {
   const t = useTranslations("home");
   const tCommon = useTranslations("common");
   const tRoomTypes = useTranslations("roomTypes");
   const tRooms = useTranslations("rooms");
 
   const featuredRooms = getFeaturedRooms();
+
+  // Helper: use DB content if available, otherwise fall back to i18n
+  const heroTitle = (locale === "vi" ? dbContent?.hero?.title : dbContent?.hero?.titleEn) || t("hero.title");
+  const heroSubtitle = (locale === "vi" ? dbContent?.hero?.subtitle : dbContent?.hero?.subtitleEn) || t("hero.subtitle");
+  const heroCta = (locale === "vi" ? dbContent?.hero?.cta : dbContent?.hero?.ctaEn) || t("hero.cta");
+  const featuresTitle = (locale === "vi" ? dbContent?.features?.title : dbContent?.features?.titleEn) || t("features.title");
+  const featuresSubtitle = (locale === "vi" ? dbContent?.features?.subtitle : dbContent?.features?.subtitleEn) || t("features.subtitle");
+  const ctaTitle = (locale === "vi" ? dbContent?.cta?.title : dbContent?.cta?.titleEn) || t("cta.title");
+  const ctaSubtitle = (locale === "vi" ? dbContent?.cta?.subtitle : dbContent?.cta?.subtitleEn) || t("cta.subtitle");
 
   return (
     <>
@@ -43,16 +83,16 @@ function HomeContent({ locale }: { locale: string }) {
         {/* Content */}
         <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
           <h1 className="font-[family-name:var(--font-heading)] text-5xl md:text-7xl lg:text-8xl font-medium mb-6 tracking-tight">
-            {t("hero.title")}
+            {heroTitle}
           </h1>
           <p className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-            {t("hero.subtitle")}
+            {heroSubtitle}
           </p>
           <Link
             href="/rooms"
             className="inline-flex items-center px-10 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest"
           >
-            {t("hero.cta")}
+            {heroCta}
           </Link>
         </div>
 
@@ -69,10 +109,10 @@ function HomeContent({ locale }: { locale: string }) {
         <div className="max-w-6xl mx-auto text-center">
           <ScrollReveal>
             <h2 className="font-[family-name:var(--font-heading)] text-3xl md:text-5xl mb-4">
-              {t("features.title")}
+              {featuresTitle}
             </h2>
             <p className="text-[var(--color-text-light)] mb-16 text-lg">
-              {t("features.subtitle")}
+              {featuresSubtitle}
             </p>
             <div className="luxury-divider mx-auto mb-16" />
           </ScrollReveal>
@@ -208,9 +248,9 @@ function HomeContent({ locale }: { locale: string }) {
         <div className="max-w-4xl mx-auto text-center">
           <ScrollReveal>
             <h2 className="font-[family-name:var(--font-heading)] text-3xl md:text-5xl text-white mb-4">
-              {t("cta.title")}
+              {ctaTitle}
             </h2>
-            <p className="text-white/70 mb-10 text-lg">{t("cta.subtitle")}</p>
+            <p className="text-white/70 mb-10 text-lg">{ctaSubtitle}</p>
             <Link
               href="/booking"
               className="inline-flex items-center px-10 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest"

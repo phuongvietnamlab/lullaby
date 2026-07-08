@@ -1,10 +1,13 @@
 import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
-import Image from "next/image";
 import { galleryImages } from "@/lib/data/rooms";
-import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { getGalleryFromDB } from "@/lib/data/rooms-db";
 import type { Metadata } from "next";
 import { GalleryGrid } from "./gallery-grid";
+import type { GalleryImage, GalleryCategory } from "@/lib/data/rooms";
+
+// ISR: revalidate every 5 minutes
+export const revalidate = 300;
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -25,14 +28,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+// Placeholder blur data URL
+const BLUR_PLACEHOLDER =
+  "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGBkaGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5vX2teleA8CkKyMzNJkj+o+pSlAVapKz//Z";
+
 export default async function GalleryPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <GalleryContent />;
+  // Fetch gallery images from DB
+  const dbImages = await getGalleryFromDB();
+
+  // Map DB images to GalleryImage format, fall back to static if DB is empty
+  let images: GalleryImage[];
+  if (dbImages && dbImages.length > 0) {
+    images = dbImages.map((img) => ({
+      src: img.url,
+      alt: img.alt || "Gallery image",
+      category: (img.category || "rooms") as GalleryCategory,
+      blurDataURL: BLUR_PLACEHOLDER,
+    }));
+  } else {
+    images = galleryImages;
+  }
+
+  return <GalleryContent images={images} />;
 }
 
-function GalleryContent() {
+function GalleryContent({ images }: { images: GalleryImage[] }) {
   const t = useTranslations("gallery");
 
   return (
@@ -55,7 +78,7 @@ function GalleryContent() {
       {/* Gallery */}
       <section className="py-[var(--spacing-section)] px-4">
         <div className="max-w-7xl mx-auto">
-          <GalleryGrid images={galleryImages} />
+          <GalleryGrid images={images} />
         </div>
       </section>
     </>
