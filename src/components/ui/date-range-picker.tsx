@@ -40,7 +40,7 @@ export function DateRangePicker({
   const disabledDays = { before: minDate ?? new Date() };
 
   return (
-    <div className="luxury-card p-4 sm:p-6 overflow-hidden">
+    <div className="luxury-card p-4 sm:p-6 overflow-hidden relative">
       <DayPicker
         mode="range"
         selected={selected}
@@ -55,11 +55,11 @@ export function DateRangePicker({
           month: "flex flex-col gap-3",
           month_caption: "flex justify-center items-center h-10 relative",
           caption_label: "font-heading text-lg sm:text-xl text-primary font-medium",
-          nav: "flex items-center justify-between absolute inset-x-0 top-0 h-10 px-1",
+          nav: "absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 flex items-center justify-between z-10",
           button_previous:
-            "inline-flex items-center justify-center w-9 h-9 rounded-full text-accent hover:bg-accent/10 transition-colors duration-300 disabled:opacity-30 disabled:hover:bg-transparent",
+            "inline-flex items-center justify-center w-10 h-10 rounded-full text-accent bg-white border border-border shadow-sm hover:bg-accent/10 hover:border-accent transition-colors duration-300 disabled:opacity-30 disabled:hover:bg-white",
           button_next:
-            "inline-flex items-center justify-center w-9 h-9 rounded-full text-accent hover:bg-accent/10 transition-colors duration-300 disabled:opacity-30 disabled:hover:bg-transparent",
+            "inline-flex items-center justify-center w-10 h-10 rounded-full text-accent bg-white border border-border shadow-sm hover:bg-accent/10 hover:border-accent transition-colors duration-300 disabled:opacity-30 disabled:hover:bg-white",
           chevron: "w-5 h-5",
           month_grid: "w-full border-collapse",
           weekdays: "flex",
