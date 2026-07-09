@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, X, Eye, Filter, RefreshCw } from "lucide-react";
+import { Check, X, Eye, Filter, RefreshCw, Calendar, User, Phone, Mail, MessageSquare } from "lucide-react";
 
 type Booking = {
   id: string;
@@ -36,6 +36,7 @@ export default function AdminBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
   const showFeedback = (type: "success" | "error", message: string) => {
     setFeedback({ type, message });
@@ -204,7 +205,7 @@ export default function AdminBookingsPage() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-end gap-1">
-                        <button className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="View details">
+                        <button onClick={() => setSelectedBooking(booking)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="View details">
                           <Eye size={15} />
                         </button>
                         {booking.status === "pending" && (
@@ -241,6 +242,116 @@ export default function AdminBookingsPage() {
           </div>
         )}
       </div>
+
+      {/* Booking Detail Modal */}
+      {selectedBooking && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setSelectedBooking(null)}>
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-900">Booking Details</h3>
+              <button onClick={() => setSelectedBooking(null)} className="p-1.5 text-gray-400 hover:text-gray-600 rounded">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="p-5 space-y-5">
+              {/* Booking Code & Status */}
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-sm font-bold text-gray-900">{selectedBooking.bookingCode}</span>
+                <BookingStatusBadge status={selectedBooking.status} />
+              </div>
+
+              {/* Guest Info */}
+              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Guest Information</h4>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <User size={14} className="text-gray-400" />
+                    <span className="font-medium text-gray-900">{selectedBooking.guestName}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Mail size={14} className="text-gray-400" />
+                    <span className="text-gray-600">{selectedBooking.guestEmail}</span>
+                  </div>
+                  {selectedBooking.guestPhone && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <Phone size={14} className="text-gray-400" />
+                      <span className="text-gray-600">{selectedBooking.guestPhone}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Booking Info */}
+              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Reservation</h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-gray-500 text-xs">Room</p>
+                    <p className="font-medium text-gray-900">{selectedBooking.roomTypeName}</p>
+                  </div>
+                  {selectedBooking.roomNumber !== "-" && (
+                    <div>
+                      <p className="text-gray-500 text-xs">Room Number</p>
+                      <p className="font-medium text-gray-900">{selectedBooking.roomNumber}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-gray-500 text-xs">Check-in</p>
+                    <p className="font-medium text-gray-900 flex items-center gap-1">
+                      <Calendar size={12} className="text-gray-400" />
+                      {selectedBooking.checkIn}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs">Check-out</p>
+                    <p className="font-medium text-gray-900 flex items-center gap-1">
+                      <Calendar size={12} className="text-gray-400" />
+                      {selectedBooking.checkOut}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs">Nights</p>
+                    <p className="font-medium text-gray-900">{selectedBooking.nights}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs">Total</p>
+                    <p className="font-bold text-gray-900">{formatPrice(selectedBooking.totalPrice)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Special Requests */}
+              {selectedBooking.specialRequests && (
+                <div className="bg-amber-50 rounded-lg p-4">
+                  <h4 className="text-xs font-semibold text-amber-700 uppercase tracking-wide flex items-center gap-1.5 mb-2">
+                    <MessageSquare size={12} />
+                    Special Requests
+                  </h4>
+                  <p className="text-sm text-amber-900">{selectedBooking.specialRequests}</p>
+                </div>
+              )}
+
+              {/* Actions */}
+              {selectedBooking.status === "pending" && (
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => { handleUpdateStatus(selectedBooking.id, "CONFIRMED"); setSelectedBooking(null); }}
+                    className="flex-1 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    Confirm Booking
+                  </button>
+                  <button
+                    onClick={() => { handleUpdateStatus(selectedBooking.id, "CANCELLED"); setSelectedBooking(null); }}
+                    className="flex-1 py-2.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
