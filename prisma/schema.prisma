@@ -147,6 +147,8 @@ model Booking {
   checkOut      DateTime
   guestCount    Int           @default(1)
   totalPrice    Decimal       @db.Decimal(10, 2)
+  promoCode     String?
+  discountAmount Decimal?     @db.Decimal(10, 2)
   status        BookingStatus @default(PENDING)
   specialRequests String?     @db.Text
   notes         String?       @db.Text

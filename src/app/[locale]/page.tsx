@@ -3,7 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { getFeaturedRooms, formatPrice, getRoomI18nKey } from "@/lib/data/rooms";
-import { getHomepageContent } from "@/lib/data/rooms-db";
+import { getHomepageContent, getRoomTypesFromDB } from "@/lib/data/rooms-db";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { HotelJsonLd } from "@/components/seo/json-ld";
 
@@ -45,15 +45,30 @@ export default async function HomePage({ params }: Props) {
   // Fetch homepage content from DB (admin-editable)
   const dbContent = await getHomepageContent() as HomepageDBContent;
 
+  // Prices must match the rooms page and the booking wizard, so read them from
+  // the same source instead of the static room data.
+  const dbRooms = await getRoomTypesFromDB();
+  const priceBySlug: Record<string, number> = Object.fromEntries(
+    dbRooms.map((room) => [room.slug, room.basePrice])
+  );
+
   return (
     <>
       <HotelJsonLd locale={locale} />
-      <HomeContent locale={locale} dbContent={dbContent} />
+      <HomeContent locale={locale} dbContent={dbContent} priceBySlug={priceBySlug} />
     </>
   );
 }
 
-function HomeContent({ locale, dbContent }: { locale: string; dbContent: HomepageDBContent }) {
+function HomeContent({
+  locale,
+  dbContent,
+  priceBySlug,
+}: {
+  locale: string;
+  dbContent: HomepageDBContent;
+  priceBySlug: Record<string, number>;
+}) {
   const t = useTranslations("home");
   const tCommon = useTranslations("common");
   const tRoomTypes = useTranslations("roomTypes");
@@ -214,7 +229,7 @@ function HomeContent({ locale, dbContent }: { locale: string; dbContent: Homepag
                       </p>
                       <div className="flex items-center justify-between pt-2">
                         <p className="font-[family-name:var(--font-heading)] text-base sm:text-lg">
-                          {formatPrice(room.price, locale)}
+                          {formatPrice(priceBySlug[room.slug] ?? room.price, locale)}
                           <span className="text-sm text-[var(--color-text-light)] font-[family-name:var(--font-body)]">
                             {tCommon("perNight")}
                           </span>

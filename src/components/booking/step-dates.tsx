@@ -10,6 +10,8 @@ import type { BookingData, AvailableRoom } from "./booking-wizard";
 
 type Props = {
   initialData: BookingData;
+  /** Slug of the room the guest came from; limits the search to that type */
+  roomFilter?: string | null;
   onSubmit: (data: {
     checkIn: string;
     checkOut: string;
@@ -18,7 +20,7 @@ type Props = {
   }) => void;
 };
 
-export function StepDates({ initialData, onSubmit }: Props) {
+export function StepDates({ initialData, roomFilter, onSubmit }: Props) {
   const t = useTranslations("booking");
   const locale = useLocale();
 
@@ -72,6 +74,7 @@ export function StepDates({ initialData, onSubmit }: Props) {
           checkIn: checkInStr,
           checkOut: checkOutStr,
           guestCount,
+          ...(roomFilter ? { roomSlug: roomFilter } : {}),
         }),
       });
 
@@ -83,7 +86,7 @@ export function StepDates({ initialData, onSubmit }: Props) {
       }
 
       if (data.rooms.length === 0) {
-        setError(t("errors.noRooms"));
+        setError(roomFilter ? t("errors.noRoomsForType") : t("errors.noRooms"));
         return;
       }
 

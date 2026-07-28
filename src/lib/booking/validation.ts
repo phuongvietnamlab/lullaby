@@ -4,6 +4,8 @@ export const checkAvailabilitySchema = z.object({
   checkIn: z.iso.date(),
   checkOut: z.iso.date(),
   guestCount: z.number().int().min(1).max(10),
+  // When present, only this room type is searched (guest came from a room page)
+  roomSlug: z.string().min(1).max(100).optional(),
 });
 
 export const createBookingSchema = z.object({
@@ -15,10 +17,19 @@ export const createBookingSchema = z.object({
   guestEmail: z.email(),
   guestPhone: z.string().min(8).max(20),
   specialRequests: z.string().max(500).optional().default(""),
+  promoCode: z.string().max(50).optional(),
+});
+
+export const validatePromoSchema = z.object({
+  code: z.string().min(1).max(50),
+  roomSlug: z.string().min(1).max(100),
+  checkIn: z.iso.date(),
+  checkOut: z.iso.date(),
 });
 
 export type CheckAvailabilityInput = z.infer<typeof checkAvailabilitySchema>;
 export type CreateBookingInput = z.infer<typeof createBookingSchema>;
+export type ValidatePromoInput = z.infer<typeof validatePromoSchema>;
 
 /**
  * Validate that check-in is before check-out and both are in the future

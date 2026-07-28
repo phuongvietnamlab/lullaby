@@ -86,10 +86,33 @@ export default async function RoomDetailPage({ params }: Props) {
     if (!room) notFound();
   }
 
-  return <RoomDetailContent locale={locale} slug={slug} dbRoom={dbRoom} />;
+  // Same price source as the rooms list and the booking wizard
+  const allDbRooms = await getRoomTypesFromDB();
+  const priceBySlug: Record<string, number> = Object.fromEntries(
+    allDbRooms.map((room) => [room.slug, room.basePrice])
+  );
+
+  return (
+    <RoomDetailContent
+      locale={locale}
+      slug={slug}
+      dbRoom={dbRoom}
+      priceBySlug={priceBySlug}
+    />
+  );
 }
 
-function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: string; dbRoom: RoomTypeFromDB | null }) {
+function RoomDetailContent({
+  locale,
+  slug,
+  dbRoom,
+  priceBySlug,
+}: {
+  locale: string;
+  slug: string;
+  dbRoom: RoomTypeFromDB | null;
+  priceBySlug: Record<string, number>;
+}) {
   const t = useTranslations("rooms");
   const tRoomTypes = useTranslations("roomTypes");
   const tRoomDetail = useTranslations("roomDetail");
@@ -309,7 +332,7 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
                 </div>
 
                 <Link
-                  href="/booking"
+                  href={{ pathname: "/booking", query: { room: slug } }}
                   className="block w-full text-center px-6 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] text-xs uppercase tracking-widest font-medium hover:bg-[var(--color-accent-light)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] min-h-[48px] flex items-center justify-center"
                 >
                   {tCommon("bookNow")}
@@ -356,7 +379,7 @@ function RoomDetailContent({ locale, slug, dbRoom }: { locale: string; slug: str
                         {otherRoom.size} m² • {t("maxGuests", { count: otherRoom.maxGuests })}
                       </p>
                       <p className="font-[family-name:var(--font-heading)] text-lg">
-                        {formatPrice(otherRoom.price, locale)}
+                        {formatPrice(priceBySlug[otherRoom.slug] ?? otherRoom.price, locale)}
                         <span className="text-sm text-[var(--color-text-light)] font-[family-name:var(--font-body)]">
                           {tCommon("perNight")}
                         </span>

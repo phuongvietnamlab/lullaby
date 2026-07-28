@@ -204,7 +204,15 @@
     "yourName": "Your Name",
     "yourEmail": "Your Email",
     "subject": "Subject",
-    "message": "Message"
+    "message": "Message",
+    "sending": "Sending...",
+    "sendSuccess": "Thank you! Your message has been sent and we will reply shortly.",
+    "errors": {
+      "invalidInput": "Please check the information you entered.",
+      "rateLimited": "Too many messages sent. Please try again later.",
+      "networkError": "Network error. Please check your connection.",
+      "sendFailed": "Could not send your message. Please try again or call us."
+    }
   },
   "booking": {
     "title": "Book a Room",
@@ -272,7 +280,8 @@
       "checkFailed": "Failed to check availability. Please try again.",
       "noRooms": "No rooms available for the selected dates. Please try different dates.",
       "bookingFailed": "Failed to create booking. Please try again.",
-      "networkError": "Network error. Please check your connection."
+      "networkError": "Network error. Please check your connection.",
+      "noRoomsForType": "This room type is sold out for the selected dates. Try other dates or view all rooms."
     },
     "status": {
       "title": "Check Booking Status",
@@ -286,6 +295,25 @@
         "CONFIRMED": "Confirmed",
         "CANCELLED": "Cancelled",
         "EXPIRED": "Expired"
+      }
+    },
+    "subtotal": "Subtotal",
+    "filteredNotice": "Showing the room type you selected.",
+    "showAllRooms": "View all rooms",
+    "promo": {
+      "label": "Promo code",
+      "placeholder": "Enter promo code",
+      "apply": "Apply",
+      "applying": "Checking...",
+      "remove": "Remove promo code",
+      "applied": "Code {code} applied",
+      "discount": "Discount ({code})",
+      "errors": {
+        "notFound": "This promo code does not exist.",
+        "inactive": "This promo code is no longer active.",
+        "notStarted": "This promo code is not valid yet for your selected dates.",
+        "expired": "This promo code has expired.",
+        "notApplicable": "This promo code does not apply to this room type."
       }
     }
   },

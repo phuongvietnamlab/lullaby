@@ -1,7 +1,11 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { getActivePromotions, formatDiscount } from "@/lib/data/promotions";
+import {
+  getActivePromotions,
+  formatDiscount,
+  type PublicPromotion,
+} from "@/lib/data/promotions";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import type { Metadata } from "next";
 
@@ -24,12 +28,19 @@ export default async function PromotionsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <PromotionsContent locale={locale} />;
+  const promotions = await getActivePromotions(locale);
+
+  return <PromotionsContent locale={locale} promotions={promotions} />;
 }
 
-function PromotionsContent({ locale }: { locale: string }) {
+function PromotionsContent({
+  locale,
+  promotions,
+}: {
+  locale: string;
+  promotions: PublicPromotion[];
+}) {
   const t = useTranslations("promotions");
-  const promotions = getActivePromotions();
 
   return (
     <>
@@ -117,10 +128,10 @@ function PromotionsContent({ locale }: { locale: string }) {
                       {/* Uses Left & CTA */}
                       <div className="flex items-center justify-between pt-4 border-t border-[var(--color-border)]">
                         <span className="text-xs text-[var(--color-text-light)]">
-                          {t("usesLeft", { count: promo.usesLeft })}
+                          {promo.usesLeft > 0 ? t("usesLeft", { count: promo.usesLeft }) : ""}
                         </span>
                         <Link
-                          href="/booking"
+                          href={{ pathname: "/booking", query: { promo: promo.code } }}
                           className="inline-flex items-center px-5 py-2.5 bg-[var(--color-primary)] text-white text-xs uppercase tracking-widest font-medium rounded-sm hover:bg-[var(--color-primary-light)] transition-colors"
                         >
                           {t("bookWithOffer")}

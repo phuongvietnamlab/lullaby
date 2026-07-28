@@ -3,7 +3,7 @@ import {
   checkAvailability,
   checkAvailabilitySchema,
   validateDates,
-  calculateTotalPrice,
+  calculateStayPrice,
   expirePendingBookings,
 } from "@/lib/booking";
 import { rateLimit } from "@/lib/rate-limit";
@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Expire old pending bookings first
-    expirePendingBookings();
+    // Expire old pending bookings first so their rooms become bookable again
+    await expirePendingBookings();
 
     const body = await request.json();
     const parsed = checkAvailabilitySchema.safeParse(body);
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { checkIn, checkOut, guestCount } = parsed.data;
+    const { checkIn, checkOut, guestCount, roomSlug } = parsed.data;
 
     // Validate dates
     const dateValidation = validateDates(checkIn, checkOut);
@@ -45,22 +45,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check availability
-    const available = checkAvailability(checkIn, checkOut, guestCount);
+    // Check availability (filtered to a single room type when roomSlug is set)
+    const available = await checkAvailability(checkIn, checkOut, guestCount, roomSlug);
 
-    // Calculate pricing for each available room
-    const results = available.map(({ roomId, room, available: availCount }) => {
-      const pricing = calculateTotalPrice(roomId, new Date(checkIn), new Date(checkOut));
+    // Price each available room off its own base price
+    const results = available.map((room) => {
+      const pricing = calculateStayPrice(
+        room.basePrice,
+        new Date(checkIn),
+        new Date(checkOut)
+      );
       return {
-        roomId,
+        roomId: room.roomTypeId,
         roomSlug: room.slug,
         roomName: room.nameKey,
-        basePrice: room.price,
+        basePrice: room.basePrice,
         totalPrice: pricing.total,
         nights: pricing.nights,
         maxGuests: room.maxGuests,
         size: room.size,
-        available: availCount,
+        available: room.available,
         images: room.images,
         amenities: room.amenities,
         highlights: room.highlights,
@@ -71,6 +75,7 @@ export async function POST(request: NextRequest) {
       checkIn,
       checkOut,
       guestCount,
+      roomSlug: roomSlug ?? null,
       rooms: results,
     });
   } catch (error) {

@@ -1,95 +1,152 @@
-﻿import { rooms, type RoomType } from "@/lib/data/rooms";
+import { db } from "@/lib/db";
+import { rooms, getRoomI18nKey, type RoomType } from "@/lib/data/rooms";
 
 /**
- * Mock room inventory - in production this would come from the database.
- * Each room type has a certain number of physical rooms available.
+ * Fallback room inventory, used only when the DB is unreachable or has no
+ * physical rooms seeded yet.
  */
-const ROOM_INVENTORY: Record<string, number> = {
-  "1": 10, // Superior Sea View: 10 rooms
-  "2": 8,  // Deluxe Bay View: 8 rooms
-  "3": 5,  // Premium Ocean Suite: 5 rooms
-  "4": 3,  // Executive Suite: 3 rooms
-  "5": 1,  // Presidential Suite: 1 room
+const FALLBACK_INVENTORY: Record<string, number> = {
+  "1": 10, // Superior Sea View
+  "2": 8, // Deluxe Bay View
+  "3": 5, // Premium Ocean Suite
+  "4": 3, // Executive Suite
+  "5": 1, // Presidential Suite
 };
 
-// TODO: Replace with Prisma query in production
-// In-memory bookings store for demo purposes
-export type BookingRecord = {
-  id: string;
-  bookingCode: string;
-  roomId: string;
+/** Booking statuses that still hold a room for the requested dates. */
+const BLOCKING_STATUSES = ["PENDING", "CONFIRMED", "CHECK_IN"] as const;
+
+export type AvailabilityResult = {
   roomTypeId: string;
-  checkIn: string; // ISO date string
-  checkOut: string; // ISO date string
-  guestCount: number;
-  guestName: string;
-  guestEmail: string;
-  guestPhone: string;
-  specialRequests: string;
-  totalPrice: number;
-  status: "PENDING" | "CONFIRMED" | "CANCELLED" | "EXPIRED";
-  createdAt: string;
-  expiresAt: string;
+  slug: string;
+  /** i18n key used by the public site, e.g. "roomTypes.superior.name" */
+  nameKey: string;
+  basePrice: number;
+  maxGuests: number;
+  size: number;
+  images: { src: string; alt: string }[];
+  amenities: string[];
+  highlights: string[];
+  available: number;
 };
 
-// In-memory store (resets on server restart)
-export const bookingsStore: BookingRecord[] = [];
+function staticRoomBySlug(slug: string): RoomType | undefined {
+  return rooms.find((r) => r.slug === slug);
+}
 
-/**
- * Check how many rooms of a given type are available for the specified dates
- */
-export function checkAvailability(
-  checkIn: string,
-  checkOut: string,
-  guestCount: number
-): { roomId: string; room: RoomType; available: number }[] {
-  const results: { roomId: string; room: RoomType; available: number }[] = [];
-
-  for (const room of rooms) {
-    // Skip rooms that can't accommodate the guest count
-    if (room.maxGuests < guestCount) continue;
-
-    const totalInventory = ROOM_INVENTORY[room.id] || 0;
-
-    // Count active bookings that overlap with the requested dates
-    const overlappingBookings = bookingsStore.filter((booking) => {
-      if (booking.roomTypeId !== room.id) return false;
-      if (booking.status === "CANCELLED" || booking.status === "EXPIRED") return false;
-      // Check date overlap
-      return booking.checkIn < checkOut && booking.checkOut > checkIn;
-    });
-
-    const available = totalInventory - overlappingBookings.length;
-
-    if (available > 0) {
-      results.push({
-        roomId: room.id,
-        room,
-        available,
-      });
-    }
-  }
-
-  return results;
+function toResultFromStatic(room: RoomType, available: number): AvailabilityResult {
+  return {
+    roomTypeId: room.id,
+    slug: room.slug,
+    nameKey: room.nameKey,
+    basePrice: room.price,
+    maxGuests: room.maxGuests,
+    size: room.size,
+    images: room.images.map((img) => ({ src: img.src, alt: img.alt })),
+    amenities: room.amenities,
+    highlights: room.highlights,
+    available,
+  };
 }
 
 /**
- * Check if a specific room type is available for the given dates
+ * Availability across all room types for the requested dates.
+ * Reads inventory and bookings from the DB; falls back to static data if the
+ * DB is unavailable.
+ *
+ * @param roomSlug - when set, only this room type is returned
  */
-export function isRoomTypeAvailable(
-  roomTypeId: string,
+export async function checkAvailability(
   checkIn: string,
-  checkOut: string
-): boolean {
-  const totalInventory = ROOM_INVENTORY[roomTypeId] || 0;
-  
-  const overlappingBookings = bookingsStore.filter((booking) => {
-    if (booking.roomTypeId !== roomTypeId) return false;
-    if (booking.status === "CANCELLED" || booking.status === "EXPIRED") return false;
-    return booking.checkIn < checkOut && booking.checkOut > checkIn;
-  });
+  checkOut: string,
+  guestCount: number,
+  roomSlug?: string
+): Promise<AvailabilityResult[]> {
+  try {
+    const roomTypes = await db.roomType.findMany({
+      where: {
+        isActive: true,
+        maxGuests: { gte: guestCount },
+        ...(roomSlug ? { slug: roomSlug } : {}),
+      },
+      orderBy: { sortOrder: "asc" },
+      include: {
+        rooms: { where: { status: { not: "OUT_OF_ORDER" } }, select: { id: true } },
+        bookings: {
+          where: {
+            status: { in: [...BLOCKING_STATUSES] },
+            checkIn: { lt: new Date(checkOut) },
+            checkOut: { gt: new Date(checkIn) },
+          },
+          select: { id: true },
+        },
+      },
+    });
 
-  return totalInventory - overlappingBookings.length > 0;
+    if (roomTypes.length === 0) {
+      // DB not seeded yet - fall back to static data.
+      return staticAvailability(checkIn, checkOut, guestCount, roomSlug);
+    }
+
+    return roomTypes
+      .map((rt) => {
+        const staticRoom = staticRoomBySlug(rt.slug);
+        const inventory =
+          rt.rooms.length || FALLBACK_INVENTORY[staticRoom?.id ?? ""] || 0;
+        const available = inventory - rt.bookings.length;
+
+        const dbImages = ((rt.images as string[]) || []).map((src) => ({
+          src,
+          alt: rt.nameEn,
+        }));
+        const dbAmenities = (rt.amenities as string[]) || [];
+
+        return {
+          roomTypeId: rt.id,
+          slug: rt.slug,
+          nameKey: `roomTypes.${getRoomI18nKey(rt.slug)}.name`,
+          basePrice: Number(rt.basePrice),
+          maxGuests: rt.maxGuests,
+          size: rt.size ?? staticRoom?.size ?? 0,
+          images: dbImages.length
+            ? dbImages
+            : (staticRoom?.images.map((img) => ({ src: img.src, alt: img.alt })) ?? []),
+          amenities: dbAmenities.length ? dbAmenities : (staticRoom?.amenities ?? []),
+          highlights: staticRoom?.highlights ?? [],
+          available,
+        };
+      })
+      .filter((r) => r.available > 0);
+  } catch (error) {
+    console.error("Availability DB query failed, using static data:", error);
+    return staticAvailability(checkIn, checkOut, guestCount, roomSlug);
+  }
+}
+
+function staticAvailability(
+  _checkIn: string,
+  _checkOut: string,
+  guestCount: number,
+  roomSlug?: string
+): AvailabilityResult[] {
+  return rooms
+    .filter((room) => room.maxGuests >= guestCount)
+    .filter((room) => !roomSlug || room.slug === roomSlug)
+    .map((room) => toResultFromStatic(room, FALLBACK_INVENTORY[room.id] || 0))
+    .filter((r) => r.available > 0);
+}
+
+/**
+ * Whether a specific room type still has inventory for the given dates.
+ */
+export async function isRoomTypeAvailable(
+  roomSlug: string,
+  checkIn: string,
+  checkOut: string,
+  guestCount = 1
+): Promise<boolean> {
+  const results = await checkAvailability(checkIn, checkOut, guestCount, roomSlug);
+  return results.length > 0;
 }
 
 /**
@@ -105,18 +162,18 @@ export function generateBookingCode(): string {
 }
 
 /**
- * Expire pending bookings older than 48 hours
+ * Mark pending bookings past their expiry as EXPIRED so their inventory is
+ * released back into availability.
  */
-export function expirePendingBookings(): number {
-  const now = new Date().toISOString();
-  let expiredCount = 0;
-
-  for (const booking of bookingsStore) {
-    if (booking.status === "PENDING" && booking.expiresAt < now) {
-      booking.status = "EXPIRED";
-      expiredCount++;
-    }
+export async function expirePendingBookings(): Promise<number> {
+  try {
+    const { count } = await db.booking.updateMany({
+      where: { status: "PENDING", expiresAt: { lt: new Date() } },
+      data: { status: "EXPIRED", cancelledAt: new Date() },
+    });
+    return count;
+  } catch (error) {
+    console.error("Failed to expire pending bookings:", error);
+    return 0;
   }
-
-  return expiredCount;
 }

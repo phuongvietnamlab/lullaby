@@ -204,7 +204,15 @@
     "yourName": "Họ và Tên",
     "yourEmail": "Email của bạn",
     "subject": "Tiêu Đề",
-    "message": "Nội Dung"
+    "message": "Nội Dung",
+    "sending": "Đang gửi...",
+    "sendSuccess": "Cảm ơn bạn! Tin nhắn đã được gửi, chúng tôi sẽ phản hồi sớm nhất.",
+    "errors": {
+      "invalidInput": "Vui lòng kiểm tra lại thông tin đã nhập.",
+      "rateLimited": "Bạn đã gửi quá nhiều tin nhắn. Vui lòng thử lại sau.",
+      "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
+      "sendFailed": "Không thể gửi tin nhắn. Vui lòng thử lại hoặc liên hệ qua điện thoại."
+    }
   },
   "booking": {
     "title": "Đặt Phòng",
@@ -272,7 +280,8 @@
       "checkFailed": "Không thể kiểm tra phòng trống. Vui lòng thử lại.",
       "noRooms": "Không còn phòng trống cho ngày đã chọn. Vui lòng thử ngày khác.",
       "bookingFailed": "Không thể tạo đặt phòng. Vui lòng thử lại.",
-      "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn."
+      "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
+      "noRoomsForType": "Loại phòng này đã hết cho ngày đã chọn. Hãy chọn ngày khác hoặc xem tất cả phòng."
     },
     "status": {
       "title": "Kiểm Tra Trạng Thái Đặt Phòng",
@@ -286,6 +295,25 @@
         "CONFIRMED": "Đã Xác Nhận",
         "CANCELLED": "Đã Hủy",
         "EXPIRED": "Đã Hết Hạn"
+      }
+    },
+    "subtotal": "Tạm tính",
+    "filteredNotice": "Đang hiển thị loại phòng bạn đã chọn.",
+    "showAllRooms": "Xem tất cả phòng",
+    "promo": {
+      "label": "Mã ưu đãi",
+      "placeholder": "Nhập mã ưu đãi",
+      "apply": "Áp dụng",
+      "applying": "Đang kiểm tra...",
+      "remove": "Bỏ mã ưu đãi",
+      "applied": "Đã áp dụng mã {code}",
+      "discount": "Ưu đãi ({code})",
+      "errors": {
+        "notFound": "Mã ưu đãi không tồn tại.",
+        "inactive": "Mã ưu đãi hiện không còn hiệu lực.",
+        "notStarted": "Mã ưu đãi chưa bắt đầu áp dụng cho ngày bạn chọn.",
+        "expired": "Mã ưu đãi đã hết hạn.",
+        "notApplicable": "Mã ưu đãi không áp dụng cho loại phòng này."
       }
     }
   },

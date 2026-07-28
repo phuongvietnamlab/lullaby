@@ -9,11 +9,22 @@ type Props = {
   rooms: AvailableRoom[];
   checkIn: string;
   checkOut: string;
+  /** True when the list is limited to the room type the guest came from */
+  filtered?: boolean;
   onSelect: (room: AvailableRoom) => void;
+  onShowAll?: () => void;
   onBack: () => void;
 };
 
-export function StepRooms({ rooms, checkIn, checkOut, onSelect, onBack }: Props) {
+export function StepRooms({
+  rooms,
+  checkIn,
+  checkOut,
+  filtered,
+  onSelect,
+  onShowAll,
+  onBack,
+}: Props) {
   const t = useTranslations("booking");
   const tRooms = useTranslations("roomTypes");
   const tAmenities = useTranslations("roomDetail.amenities");
@@ -48,6 +59,19 @@ export function StepRooms({ rooms, checkIn, checkOut, onSelect, onBack }: Props)
           </p>
         </div>
       </div>
+
+      {filtered && onShowAll && (
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg bg-surface-dim border border-border">
+          <span className="text-sm text-text-light">{t("filteredNotice")}</span>
+          <button
+            type="button"
+            onClick={onShowAll}
+            className="text-sm font-medium text-accent hover:underline"
+          >
+            {t("showAllRooms")}
+          </button>
+        </div>
+      )}
 
       <div className="space-y-4">
         {rooms.map((room) => {

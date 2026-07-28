@@ -1,11 +1,9 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,8 +25,10 @@ export default function AdminLoginPage() {
       return;
     }
 
-    router.push("/admin");
-    router.refresh();
+    // Full page navigation: a client-side push can render the dashboard before
+    // the auth client's session store has picked up the new cookie, which
+    // bounces the user straight back to this page.
+    window.location.assign("/admin");
   }
 
   return (

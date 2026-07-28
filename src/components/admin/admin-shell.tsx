@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import {
@@ -47,15 +47,18 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   const { data: session, isPending } = authClient.useSession();
 
-  // Redirect to login if no session
-  if (!isPending && !session) {
-    router.push("/admin/login");
-    return null;
-  }
+  // Redirect to login once the session has actually resolved. Doing this during
+  // render would fire before the session store hydrates and bounce a freshly
+  // signed-in user back to the login page.
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.replace("/admin/login");
+    }
+  }, [isPending, session, router]);
 
   async function handleLogout() {
     await authClient.signOut();
-    router.push("/admin/login");
+    router.replace("/admin/login");
   }
 
   function isActive(href: string) {

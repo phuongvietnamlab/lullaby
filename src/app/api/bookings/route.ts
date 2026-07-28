@@ -4,7 +4,9 @@ import {
   createBookingSchema,
   validateDates,
   generateBookingCode,
-  calculateTotalPrice,
+  calculateStayPrice,
+  expirePendingBookings,
+  validatePromoCode,
 } from "@/lib/booking";
 import { rateLimit } from "@/lib/rate-limit";
 import {
@@ -45,6 +47,7 @@ export async function POST(request: NextRequest) {
       guestEmail,
       guestPhone,
       specialRequests,
+      promoCode,
     } = parsed.data;
 
     // Validate dates
@@ -55,6 +58,9 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Release rooms held by expired pending bookings before counting
+    await expirePendingBookings();
 
     // Check availability via DB (prevent double-booking)
     const roomType = await db.roomType.findFirst({
@@ -93,8 +99,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Calculate pricing
-    const pricing = calculateTotalPrice(roomTypeId, new Date(checkIn), new Date(checkOut));
+    // Calculate pricing from the room type's own base price
+    const pricing = calculateStayPrice(
+      Number(rt.basePrice),
+      new Date(checkIn),
+      new Date(checkOut)
+    );
+
+    // Re-validate the promo code server-side; a bad code is ignored, not fatal
+    let appliedCode: string | null = null;
+    let discountAmount = 0;
+    if (promoCode?.trim()) {
+      const promo = await validatePromoCode(promoCode, rt.slug, checkIn, pricing.total);
+      if (promo.valid) {
+        appliedCode = promo.code;
+        discountAmount = promo.discountAmount;
+      }
+    }
+    const finalPrice = pricing.total - discountAmount;
 
     // Generate booking code
     const bookingCode = generateBookingCode();
@@ -124,7 +146,9 @@ export async function POST(request: NextRequest) {
         checkIn: new Date(checkIn),
         checkOut: new Date(checkOut),
         guestCount,
-        totalPrice: pricing.total,
+        totalPrice: finalPrice,
+        promoCode: appliedCode,
+        discountAmount: discountAmount || null,
         status: "PENDING",
         specialRequests: specialRequests || null,
         expiresAt,
@@ -149,6 +173,8 @@ export async function POST(request: NextRequest) {
       nights,
       status: booking.status,
       expiresAt: booking.expiresAt?.toISOString(),
+      promoCode: appliedCode ?? undefined,
+      discountAmount: discountAmount || undefined,
     };
 
     Promise.allSettled([
@@ -173,6 +199,9 @@ export async function POST(request: NextRequest) {
         checkIn: checkIn,
         checkOut: checkOut,
         guestCount: booking.guestCount,
+        subtotal: pricing.total,
+        discountAmount,
+        promoCode: appliedCode,
         totalPrice: Number(booking.totalPrice),
         nights,
         expiresAt: booking.expiresAt?.toISOString(),

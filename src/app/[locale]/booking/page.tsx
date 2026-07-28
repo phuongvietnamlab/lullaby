@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { BookingWizard } from "@/components/booking/booking-wizard";
@@ -14,7 +15,10 @@ export default async function BookingPage({ params }: Props) {
     <section className="pt-24 sm:pt-28 pb-12 sm:pb-20 px-4 sm:px-6 md:px-8">
       <div className="max-w-5xl mx-auto">
         <BookingPageHeader />
-        <BookingWizard />
+        {/* BookingWizard reads the ?room= param, so it needs a Suspense boundary */}
+        <Suspense fallback={<div className="min-h-[400px]" />}>
+          <BookingWizard />
+        </Suspense>
       </div>
     </section>
   );

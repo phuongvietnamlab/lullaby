@@ -28,6 +28,15 @@ export interface BookingEmailData {
   nights: number;
   status: string;
   expiresAt?: string;
+  promoCode?: string;
+  discountAmount?: number;
+}
+
+export interface ContactMessageData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
 }
 
 /**
@@ -90,6 +99,57 @@ export async function sendAdminNotification(
     return true;
   } catch (error) {
     console.error("[Email] Failed to send admin notification:", error);
+    return false;
+  }
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
+ * Forward a contact form submission to the hotel inbox.
+ * Returns false when email is not configured so the caller can surface that.
+ */
+export async function sendContactMessage(
+  data: ContactMessageData
+): Promise<boolean> {
+  const resend = getResendClient();
+  if (!resend) {
+    console.warn(
+      "[Email] RESEND_API_KEY not configured. Skipping contact message."
+    );
+    return false;
+  }
+
+  try {
+    const html = `
+      <div style="font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #222;">
+        <h2 style="margin: 0 0 16px;">Tin nhắn mới từ website</h2>
+        <p><strong>Họ tên:</strong> ${escapeHtml(data.name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(data.email)}</p>
+        <p><strong>Tiêu đề:</strong> ${escapeHtml(data.subject)}</p>
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 16px 0;" />
+        <p style="white-space: pre-wrap;">${escapeHtml(data.message)}</p>
+      </div>
+    `;
+
+    await resend.emails.send({
+      from: `Lullaby Sky Villa <${FROM_EMAIL}>`,
+      to: ADMIN_EMAIL,
+      replyTo: data.email,
+      subject: `[Liên hệ] ${data.subject}`,
+      html,
+    });
+    console.log(`[Email] Contact message forwarded from ${data.email}`);
+    return true;
+  } catch (error) {
+    console.error("[Email] Failed to send contact message:", error);
     return false;
   }
 }

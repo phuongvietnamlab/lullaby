@@ -3,7 +3,8 @@
  * Provides active and scheduled promotions for public pages
  */
 
-import { mockPromotions, type PromotionAdmin } from "@/lib/admin/mock-data";
+import { db } from "@/lib/db";
+import { mockPromotions } from "@/lib/admin/mock-data";
 
 export type PublicPromotion = {
   id: string;
@@ -18,9 +19,42 @@ export type PublicPromotion = {
 };
 
 /**
- * Get all active promotions for public display
+ * Get promotions to advertise on the public site.
+ *
+ * Reads from the DB so the codes shown here are the same ones the checkout
+ * validator accepts. Falls back to the static list only when the DB is empty
+ * or unreachable.
  */
-export function getActivePromotions(): PublicPromotion[] {
+export async function getActivePromotions(
+  locale: string = "vi"
+): Promise<PublicPromotion[]> {
+  try {
+    const promos = await db.promotion.findMany({
+      where: { isActive: true, endDate: { gte: new Date() } },
+      orderBy: { endDate: "asc" },
+      include: { roomTypes: { include: { roomType: true } } },
+    });
+
+    if (promos.length > 0) {
+      return promos.map((promo) => ({
+        id: promo.id,
+        name: (locale === "vi" ? promo.name : promo.nameEn) || promo.name,
+        code: promo.code ?? "",
+        discountType: promo.discountType === "PERCENTAGE" ? "percentage" : "fixed",
+        discountValue: Number(promo.discountValue),
+        startDate: promo.startDate.toISOString(),
+        endDate: promo.endDate.toISOString(),
+        applicableRooms: promo.roomTypes.map((rt) =>
+          locale === "vi" ? rt.roomType.name : rt.roomType.nameEn
+        ),
+        // The schema tracks no usage cap, so nothing to count down
+        usesLeft: 0,
+      }));
+    }
+  } catch (error) {
+    console.error("Failed to fetch promotions from DB, using static data:", error);
+  }
+
   return mockPromotions
     .filter((promo) => promo.status === "active" || promo.status === "scheduled")
     .map((promo) => ({

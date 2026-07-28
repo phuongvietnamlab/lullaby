@@ -2,22 +2,36 @@
 
 import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { ArrowLeft, Calendar, Users, User, Mail, Phone, CreditCard } from "lucide-react";
+import { ArrowLeft, Calendar, Users, User, Mail, Phone, CreditCard, Tag, X } from "lucide-react";
 import { formatPrice } from "@/lib/data/rooms";
 import type { BookingData, BookingResult } from "./booking-wizard";
 
 type Props = {
   bookingData: BookingData;
+  /** Code carried in from the promotions page, pre-filled but not yet applied */
+  promoPrefill?: string;
+  onPromoChange: (promoCode: string, discountAmount: number) => void;
   onConfirm: (result: BookingResult) => void;
   onBack: () => void;
 };
 
-export function StepConfirmation({ bookingData, onConfirm, onBack }: Props) {
+export function StepConfirmation({
+  bookingData,
+  promoPrefill = "",
+  onPromoChange,
+  onConfirm,
+  onBack,
+}: Props) {
   const t = useTranslations("booking");
   const tRooms = useTranslations("roomTypes");
   const locale = useLocale();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [promoInput, setPromoInput] = useState(
+    (bookingData.promoCode || promoPrefill).toUpperCase()
+  );
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [promoError, setPromoError] = useState("");
 
   const { selectedRoom } = bookingData;
   if (!selectedRoom) return null;
@@ -29,6 +43,52 @@ export function StepConfirmation({ bookingData, onConfirm, onBack }: Props) {
     (new Date(bookingData.checkOut).getTime() - new Date(bookingData.checkIn).getTime()) /
       (1000 * 60 * 60 * 24)
   );
+
+  const subtotal = selectedRoom.totalPrice;
+  const discountAmount = bookingData.discountAmount;
+  const finalTotal = subtotal - discountAmount;
+
+  const handleApplyPromo = async () => {
+    const code = promoInput.trim();
+    if (!code) return;
+
+    setPromoLoading(true);
+    setPromoError("");
+
+    try {
+      const res = await fetch("/api/promotions/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code,
+          roomSlug: selectedRoom.roomSlug,
+          checkIn: bookingData.checkIn,
+          checkOut: bookingData.checkOut,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.valid) {
+        const reason = typeof data.reason === "string" ? data.reason : "notFound";
+        setPromoError(t(`promo.errors.${reason}` as never));
+        onPromoChange("", 0);
+        return;
+      }
+
+      onPromoChange(data.code, data.discountAmount);
+    } catch {
+      setPromoError(t("errors.networkError"));
+    } finally {
+      setPromoLoading(false);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setPromoInput("");
+    setPromoError("");
+    onPromoChange("", 0);
+  };
 
   const handleConfirm = async () => {
     setLoading(true);
@@ -47,6 +107,7 @@ export function StepConfirmation({ bookingData, onConfirm, onBack }: Props) {
           guestEmail: bookingData.guestEmail,
           guestPhone: bookingData.guestPhone,
           specialRequests: bookingData.specialRequests,
+          ...(bookingData.promoCode ? { promoCode: bookingData.promoCode } : {}),
         }),
       });
 
@@ -176,12 +237,76 @@ export function StepConfirmation({ bookingData, onConfirm, onBack }: Props) {
           </div>
         </div>
 
+        {/* Promo code */}
+        <div className="p-4 md:p-6 border-t border-border space-y-3">
+          <label
+            htmlFor="promoCode"
+            className="flex items-center gap-2 text-sm font-medium text-text uppercase tracking-wide"
+          >
+            <Tag className="w-4 h-4 text-accent" />
+            {t("promo.label")}
+          </label>
+
+          {bookingData.promoCode ? (
+            <div className="flex items-center justify-between gap-3 p-3 rounded-lg bg-success/10 border border-success/30">
+              <span className="text-sm text-success">
+                {t("promo.applied", { code: bookingData.promoCode })}
+              </span>
+              <button
+                type="button"
+                onClick={handleRemovePromo}
+                className="p-1 rounded-full hover:bg-success/20 transition-colors"
+                aria-label={t("promo.remove")}
+              >
+                <X className="w-4 h-4 text-success" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                id="promoCode"
+                type="text"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+                placeholder={t("promo.placeholder")}
+                className="flex-1 px-4 py-3 border border-border rounded-lg bg-surface-bright
+                           focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent
+                           transition-all text-text uppercase tracking-wider"
+              />
+              <button
+                type="button"
+                onClick={handleApplyPromo}
+                disabled={promoLoading || !promoInput.trim()}
+                className="px-6 py-3 bg-primary text-text-inverse rounded-lg font-medium
+                           hover:bg-primary-light transition-all duration-300
+                           disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {promoLoading ? t("promo.applying") : t("promo.apply")}
+              </button>
+            </div>
+          )}
+
+          {promoError && <p className="text-sm text-error">{promoError}</p>}
+        </div>
+
         {/* Total Price */}
-        <div className="p-4 md:p-6 bg-surface-dim border-t border-border">
+        <div className="p-4 md:p-6 bg-surface-dim border-t border-border space-y-2">
+          {discountAmount > 0 && (
+            <>
+              <div className="flex items-center justify-between text-sm text-text-light">
+                <span>{t("subtotal")}</span>
+                <span>{formatPrice(subtotal, locale)}</span>
+              </div>
+              <div className="flex items-center justify-between text-sm text-success">
+                <span>{t("promo.discount", { code: bookingData.promoCode })}</span>
+                <span>-{formatPrice(discountAmount, locale)}</span>
+              </div>
+            </>
+          )}
           <div className="flex items-center justify-between">
             <span className="text-text-light">{t("totalPrice")}</span>
             <span className="text-2xl font-heading text-primary">
-              {formatPrice(selectedRoom.totalPrice, locale)}
+              {formatPrice(finalTotal, locale)}
             </span>
           </div>
         </div>

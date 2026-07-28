@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { ContactForm } from "@/components/contact/contact-form";
 import type { Metadata } from "next";
 
 type Props = {
@@ -55,64 +56,7 @@ function ContactContent() {
                 <h2 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl mb-6 sm:mb-8">
                   {t("sendMessage")}
                 </h2>
-                <form className="space-y-5 sm:space-y-6" action="#" method="POST">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-                    <div>
-                      <label htmlFor="name" className="block text-sm text-[var(--color-text-light)] mb-2">
-                        {t("yourName")}
-                      </label>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        required
-                        className="w-full px-4 py-3 border border-[var(--color-border)] rounded-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors bg-transparent min-h-[48px]"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm text-[var(--color-text-light)] mb-2">
-                        {t("yourEmail")}
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        className="w-full px-4 py-3 border border-[var(--color-border)] rounded-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors bg-transparent min-h-[48px]"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label htmlFor="subject" className="block text-sm text-[var(--color-text-light)] mb-2">
-                      {t("subject")}
-                    </label>
-                    <input
-                      type="text"
-                      id="subject"
-                      name="subject"
-                      required
-                      className="w-full px-4 py-3 border border-[var(--color-border)] rounded-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors bg-transparent min-h-[48px]"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="message" className="block text-sm text-[var(--color-text-light)] mb-2">
-                      {t("message")}
-                    </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      rows={6}
-                      required
-                      className="w-full px-4 py-3 border border-[var(--color-border)] rounded-sm focus:outline-none focus:border-[var(--color-accent)] transition-colors bg-transparent resize-none"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full sm:w-auto px-8 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] text-xs uppercase tracking-widest font-medium hover:bg-[var(--color-accent-light)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] min-h-[48px]"
-                  >
-                    {t("sendMessage")}
-                  </button>
-                </form>
+                <ContactForm />
               </div>
             </ScrollReveal>
 

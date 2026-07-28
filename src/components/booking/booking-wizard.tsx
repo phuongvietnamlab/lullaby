@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { StepDates } from "./step-dates";
 import { StepRooms } from "./step-rooms";
@@ -17,6 +18,8 @@ export type BookingData = {
   guestEmail: string;
   guestPhone: string;
   specialRequests: string;
+  promoCode: string;
+  discountAmount: number;
 };
 
 export type AvailableRoom = {
@@ -40,6 +43,9 @@ export type BookingResult = {
   checkIn: string;
   checkOut: string;
   guestCount: number;
+  subtotal?: number;
+  discountAmount?: number;
+  promoCode?: string | null;
   totalPrice: number;
   nights: number;
   expiresAt: string;
@@ -50,6 +56,13 @@ type Step = (typeof STEPS)[number];
 
 export function BookingWizard() {
   const t = useTranslations("booking");
+  const searchParams = useSearchParams();
+  // Set when the guest arrives from a room page: only search that room type
+  const [roomFilter, setRoomFilter] = useState<string | null>(
+    searchParams.get("room")
+  );
+  // Code carried over from the promotions page; still has to be validated
+  const promoPrefill = searchParams.get("promo") ?? "";
   const [currentStep, setCurrentStep] = useState<Step>("dates");
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null);
   const [availableRooms, setAvailableRooms] = useState<AvailableRoom[]>([]);
@@ -62,6 +75,8 @@ export function BookingWizard() {
     guestEmail: "",
     guestPhone: "",
     specialRequests: "",
+    promoCode: "",
+    discountAmount: 0,
   });
 
   const stepIndex = STEPS.indexOf(currentStep);
@@ -97,6 +112,16 @@ export function BookingWizard() {
   }) => {
     setBookingData((prev) => ({ ...prev, ...data }));
     goToStep("confirmation");
+  };
+
+  const handlePromoChange = (promoCode: string, discountAmount: number) => {
+    setBookingData((prev) => ({ ...prev, promoCode, discountAmount }));
+  };
+
+  // Guest asked to browse every room type instead of the one they came from
+  const handleShowAllRooms = () => {
+    setRoomFilter(null);
+    goToStep("dates");
   };
 
   const handleBookingConfirmed = (result: BookingResult) => {
@@ -150,6 +175,7 @@ export function BookingWizard() {
         {currentStep === "dates" && (
           <StepDates
             initialData={bookingData}
+            roomFilter={roomFilter}
             onSubmit={handleDatesSubmit}
           />
         )}
@@ -158,7 +184,9 @@ export function BookingWizard() {
             rooms={availableRooms}
             checkIn={bookingData.checkIn}
             checkOut={bookingData.checkOut}
+            filtered={Boolean(roomFilter)}
             onSelect={handleRoomSelect}
+            onShowAll={handleShowAllRooms}
             onBack={() => goToStep("dates")}
           />
         )}
@@ -172,6 +200,8 @@ export function BookingWizard() {
         {currentStep === "confirmation" && (
           <StepConfirmation
             bookingData={bookingData}
+            promoPrefill={promoPrefill}
+            onPromoChange={handlePromoChange}
             onConfirm={handleBookingConfirmed}
             onBack={() => goToStep("guest")}
           />
