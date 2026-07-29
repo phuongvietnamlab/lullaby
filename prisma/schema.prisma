@@ -162,6 +162,7 @@ model Booking {
   guest         Guest         @relation(fields: [guestId], references: [id])
   room          Room?         @relation(fields: [roomId], references: [id])
   roomType      RoomType      @relation(fields: [roomTypeId], references: [id])
+  reviews       Review[]
 
   @@map("bookings")
 }
@@ -206,8 +207,11 @@ model Review {
   id          String       @id @default(cuid())
   guestId     String
   roomTypeId  String?
+  bookingId   String?      @unique          // one review per booking (D-10, REV-05)
+  guestName   String?                       // editable display override (D-05, REV-02)
   rating      Int          // 1-5
   comment     String?      @db.Text
+  photos      String[]     @default([])     // public URL array (D-09, REV-03)
   response    String?      @db.Text // admin response
   status      ReviewStatus @default(PENDING)
   createdAt   DateTime     @default(now())
@@ -215,6 +219,7 @@ model Review {
 
   guest       Guest        @relation(fields: [guestId], references: [id])
   roomType    RoomType?    @relation(fields: [roomTypeId], references: [id])
+  booking     Booking?     @relation(fields: [bookingId], references: [id])
 
   @@map("reviews")
 }
