@@ -10,8 +10,10 @@ const submitSchema = z.object({
   guestName: z.string().trim().min(1).max(120),
   // Photo count capped server-side ≤5 (D-07); stores URL strings only (Pitfall 4)
   photos: z.array(z.string().url()).max(5).default([]),
-  // Honeypot — must be empty; non-empty = bot (D-11)
-  website: z.string().max(0).optional().default(""),
+  // Honeypot — legit clients leave this empty; non-empty = bot. Bounded (not
+  // .max(0)) so a filled honeypot passes validation and reaches the silent
+  // fake-success branch below instead of a tell-tale 400 (D-11, Open Q2).
+  website: z.string().max(200).optional().default(""),
 });
 
 export async function POST(request: NextRequest) {
