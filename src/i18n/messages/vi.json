@@ -381,6 +381,11 @@
     "stayDate": "Lưu trú: {date}",
     "hotelResponse": "Phản Hồi Từ Khách Sạn",
     "writeReview": "Viết Đánh Giá",
+    "verified": "Đã xác minh",
+    "homeSectionTitle": "Khách Hàng Nói Gì",
+    "homeSectionSubtitle": "Đánh giá thật từ khách đã lưu trú",
+    "emptyInvite": "Chưa có đánh giá — hãy là người đầu tiên chia sẻ trải nghiệm.",
+    "roomReviewsTitle": "Đánh giá phòng này",
     "submitTitle": "Chia Sẻ Trải Nghiệm",
     "submitSubtitle": "Kể cho chúng tôi về kỳ nghỉ của bạn tại Lullaby Sky Villa",
     "form": {

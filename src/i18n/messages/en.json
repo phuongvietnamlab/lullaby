@@ -381,6 +381,11 @@
     "stayDate": "Stay: {date}",
     "hotelResponse": "Hotel Response",
     "writeReview": "Write a Review",
+    "verified": "Verified",
+    "homeSectionTitle": "What Our Guests Say",
+    "homeSectionSubtitle": "Real reviews from verified guests",
+    "emptyInvite": "No reviews yet — be the first to share your stay.",
+    "roomReviewsTitle": "Reviews for this room",
     "submitTitle": "Share Your Experience",
     "submitSubtitle": "Tell us about your stay at Lullaby Sky Villa",
     "form": {
