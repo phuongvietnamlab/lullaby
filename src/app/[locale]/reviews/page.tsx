@@ -1,7 +1,11 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { getApprovedReviews, getAverageRating } from "@/lib/data/reviews";
+import {
+  getApprovedReviews,
+  getAverageRating,
+  type PublicReview,
+} from "@/lib/data/reviews";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import type { Metadata } from "next";
 
@@ -24,7 +28,17 @@ export default async function ReviewsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <ReviewsContent locale={locale} />;
+  const reviews = await getApprovedReviews();
+  const { average, count } = await getAverageRating();
+
+  return (
+    <ReviewsContent
+      locale={locale}
+      reviews={reviews}
+      average={average}
+      count={count}
+    />
+  );
 }
 
 function StarRating({ rating, size = "md" }: { rating: number; size?: "sm" | "md" | "lg" }) {
@@ -47,10 +61,18 @@ function StarRating({ rating, size = "md" }: { rating: number; size?: "sm" | "md
   );
 }
 
-function ReviewsContent({ locale }: { locale: string }) {
+function ReviewsContent({
+  locale,
+  reviews,
+  average,
+  count,
+}: {
+  locale: string;
+  reviews: PublicReview[];
+  average: number;
+  count: number;
+}) {
   const t = useTranslations("reviews");
-  const reviews = getApprovedReviews();
-  const { average, count } = getAverageRating();
 
   return (
     <>
@@ -99,9 +121,6 @@ function ReviewsContent({ locale }: { locale: string }) {
               <div className="p-6 md:p-8 bg-white border border-[var(--color-border)] rounded-sm">
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div>
-                    <h3 className="font-[family-name:var(--font-heading)] text-xl mb-1">
-                      {review.title}
-                    </h3>
                     <StarRating rating={review.rating} />
                   </div>
                   <div className="text-right text-sm text-[var(--color-text-light)] shrink-0">
