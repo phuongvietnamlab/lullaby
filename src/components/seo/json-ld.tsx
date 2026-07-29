@@ -1,10 +1,49 @@
 ﻿import { type RoomType } from "@/lib/data/rooms";
 
-type HotelJsonLdProps = {
-  locale: string;
+/**
+ * Live APPROVED aggregate shape fed from getAverageRating / getRoomTypeReviewSummary.
+ * ratingValue/ratingCount here are the EXACT numbers the caller computed — no
+ * re-averaging in this module (SEO-04 / Pitfall 2).
+ */
+type Agg = { average: number; count: number };
+
+/**
+ * Attach a schema.org AggregateRating to a schema object ONLY when there is at
+ * least one APPROVED review (D-07). When !agg || agg.count < 1 the schema is
+ * returned unchanged — the aggregateRating node is omitted ENTIRELY (never
+ * ratingCount: 0, which is a Rich Results structural error / T-11-07).
+ */
+function withAggregate(
+  schema: Record<string, unknown>,
+  agg?: Agg | null
+): Record<string, unknown> {
+  if (!agg || agg.count < 1) return schema;
+  return {
+    ...schema,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: agg.average,
+      ratingCount: agg.count,
+      bestRating: 5,
+      worstRating: 1,
+    },
+  };
+}
+
+type HotelReview = {
+  author: string;
+  rating: number;
+  datePublished: string;
+  body?: string;
 };
 
-export function HotelJsonLd({ locale }: HotelJsonLdProps) {
+type HotelJsonLdProps = {
+  locale: string;
+  agg?: Agg | null;
+  reviews?: HotelReview[];
+};
+
+export function HotelJsonLd({ locale, agg, reviews }: HotelJsonLdProps) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "Hotel",
@@ -46,10 +85,34 @@ export function HotelJsonLd({ locale }: HotelJsonLdProps) {
     ],
   };
 
+  // Site-wide AggregateRating (SEO-01), omitted entirely when count < 1 (D-07).
+  let finalSchema = withAggregate(schema, agg);
+
+  // Homepage featured Review nodes. Author name is truncated (<100 chars) and the
+  // free-text body is OMITTED by default to neutralize the HIGH XSS item (T-11-06,
+  // research A5). All values reach the <script> only via JSON.stringify below, which
+  // escapes quotes and the "<" in "</script>" — no string concatenation of JSON.
+  if (reviews && reviews.length > 0) {
+    finalSchema = {
+      ...finalSchema,
+      review: reviews.map((r) => ({
+        "@type": "Review",
+        author: { "@type": "Person", name: r.author.slice(0, 99) },
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: r.rating,
+          bestRating: 5,
+          worstRating: 1,
+        },
+        datePublished: r.datePublished,
+      })),
+    };
+  }
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(finalSchema) }}
     />
   );
 }
@@ -59,9 +122,16 @@ type RoomJsonLdProps = {
   locale: string;
   roomName: string;
   roomDescription: string;
+  agg?: Agg | null;
 };
 
-export function RoomJsonLd({ room, locale, roomName, roomDescription }: RoomJsonLdProps) {
+export function RoomJsonLd({
+  room,
+  locale,
+  roomName,
+  roomDescription,
+  agg,
+}: RoomJsonLdProps) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "HotelRoom",
@@ -90,10 +160,14 @@ export function RoomJsonLd({ room, locale, roomName, roomDescription }: RoomJson
     },
   };
 
+  // Per-room AggregateRating (SEO-02), omitted entirely when count < 1 (D-07).
+  // Aggregate-only per-room — no Review nodes here, keeping XSS surface minimal.
+  const finalSchema = withAggregate(schema, agg);
+
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(finalSchema) }}
     />
   );
 }
