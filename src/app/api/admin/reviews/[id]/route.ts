@@ -4,7 +4,7 @@ import { requireAdminSession } from "@/lib/auth-utils";
 
 // Free-form moderation status (D-04): any status is directly settable from any
 // current status. There is intentionally NO transition state machine here — do
-// NOT reintroduce a TRANSITIONS map or a 409 response.
+// NOT reintroduce a TRANSITIONS map or a transition-conflict response.
 const VALID_STATUSES = ["PENDING", "APPROVED", "REJECTED"] as const;
 type ValidStatus = (typeof VALID_STATUSES)[number];
 
