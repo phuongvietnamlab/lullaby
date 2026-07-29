@@ -214,6 +214,7 @@ model Review {
   photos      String[]     @default([])     // public URL array (D-09, REV-03)
   response    String?      @db.Text // admin response
   status      ReviewStatus @default(PENDING)
+  rejectReason String?     @db.Text // internal-only staff note (D-01/D-02/D-03)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
