@@ -26,6 +26,7 @@
     "reviews": "Đánh Giá",
     "contact": "Liên Hệ",
     "booking": "Đặt Phòng",
+    "bookingStatus": "Trạng Thái Đặt Phòng",
     "about": "Giới Thiệu"
   },
   "home": {
@@ -133,7 +134,11 @@
       "spa": "Sử Dụng Spa",
       "transfer": "Đưa Đón Sân Bay",
       "kitchen": "Bếp Đầy Đủ",
-      "jacuzzi": "Jacuzzi Riêng"
+      "jacuzzi": "Jacuzzi Riêng",
+      "rainshower": "Vòi Sen Mưa",
+      "balcony": "Ban Công Riêng",
+      "pool": "Hồ Bơi Riêng",
+      "butler": "Quản Gia 24/7"
     },
     "highlightsList": {
       "seaView": "Tầm nhìn biển tuyệt đẹp từ ban công riêng",
@@ -392,7 +397,34 @@
       "namePlaceholder": "VD: Nguyễn Văn A",
       "emailPlaceholder": "VD: nguyenvana@email.com",
       "titlePlaceholder": "VD: Kỳ nghỉ tuyệt vời!",
-      "commentPlaceholder": "Chia sẻ trải nghiệm của bạn với những khách khác..."
+      "commentPlaceholder": "Chia sẻ trải nghiệm của bạn với những khách khác...",
+      "nameHelper": "Tên này sẽ hiển thị công khai cùng đánh giá",
+      "roomLockedHelper": "Từ đặt phòng đã xác minh của bạn",
+      "photoPrompt": "Thêm ảnh (tùy chọn)",
+      "photoHint": "Tối đa 5 ảnh, mỗi ảnh ≤ 5MB (JPG, PNG, WebP)",
+      "removePhoto": "Xóa ảnh",
+      "photoMax": "Tối đa 5 ảnh mỗi đánh giá.",
+      "successBody": "Đánh giá của bạn sẽ hiển thị công khai sau khi được đội ngũ HASANA duyệt.",
+      "errorRating": "Vui lòng chọn số sao.",
+      "errorCommentShort": "Nội dung cần ít nhất 20 ký tự.",
+      "errorCommentLong": "Nội dung tối đa 1000 ký tự.",
+      "errorPhotoSize": "Ảnh vượt quá 5MB. Chọn ảnh nhỏ hơn.",
+      "errorPhotoType": "Chỉ chấp nhận JPG, PNG hoặc WebP.",
+      "errorPhotoUpload": "Tải ảnh thất bại. Vui lòng thử lại.",
+      "errorSubmit": "Không gửi được đánh giá. Vui lòng thử lại sau."
+    },
+    "verify": {
+      "title": "Xác Minh Đặt Phòng",
+      "subtitle": "Nhập mã đặt phòng và email để xác nhận bạn đã lưu trú",
+      "bookingCode": "Mã Đặt Phòng",
+      "bookingCodePlaceholder": "VD: HSN-2026-00123",
+      "submit": "Xác Minh",
+      "verifying": "Đang xác minh...",
+      "verifiedBadge": "Đã xác minh · Mã {code}",
+      "errorInvalidCode": "Không tìm thấy mã đặt phòng này. Vui lòng kiểm tra lại mã trong email xác nhận.",
+      "errorEmailMismatch": "Email không khớp với đặt phòng này. Dùng email bạn đã đặt phòng.",
+      "errorIneligible": "Chỉ khách đã hoàn tất kỳ lưu trú mới có thể đánh giá.",
+      "errorAlreadyReviewed": "Bạn đã đánh giá kỳ lưu trú này rồi. Cảm ơn bạn!"
     },
     "selectRoom": "Chọn loại phòng",
     "stars": "{count} sao"

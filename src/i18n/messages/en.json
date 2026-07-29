@@ -26,6 +26,7 @@
     "reviews": "Reviews",
     "contact": "Contact",
     "booking": "Book",
+    "bookingStatus": "Booking Status",
     "about": "About"
   },
   "home": {
@@ -133,7 +134,11 @@
       "spa": "Spa Access",
       "transfer": "Airport Transfer",
       "kitchen": "Full Kitchen",
-      "jacuzzi": "Private Jacuzzi"
+      "jacuzzi": "Private Jacuzzi",
+      "rainshower": "Rain Shower",
+      "balcony": "Private Balcony",
+      "pool": "Private Pool",
+      "butler": "24/7 Butler"
     },
     "highlightsList": {
       "seaView": "Stunning sea view from private balcony",
@@ -392,7 +397,34 @@
       "namePlaceholder": "e.g. John Smith",
       "emailPlaceholder": "e.g. john@email.com",
       "titlePlaceholder": "e.g. Amazing stay!",
-      "commentPlaceholder": "Share your experience with other guests..."
+      "commentPlaceholder": "Share your experience with other guests...",
+      "nameHelper": "This name will be shown publicly with your review",
+      "roomLockedHelper": "From your verified booking",
+      "photoPrompt": "Add photos (optional)",
+      "photoHint": "Up to 5 photos, ≤ 5MB each (JPG, PNG, WebP)",
+      "removePhoto": "Remove photo",
+      "photoMax": "Maximum 5 photos per review.",
+      "successBody": "Your review will appear publicly once the HASANA team approves it.",
+      "errorRating": "Please select a star rating.",
+      "errorCommentShort": "Your review needs at least 20 characters.",
+      "errorCommentLong": "Reviews are limited to 1000 characters.",
+      "errorPhotoSize": "Image exceeds 5MB. Please choose a smaller file.",
+      "errorPhotoType": "Only JPG, PNG or WebP images are allowed.",
+      "errorPhotoUpload": "Photo upload failed. Please try again.",
+      "errorSubmit": "We couldn't submit your review. Please try again."
+    },
+    "verify": {
+      "title": "Verify Your Booking",
+      "subtitle": "Enter your booking code and email to confirm your stay",
+      "bookingCode": "Booking Code",
+      "bookingCodePlaceholder": "e.g. HSN-2026-00123",
+      "submit": "Verify",
+      "verifying": "Verifying...",
+      "verifiedBadge": "Verified · Booking {code}",
+      "errorInvalidCode": "We couldn't find that booking code. Please check the code in your confirmation email.",
+      "errorEmailMismatch": "This email doesn't match the booking. Please use the email you booked with.",
+      "errorIneligible": "Only guests who have completed their stay can leave a review.",
+      "errorAlreadyReviewed": "You've already reviewed this stay. Thank you!"
     },
     "selectRoom": "Select room type",
     "stars": "{count} stars"
