@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { Link } from "@/i18n/navigation";
 import { getRoomBySlug, getAllRoomSlugs, formatPrice, rooms, getRoomI18nKey } from "@/lib/data/rooms";
 import { getRoomTypeBySlugFromDB, getRoomTypesFromDB, type RoomTypeFromDB } from "@/lib/data/rooms-db";
@@ -182,16 +182,15 @@ function RoomDetailContent({
 
       {/* Hero Gallery */}
       <section className="relative h-[50vh] sm:h-[70vh] min-h-[350px] sm:min-h-[500px] overflow-hidden">
-        {heroImage && (
-          <Image
-            src={heroImage}
-            alt={roomName}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        )}
+        <ImageWithFallback
+          src={heroImage}
+          alt={roomName}
+          fallbackLabel={roomName}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-8 md:p-16">
           <div className="max-w-7xl mx-auto">
@@ -238,9 +237,10 @@ function RoomDetailContent({
                       const imgSrc = typeof img === "string" ? img : img;
                       return (
                         <div key={idx} className="relative aspect-[4/3] overflow-hidden rounded-sm">
-                          <Image
+                          <ImageWithFallback
                             src={imgSrc}
                             alt={`${roomName} ${idx + 2}`}
+                            fallbackLabel={roomName}
                             fill
                             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 40vw"
                             className="object-cover hover:scale-105 transition-transform duration-700"
@@ -436,9 +436,10 @@ function RoomDetailContent({
                     className="group block overflow-hidden rounded-sm border border-[var(--color-border)] bg-white"
                   >
                     <div className="relative aspect-[16/9] overflow-hidden">
-                      <Image
+                      <ImageWithFallback
                         src={otherRoom.images[0].src}
                         alt={otherRoom.images[0].alt}
+                        fallbackLabel={otherRoom.images[0].alt}
                         fill
                         sizes="(max-width: 768px) 100vw, 50vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-700"

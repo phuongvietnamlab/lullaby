@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { StepDates } from "./step-dates";
@@ -81,7 +81,27 @@ export function BookingWizard() {
 
   const stepIndex = STEPS.indexOf(currentStep);
 
-  const goToStep = (step: Step) => setCurrentStep(step);
+  // Advance to a later step AND record it in browser history, so the browser
+  // Back button walks back through the wizard (confirmation → guest → rooms →
+  // dates) instead of leaving the booking page for the previous page.
+  const goToStep = (step: Step) => {
+    window.history.pushState({ step }, "");
+    setCurrentStep(step);
+  };
+
+  // Keep currentStep in sync with browser Back/Forward. Seed the current entry
+  // (replaceState) so the first Back has a state object to return to.
+  useEffect(() => {
+    window.history.replaceState({ step: currentStep }, "");
+    const onPop = (e: PopStateEvent) => {
+      const s = (e.state as { step?: Step } | null)?.step;
+      setCurrentStep(s && STEPS.includes(s) ? s : "dates");
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+    // Mount-only: currentStep is intentionally excluded.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleDatesSubmit = (data: {
     checkIn: string;
@@ -121,7 +141,7 @@ export function BookingWizard() {
   // Guest asked to browse every room type instead of the one they came from
   const handleShowAllRooms = () => {
     setRoomFilter(null);
-    goToStep("dates");
+    window.history.back();
   };
 
   const handleBookingConfirmed = (result: BookingResult) => {
@@ -187,14 +207,14 @@ export function BookingWizard() {
             filtered={Boolean(roomFilter)}
             onSelect={handleRoomSelect}
             onShowAll={handleShowAllRooms}
-            onBack={() => goToStep("dates")}
+            onBack={() => window.history.back()}
           />
         )}
         {currentStep === "guest" && (
           <StepGuest
             initialData={bookingData}
             onSubmit={handleGuestSubmit}
-            onBack={() => goToStep("rooms")}
+            onBack={() => window.history.back()}
           />
         )}
         {currentStep === "confirmation" && (
@@ -203,7 +223,7 @@ export function BookingWizard() {
             promoPrefill={promoPrefill}
             onPromoChange={handlePromoChange}
             onConfirm={handleBookingConfirmed}
-            onBack={() => goToStep("guest")}
+            onBack={() => window.history.back()}
           />
         )}
       </div>

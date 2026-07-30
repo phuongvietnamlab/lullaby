@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { rooms, formatPrice, getRoomI18nKey } from "@/lib/data/rooms";
 import { getRoomTypesFromDB, type RoomTypeFromDB } from "@/lib/data/rooms-db";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -90,15 +90,14 @@ function RoomsContent({ locale, dbRooms }: { locale: string; dbRooms: RoomTypeFr
                   <article className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-16 items-center">
                     {/* Image */}
                     <div className={`relative aspect-[4/3] overflow-hidden rounded-sm ${index % 2 === 1 ? "md:order-2" : ""}`}>
-                      {imageUrl && (
-                        <Image
-                          src={imageUrl}
-                          alt={displayName}
-                          fill
-                          sizes="(max-width: 768px) 100vw, 50vw"
-                          className="object-cover transition-transform duration-700 hover:scale-105"
-                        />
-                      )}
+                      <ImageWithFallback
+                        src={imageUrl}
+                        alt={displayName}
+                        fallbackLabel={displayName}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover transition-transform duration-700 hover:scale-105"
+                      />
                     </div>
 
                     {/* Info */}
