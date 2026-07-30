@@ -36,7 +36,7 @@ const BLUR_PLACEHOLDER =
 const ROOM_IMAGES = {
   superior: [
     "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80",
-    "https://images.unsplash.com/photo-1590490360182-c33d955bc03e?w=800&q=80",
+    "https://images.unsplash.com/photo-1590490359683-658d3d23f972?w=800&q=80",
     "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=800&q=80",
   ],
   deluxe: [
@@ -278,11 +278,11 @@ export const galleryImages: GalleryImage[] = [
   { src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80", alt: "Mountain bay view", category: "views", blurDataURL: BLUR_PLACEHOLDER },
   // Dining
   { src: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80", alt: "Fine dining restaurant", category: "dining", blurDataURL: BLUR_PLACEHOLDER },
-  { src: "https://images.unsplash.com/photo-1550966871-3ed3cdb51f3a?w=800&q=80", alt: "Breakfast buffet", category: "dining", blurDataURL: BLUR_PLACEHOLDER },
+  { src: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=800&q=80", alt: "Breakfast buffet", category: "dining", blurDataURL: BLUR_PLACEHOLDER },
   { src: "https://images.unsplash.com/photo-1544148103-0773bf10d330?w=800&q=80", alt: "Restaurant terrace", category: "dining", blurDataURL: BLUR_PLACEHOLDER },
   // Spa
   { src: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80", alt: "Spa treatment room", category: "spa", blurDataURL: BLUR_PLACEHOLDER },
-  { src: "https://images.unsplash.com/photo-1540555700478-4be289fbec6d?w=800&q=80", alt: "Relaxation pool", category: "spa", blurDataURL: BLUR_PLACEHOLDER },
+  { src: "https://images.unsplash.com/photo-1595576508898-0ad5c879a061?w=800&q=80", alt: "Relaxation pool", category: "spa", blurDataURL: BLUR_PLACEHOLDER },
   // Facilities
   { src: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80", alt: "Hotel exterior", category: "facilities", blurDataURL: BLUR_PLACEHOLDER },
   { src: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80", alt: "Swimming pool", category: "facilities", blurDataURL: BLUR_PLACEHOLDER },
