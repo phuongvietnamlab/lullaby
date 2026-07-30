@@ -46,6 +46,12 @@ export function Footer() {
                 {tNav("booking")}
               </Link>
               <Link
+                href="/booking/status"
+                className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2.5 min-h-[44px] flex items-center justify-center sm:justify-start"
+              >
+                {tNav("bookingStatus")}
+              </Link>
+              <Link
                 href="/blog"
                 className="block text-sm hover:text-[var(--color-accent)] transition-colors py-2.5 min-h-[44px] flex items-center justify-center sm:justify-start"
               >

@@ -2,8 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdminSession } from "@/lib/auth-utils";
 
-const VALID_STATUSES = ["CONFIRMED", "CANCELLED", "CHECK_IN", "CHECK_OUT"] as const;
+const VALID_STATUSES = [
+  "CONFIRMED",
+  "CANCELLED",
+  "CHECK_IN",
+  "CHECK_OUT",
+  "COMPLETED",
+  "NO_SHOW",
+] as const;
 type ValidStatus = (typeof VALID_STATUSES)[number];
+
+// Allowed status transitions. Prevents illegal jumps (e.g. pending -> completed).
+const TRANSITIONS: Record<string, ValidStatus[]> = {
+  PENDING: ["CONFIRMED", "CANCELLED"],
+  CONFIRMED: ["CHECK_IN", "CANCELLED", "NO_SHOW"],
+  CHECK_IN: ["CHECK_OUT"],
+  CHECK_OUT: ["COMPLETED"],
+};
 
 export async function PATCH(
   request: NextRequest,
@@ -32,6 +47,17 @@ export async function PATCH(
     const booking = await db.booking.findUnique({ where: { id } });
     if (!booking) {
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+
+    // Enforce valid state transition
+    const allowed = TRANSITIONS[booking.status] || [];
+    if (!allowed.includes(status as ValidStatus)) {
+      return NextResponse.json(
+        {
+          error: `Cannot change status from ${booking.status} to ${status}`,
+        },
+        { status: 409 }
+      );
     }
 
     // Build update data

@@ -37,12 +37,21 @@ export function Header() {
     };
   }, [isMobileMenuOpen]);
 
+  // Pages with a dark full-bleed hero behind the header at scroll top.
+  // Other pages have a light background at top, so header text must be dark.
+  const heroRoutes = ["/", "/contact", "/gallery", "/rooms", "/about", "/attractions"];
+  const hasHero = heroRoutes.some((r) =>
+    r === "/" ? pathname === "/" : pathname.startsWith(r)
+  );
+  const solid = isScrolled || !hasHero;
+
   const navLinks = [
     { href: "/" as const, label: t("home") },
     { href: "/rooms" as const, label: t("rooms") },
     { href: "/gallery" as const, label: t("gallery") },
     { href: "/blog" as const, label: t("blog") },
     { href: "/promotions" as const, label: t("promotions") },
+    { href: "/booking/status" as const, label: t("bookingStatus") },
     { href: "/contact" as const, label: t("contact") },
   ];
 
@@ -60,7 +69,7 @@ export function Header() {
           <Link href="/" className="flex items-center space-x-2 min-h-[44px] items-center">
             <span
               className={`font-[family-name:var(--font-heading)] text-xl sm:text-2xl font-medium tracking-wider transition-colors duration-[var(--duration-normal)] ${
-                isScrolled ? "text-[var(--color-primary)]" : "text-white"
+                solid ? "text-[var(--color-primary)]" : "text-white"
               }`}
             >
               Lullaby
@@ -76,7 +85,7 @@ export function Header() {
                 className={`text-sm uppercase tracking-widest transition-colors duration-[var(--duration-normal)] hover:text-[var(--color-accent)] min-h-[44px] flex items-center ${
                   pathname === link.href
                     ? "text-[var(--color-accent)]"
-                    : isScrolled
+                    : solid
                     ? "text-[var(--color-text)]"
                     : "text-white/90"
                 }`}
@@ -88,7 +97,7 @@ export function Header() {
 
           {/* Right side: Language + Book button */}
           <div className="hidden lg:flex items-center space-x-4">
-            <LanguageSwitcher isScrolled={isScrolled} />
+            <LanguageSwitcher isScrolled={solid} />
             <Link
               href="/booking"
               className="px-6 py-2.5 bg-[var(--color-accent)] text-[var(--color-primary-dark)] text-xs uppercase tracking-widest font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] min-h-[44px] flex items-center"
@@ -107,17 +116,17 @@ export function Header() {
             <div className="space-y-1.5">
               <span
                 className={`block w-6 h-0.5 transition-all duration-[var(--duration-normal)] ${
-                  isScrolled ? "bg-[var(--color-primary)]" : "bg-white"
+                  solid ? "bg-[var(--color-primary)]" : "bg-white"
                 } ${isMobileMenuOpen ? "rotate-45 translate-y-2" : ""}`}
               />
               <span
                 className={`block w-6 h-0.5 transition-all duration-[var(--duration-normal)] ${
-                  isScrolled ? "bg-[var(--color-primary)]" : "bg-white"
+                  solid ? "bg-[var(--color-primary)]" : "bg-white"
                 } ${isMobileMenuOpen ? "opacity-0" : ""}`}
               />
               <span
                 className={`block w-6 h-0.5 transition-all duration-[var(--duration-normal)] ${
-                  isScrolled ? "bg-[var(--color-primary)]" : "bg-white"
+                  solid ? "bg-[var(--color-primary)]" : "bg-white"
                 } ${isMobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`}
               />
             </div>

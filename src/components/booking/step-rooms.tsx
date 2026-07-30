@@ -3,6 +3,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { ArrowLeft, Users, Maximize2, Check } from "lucide-react";
 import { formatPrice } from "@/lib/data/rooms";
+import { amenityKey } from "@/lib/amenities";
 import type { AvailableRoom } from "./booking-wizard";
 
 type Props = {
@@ -127,7 +128,10 @@ export function StepRooms({
                           className="flex items-center gap-1 text-xs bg-surface-dim px-2 py-1 rounded"
                         >
                           <Check className="w-3 h-3 text-success" />
-                          {tAmenities(amenity)}
+                          {(() => {
+                            const key = amenityKey(amenity);
+                            return key ? tAmenities(key as never) : amenity;
+                          })()}
                         </span>
                       ))}
                       {room.amenities.length > 5 && (

@@ -6,7 +6,16 @@
  *
  * Run: npx tsx scripts/seed-promotions.ts
  */
-import { db } from "../src/lib/db";
+import path from "node:path";
+import process from "node:process";
+
+// Must run before src/lib/db is imported - that module reads DATABASE_URL at
+// import time to build its connection pool. Hence the dynamic import in main().
+try {
+  process.loadEnvFile(path.join(__dirname, "..", ".env"));
+} catch {
+  // No .env file - rely on the ambient environment
+}
 
 type Seed = {
   code: string;
@@ -54,6 +63,12 @@ const PROMOTIONS: Seed[] = [
 ];
 
 async function main() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set - check your .env file");
+  }
+
+  const { db } = await import("../src/lib/db");
+
   for (const seed of PROMOTIONS) {
     const promo = await db.promotion.upsert({
       where: { code: seed.code },
@@ -102,8 +117,7 @@ async function main() {
   await db.$disconnect();
 }
 
-main().catch(async (err) => {
+main().catch((err) => {
   console.error("Error:", err);
-  await db.$disconnect();
   process.exit(1);
 });

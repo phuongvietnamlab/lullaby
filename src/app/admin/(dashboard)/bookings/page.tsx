@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, X, Eye, Filter, RefreshCw, Calendar, User, Phone, Mail, MessageSquare } from "lucide-react";
+import { Check, X, Eye, Filter, RefreshCw, Calendar, User, Phone, Mail, MessageSquare, LogIn, LogOut, CheckCheck, CalendarClock } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 type Booking = {
   id: string;
@@ -20,7 +21,44 @@ type Booking = {
   specialRequests?: string;
 };
 
-type StatusFilter = "all" | "pending" | "confirmed" | "checked_in" | "checked_out" | "cancelled" | "expired";
+type BookingStatus =
+  | "pending"
+  | "confirmed"
+  | "check_in"
+  | "check_out"
+  | "completed"
+  | "cancelled"
+  | "no_show"
+  | "expired";
+
+// "arrivals" is a virtual view (confirmed bookings arriving today or later),
+// not a real DB status.
+type StatusFilter = "all" | "arrivals" | BookingStatus;
+
+type ActionDef = {
+  status: string;
+  label: string;
+  icon: LucideIcon;
+  color: string;
+};
+
+// Status -> next action buttons. Keys are lowercase DB statuses.
+const NEXT_ACTIONS: Record<string, ActionDef[]> = {
+  pending: [
+    { status: "CONFIRMED", label: "Confirm", icon: Check, color: "hover:text-green-600 hover:bg-green-50" },
+    { status: "CANCELLED", label: "Cancel", icon: X, color: "hover:text-red-600 hover:bg-red-50" },
+  ],
+  confirmed: [
+    { status: "CHECK_IN", label: "Check In", icon: LogIn, color: "hover:text-blue-600 hover:bg-blue-50" },
+    { status: "CANCELLED", label: "Cancel", icon: X, color: "hover:text-red-600 hover:bg-red-50" },
+  ],
+  check_in: [
+    { status: "CHECK_OUT", label: "Check Out", icon: LogOut, color: "hover:text-blue-600 hover:bg-blue-50" },
+  ],
+  check_out: [
+    { status: "COMPLETED", label: "Complete", icon: CheckCheck, color: "hover:text-green-600 hover:bg-green-50" },
+  ],
+};
 
 function formatPrice(price: number): string {
   return new Intl.NumberFormat("vi-VN", {
@@ -43,7 +81,16 @@ export default function AdminBookingsPage() {
     setTimeout(() => setFeedback(null), 4000);
   };
 
-  const handleUpdateStatus = async (bookingId: string, status: "CONFIRMED" | "CANCELLED") => {
+  const STATUS_VERB: Record<string, string> = {
+    CONFIRMED: "confirmed",
+    CANCELLED: "cancelled",
+    CHECK_IN: "checked in",
+    CHECK_OUT: "checked out",
+    COMPLETED: "completed",
+    NO_SHOW: "marked as no-show",
+  };
+
+  const handleUpdateStatus = async (bookingId: string, status: string) => {
     if (status === "CANCELLED") {
       const confirmed = window.confirm("Are you sure you want to cancel this booking?");
       if (!confirmed) return;
@@ -64,7 +111,7 @@ export default function AdminBookingsPage() {
         return;
       }
 
-      showFeedback("success", `Booking ${status === "CONFIRMED" ? "confirmed" : "cancelled"} successfully`);
+      showFeedback("success", `Booking ${STATUS_VERB[status] || "updated"} successfully`);
       fetchBookings();
     } catch {
       showFeedback("error", "Network error. Please try again.");
@@ -90,18 +137,29 @@ export default function AdminBookingsPage() {
     fetchBookings();
   }, []);
 
+  const today = new Date().toISOString().split("T")[0];
+  // Upcoming arrivals: confirmed and not yet checked in, arriving today or later.
+  const arrivals = bookings
+    .filter((b) => b.status === "confirmed" && b.checkIn >= today)
+    .sort((a, b) => a.checkIn.localeCompare(b.checkIn));
+
   const filteredBookings =
     statusFilter === "all"
       ? bookings
+      : statusFilter === "arrivals"
+      ? arrivals
       : bookings.filter((b) => b.status === statusFilter);
 
-  const statusCounts = {
+  const statusCounts: Record<StatusFilter, number> = {
     all: bookings.length,
+    arrivals: arrivals.length,
     pending: bookings.filter((b) => b.status === "pending").length,
     confirmed: bookings.filter((b) => b.status === "confirmed").length,
-    checked_in: bookings.filter((b) => b.status === "checked_in").length,
-    checked_out: bookings.filter((b) => b.status === "checked_out").length,
+    check_in: bookings.filter((b) => b.status === "check_in").length,
+    check_out: bookings.filter((b) => b.status === "check_out").length,
+    completed: bookings.filter((b) => b.status === "completed").length,
     cancelled: bookings.filter((b) => b.status === "cancelled").length,
+    no_show: bookings.filter((b) => b.status === "no_show").length,
     expired: bookings.filter((b) => b.status === "expired").length,
   };
 
@@ -139,18 +197,21 @@ export default function AdminBookingsPage() {
       {/* Status Filter Tabs */}
       <div className="flex items-center gap-2 flex-wrap">
         <Filter size={16} className="text-gray-400" />
-        {(["all", "pending", "confirmed", "checked_in", "checked_out", "cancelled", "expired"] as StatusFilter[]).map(
+        {(["all", "arrivals", "pending", "confirmed", "check_in", "check_out", "completed", "cancelled", "no_show", "expired"] as StatusFilter[]).map(
           (status) => (
             <button
               key={status}
               onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors inline-flex items-center gap-1 ${
                 statusFilter === status
                   ? "bg-slate-800 text-white"
+                  : status === "arrivals"
+                  ? "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
-              {status.replace("_", " ")} ({statusCounts[status]})
+              {status === "arrivals" && <CalendarClock size={12} />}
+              {status === "arrivals" ? "Upcoming Check-ins" : status.replace("_", " ")} ({statusCounts[status]})
             </button>
           )
         )}
@@ -208,26 +269,20 @@ export default function AdminBookingsPage() {
                         <button onClick={() => setSelectedBooking(booking)} className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded" title="View details">
                           <Eye size={15} />
                         </button>
-                        {booking.status === "pending" && (
-                          <>
+                        {(NEXT_ACTIONS[booking.status] || []).map((action) => {
+                          const Icon = action.icon;
+                          return (
                             <button
-                              onClick={() => handleUpdateStatus(booking.id, "CONFIRMED")}
+                              key={action.status}
+                              onClick={() => handleUpdateStatus(booking.id, action.status)}
                               disabled={actionLoading === booking.id}
-                              className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded disabled:opacity-50"
-                              title="Confirm"
+                              className={`p-1.5 text-gray-400 rounded disabled:opacity-50 ${action.color}`}
+                              title={action.label}
                             >
-                              <Check size={15} />
+                              <Icon size={15} />
                             </button>
-                            <button
-                              onClick={() => handleUpdateStatus(booking.id, "CANCELLED")}
-                              disabled={actionLoading === booking.id}
-                              className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded disabled:opacity-50"
-                              title="Cancel"
-                            >
-                              <X size={15} />
-                            </button>
-                          </>
-                        )}
+                          );
+                        })}
                       </div>
                     </td>
                   </tr>
@@ -332,20 +387,21 @@ export default function AdminBookingsPage() {
               )}
 
               {/* Actions */}
-              {selectedBooking.status === "pending" && (
+              {(NEXT_ACTIONS[selectedBooking.status] || []).length > 0 && (
                 <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={() => { handleUpdateStatus(selectedBooking.id, "CONFIRMED"); setSelectedBooking(null); }}
-                    className="flex-1 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
-                  >
-                    Confirm Booking
-                  </button>
-                  <button
-                    onClick={() => { handleUpdateStatus(selectedBooking.id, "CANCELLED"); setSelectedBooking(null); }}
-                    className="flex-1 py-2.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 transition-colors"
-                  >
-                    Cancel
-                  </button>
+                  {NEXT_ACTIONS[selectedBooking.status].map((action) => (
+                    <button
+                      key={action.status}
+                      onClick={() => { handleUpdateStatus(selectedBooking.id, action.status); setSelectedBooking(null); }}
+                      className={`flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                        action.status === "CANCELLED"
+                          ? "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                          : "bg-slate-800 text-white hover:bg-slate-700"
+                      }`}
+                    >
+                      {action.label}
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
@@ -360,9 +416,11 @@ function BookingStatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-800",
     confirmed: "bg-green-100 text-green-800",
-    checked_in: "bg-blue-100 text-blue-800",
-    checked_out: "bg-gray-100 text-gray-800",
+    check_in: "bg-blue-100 text-blue-800",
+    check_out: "bg-indigo-100 text-indigo-800",
+    completed: "bg-gray-100 text-gray-800",
     cancelled: "bg-red-100 text-red-800",
+    no_show: "bg-orange-100 text-orange-800",
     expired: "bg-orange-100 text-orange-800",
   };
 
