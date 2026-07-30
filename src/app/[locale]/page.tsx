@@ -296,7 +296,7 @@ function HomeContent({
 
       {/* Guest Reviews Section (DISP-01) — static 6-card grid (D-02), server-rendered.
           Average + cards share the same aggregate as the HotelJsonLd above (SEO-04). */}
-      <section className="py-[var(--spacing-section-sm)] sm:py-[var(--spacing-section)] px-4 sm:px-6">
+      <section className="scroll-mt-24 py-[var(--spacing-section-sm)] sm:py-[var(--spacing-section)] px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <ScrollReveal>
             <div className="text-center mb-10 sm:mb-16">
@@ -327,8 +327,18 @@ function HomeContent({
                 </div>
               </ScrollReveal>
 
-              {/* Static 6-card grid: 3 across desktop, 2 tablet, stacked mobile (D-02) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+              {/* Static card grid (D-02): up to 3 across desktop, 2 tablet, stacked mobile.
+                  Columns + max width adapt to the review count so a 1- or 2-review set
+                  stays centered instead of leaving an empty trailing column. */}
+              <div
+                className={`grid grid-cols-1 gap-6 sm:gap-8 mx-auto ${
+                  reviews.length === 1
+                    ? "max-w-md"
+                    : reviews.length === 2
+                      ? "sm:grid-cols-2 max-w-3xl"
+                      : "sm:grid-cols-2 md:grid-cols-3"
+                }`}
+              >
                 {reviews.map((review, idx) => (
                   <ScrollReveal key={review.id} delay={idx * 0.1}>
                     <ReviewCard review={review} locale={locale} />

@@ -403,7 +403,11 @@ function RoomDetailContent({
               </div>
             </ScrollReveal>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            <div
+              className={`grid grid-cols-1 gap-6 sm:gap-8 mx-auto ${
+                reviews.length === 1 ? "max-w-xl" : "md:grid-cols-2 max-w-4xl"
+              }`}
+            >
               {reviews.map((review, idx) => (
                 <ScrollReveal key={review.id} delay={idx * 0.1}>
                   <ReviewCard review={review} locale={locale} />
