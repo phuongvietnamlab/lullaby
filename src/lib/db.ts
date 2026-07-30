@@ -11,9 +11,15 @@ function createPrismaClient() {
 
   const pool = new pg.Pool({
     connectionString,
-    max: 5, // Limit connections for serverless
-    idleTimeoutMillis: 30000,
+    // Keep this small. Supabase's SESSION-mode pooler caps total clients (e.g.
+    // pool_size: 15) and every server instance / serverless lambda opens its own
+    // pool, so a large max exhausts the DB ("EMAXCONNSESSION: max clients
+    // reached"). For production prefer the Supabase TRANSACTION pooler
+    // (host ...pooler.supabase.com:6543, add ?pgbouncer=true) which multiplexes.
+    max: 3,
+    idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 10000,
+    allowExitOnIdle: true,
     ssl: connectionString?.includes("supabase.com")
       ? { rejectUnauthorized: false }
       : undefined,
@@ -25,4 +31,7 @@ function createPrismaClient() {
 
 export const db = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+// Reuse one client per process in EVERY environment. In dev this stops HMR from
+// opening a fresh pool on each reload; on a warm serverless instance it stops a
+// new pool per invocation — both of which otherwise exhaust the Supabase pooler.
+globalForPrisma.prisma = db;
