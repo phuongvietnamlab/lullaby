@@ -5,8 +5,12 @@ import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { getRoomBySlug, getAllRoomSlugs, formatPrice, rooms, getRoomI18nKey } from "@/lib/data/rooms";
 import { getRoomTypeBySlugFromDB, getRoomTypesFromDB, type RoomTypeFromDB } from "@/lib/data/rooms-db";
+import { amenityKey } from "@/lib/amenities";
 import { RoomJsonLd } from "@/components/seo/json-ld";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { ReviewCard } from "@/components/reviews/review-card";
+import { StarRating } from "@/components/reviews/star-rating";
+import { getRoomTypeReviewSummary, type PublicReview } from "@/lib/data/reviews";
 import type { Metadata } from "next";
 
 // ISR: revalidate every 5 minutes
@@ -92,12 +96,22 @@ export default async function RoomDetailPage({ params }: Props) {
     allDbRooms.map((room) => [room.slug, room.basePrice])
   );
 
+  // Per-room APPROVED review summary (DISP-02/SEO-02), scoped to this exact room
+  // type by dbRoom.id. Static-only rooms (no DB row) have no queryable id, so we
+  // fall back to an empty summary — no crash, no per-room reviews (Pitfall 5).
+  const roomSummary = dbRoom
+    ? await getRoomTypeReviewSummary(dbRoom.id)
+    : { average: 0, count: 0, reviews: [] as PublicReview[] };
+
   return (
     <RoomDetailContent
       locale={locale}
       slug={slug}
       dbRoom={dbRoom}
       priceBySlug={priceBySlug}
+      reviews={roomSummary.reviews}
+      reviewAverage={roomSummary.average}
+      reviewCount={roomSummary.count}
     />
   );
 }
@@ -107,16 +121,23 @@ function RoomDetailContent({
   slug,
   dbRoom,
   priceBySlug,
+  reviews,
+  reviewAverage,
+  reviewCount,
 }: {
   locale: string;
   slug: string;
   dbRoom: RoomTypeFromDB | null;
   priceBySlug: Record<string, number>;
+  reviews: PublicReview[];
+  reviewAverage: number;
+  reviewCount: number;
 }) {
   const t = useTranslations("rooms");
   const tRoomTypes = useTranslations("roomTypes");
   const tRoomDetail = useTranslations("roomDetail");
   const tCommon = useTranslations("common");
+  const tReviews = useTranslations("reviews");
 
   const room = getRoomBySlug(slug);
   const key = getRoomI18nKey(slug);
@@ -151,7 +172,13 @@ function RoomDetailContent({
 
   return (
     <>
-      <RoomJsonLd room={room || rooms[0]} locale={locale} roomName={roomName} roomDescription={roomDesc} />
+      <RoomJsonLd
+        room={room || rooms[0]}
+        locale={locale}
+        roomName={roomName}
+        roomDescription={roomDesc}
+        agg={reviewCount > 0 ? { average: reviewAverage, count: reviewCount } : null}
+      />
 
       {/* Hero Gallery */}
       <section className="relative h-[50vh] sm:h-[70vh] min-h-[350px] sm:min-h-[500px] overflow-hidden">
@@ -247,7 +274,10 @@ function RoomDetailContent({
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
                         <span className="text-xs sm:text-sm">
-                          {amenity.match(/^[a-z_]+$/) ? tRoomDetail(`amenities.${amenity}` as never) : amenity}
+                          {(() => {
+                            const key = amenityKey(amenity);
+                            return key ? tRoomDetail(`amenities.${key}` as never) : amenity;
+                          })()}
                         </span>
                       </div>
                     ))}
@@ -342,6 +372,47 @@ function RoomDetailContent({
           </div>
         </div>
       </section>
+
+      {/* Per-room Guest Reviews (DISP-02) — only this room type's APPROVED reviews.
+          Shown only when there is at least one (no per-room empty invite, D-07).
+          Average + cards + RoomJsonLd agg all share the same aggregate (SEO-04). */}
+      {reviewCount > 0 && (
+        <section className="py-[var(--spacing-section-sm)] sm:py-[var(--spacing-section)] px-4 sm:px-6">
+          <div className="max-w-7xl mx-auto">
+            <ScrollReveal>
+              <h2 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl text-center mb-8 sm:mb-12">
+                {tReviews("roomReviewsTitle")}
+              </h2>
+            </ScrollReveal>
+
+            {/* Average summary — same numbers as the RoomJsonLd ratingValue (SEO-04) */}
+            <ScrollReveal>
+              <div className="flex flex-col items-center justify-center mb-10 sm:mb-14">
+                <p className="text-sm uppercase tracking-widest text-[var(--color-text-light)] mb-2">
+                  {tReviews("averageRating")}
+                </p>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="font-[family-name:var(--font-heading)] text-4xl sm:text-5xl">
+                    {reviewAverage}
+                  </span>
+                  <StarRating rating={Math.round(reviewAverage)} size="lg" />
+                </div>
+                <p className="text-sm text-[var(--color-text-light)]">
+                  {tReviews("basedOn", { count: reviewCount })}
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+              {reviews.map((review, idx) => (
+                <ScrollReveal key={review.id} delay={idx * 0.1}>
+                  <ReviewCard review={review} locale={locale} />
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Other Rooms */}
       <section className="py-[var(--spacing-section-sm)] sm:py-[var(--spacing-section)] px-4 sm:px-6 bg-[var(--color-surface-dim)]">
