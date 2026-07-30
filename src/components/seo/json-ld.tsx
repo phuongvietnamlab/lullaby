@@ -1,4 +1,4 @@
-﻿import { type RoomType } from "@/lib/data/rooms";
+import { type RoomType } from "@/lib/data/rooms";
 
 /**
  * Live APPROVED aggregate shape fed from getAverageRating / getRoomTypeReviewSummary.
@@ -6,6 +6,20 @@
  * re-averaging in this module (SEO-04 / Pitfall 2).
  */
 type Agg = { average: number; count: number };
+
+/**
+ * Serialize a schema object for embedding in a <script type="application/ld+json">
+ * tag. JSON.stringify does NOT escape "<", so a guest-controlled string containing
+ * "</script>" would break out of the tag (stored XSS, T-11-06). Escape the characters
+ * that can terminate the script/HTML-comment context before dangerouslySetInnerHTML.
+ * Standard Next.js JSON-LD hardening.
+ */
+function jsonLdHtml(schema: Record<string, unknown>): string {
+  return JSON.stringify(schema)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
+}
 
 /**
  * Attach a schema.org AggregateRating to a schema object ONLY when there is at
@@ -89,9 +103,10 @@ export function HotelJsonLd({ locale, agg, reviews }: HotelJsonLdProps) {
   let finalSchema = withAggregate(schema, agg);
 
   // Homepage featured Review nodes. Author name is truncated (<100 chars) and the
-  // free-text body is OMITTED by default to neutralize the HIGH XSS item (T-11-06,
-  // research A5). All values reach the <script> only via JSON.stringify below, which
-  // escapes quotes and the "<" in "</script>" — no string concatenation of JSON.
+  // free-text body is OMITTED by default to shrink the XSS surface (T-11-06, research
+  // A5). Guest-controlled author name still reaches the <script>, so serialization
+  // goes through jsonLdHtml() below, which escapes "<" — JSON.stringify alone does not,
+  // and "</script>" in an author name would otherwise break out of the tag.
   if (reviews && reviews.length > 0) {
     finalSchema = {
       ...finalSchema,
@@ -112,7 +127,7 @@ export function HotelJsonLd({ locale, agg, reviews }: HotelJsonLdProps) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(finalSchema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdHtml(finalSchema) }}
     />
   );
 }
@@ -167,7 +182,7 @@ export function RoomJsonLd({
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(finalSchema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdHtml(finalSchema) }}
     />
   );
 }
@@ -204,7 +219,7 @@ export function LodgingBusinessJsonLd({ locale }: { locale: string }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLdHtml(schema) }}
     />
   );
 }
