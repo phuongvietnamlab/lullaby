@@ -4,8 +4,11 @@ import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { getFeaturedRooms, formatPrice, getRoomI18nKey } from "@/lib/data/rooms";
 import { getHomepageContent, getRoomTypesFromDB } from "@/lib/data/rooms-db";
+import { getApprovedReviews, getAverageRating, type PublicReview } from "@/lib/data/reviews";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { HotelJsonLd } from "@/components/seo/json-ld";
+import { ReviewCard } from "@/components/reviews/review-card";
+import { StarRating } from "@/components/reviews/star-rating";
 
 // ISR: revalidate every 5 minutes
 export const revalidate = 300;
@@ -52,10 +55,36 @@ export default async function HomePage({ params }: Props) {
     dbRooms.map((room) => [room.slug, room.basePrice])
   );
 
+  // Approved reviews + site-wide aggregate: fetched ONCE and used to feed both the
+  // visible section (below) and the HotelJsonLd structured data. Sharing this single
+  // source is what keeps the visible average identical to the JSON-LD ratingValue
+  // (SEO-04 / Pitfall 2).
+  const featuredReviews = await getApprovedReviews(6);
+  const reviewAgg = await getAverageRating();
+
+  // JSON-LD Review nodes: author/rating/date only — the free-text body is omitted
+  // by default (Plan 02 HotelJsonLd default, lowest XSS surface, T-11-13).
+  const reviewNodes = featuredReviews.map((r) => ({
+    author: r.guestName,
+    rating: r.rating,
+    datePublished: r.createdAt,
+  }));
+
   return (
     <>
-      <HotelJsonLd locale={locale} />
-      <HomeContent locale={locale} dbContent={dbContent} priceBySlug={priceBySlug} />
+      <HotelJsonLd
+        locale={locale}
+        agg={reviewAgg.count > 0 ? reviewAgg : null}
+        reviews={reviewNodes}
+      />
+      <HomeContent
+        locale={locale}
+        dbContent={dbContent}
+        priceBySlug={priceBySlug}
+        reviews={featuredReviews}
+        average={reviewAgg.average}
+        count={reviewAgg.count}
+      />
     </>
   );
 }
@@ -64,15 +93,22 @@ function HomeContent({
   locale,
   dbContent,
   priceBySlug,
+  reviews,
+  average,
+  count,
 }: {
   locale: string;
   dbContent: HomepageDBContent;
   priceBySlug: Record<string, number>;
+  reviews: PublicReview[];
+  average: number;
+  count: number;
 }) {
   const t = useTranslations("home");
   const tCommon = useTranslations("common");
   const tRoomTypes = useTranslations("roomTypes");
   const tRooms = useTranslations("rooms");
+  const t2 = useTranslations("reviews");
 
   const featuredRooms = getFeaturedRooms();
 
@@ -255,6 +291,78 @@ function HomeContent({
               </Link>
             </div>
           </ScrollReveal>
+        </div>
+      </section>
+
+      {/* Guest Reviews Section (DISP-01) — static 6-card grid (D-02), server-rendered.
+          Average + cards share the same aggregate as the HotelJsonLd above (SEO-04). */}
+      <section className="py-[var(--spacing-section-sm)] sm:py-[var(--spacing-section)] px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <ScrollReveal>
+            <div className="text-center mb-10 sm:mb-16">
+              <h2 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl md:text-5xl mb-4">
+                {t2("homeSectionTitle")}
+              </h2>
+              <p className="text-[var(--color-text-light)] text-base sm:text-lg">
+                {t2("homeSectionSubtitle")}
+              </p>
+              <div className="luxury-divider mx-auto mt-6" />
+            </div>
+          </ScrollReveal>
+
+          {count > 0 ? (
+            <>
+              {/* Average summary — same numbers as JSON-LD ratingValue/ratingCount (SEO-04) */}
+              <ScrollReveal>
+                <div className="flex flex-col items-center justify-center mb-10 sm:mb-14">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="font-[family-name:var(--font-heading)] text-4xl sm:text-5xl">
+                      {average}
+                    </span>
+                    <StarRating rating={Math.round(average)} size="lg" />
+                  </div>
+                  <p className="text-sm text-[var(--color-text-light)]">
+                    {t2("basedOn", { count })}
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              {/* Static 6-card grid: 3 across desktop, 2 tablet, stacked mobile (D-02) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+                {reviews.map((review, idx) => (
+                  <ScrollReveal key={review.id} delay={idx * 0.1}>
+                    <ReviewCard review={review} locale={locale} />
+                  </ScrollReveal>
+                ))}
+              </div>
+
+              <ScrollReveal delay={0.3}>
+                <div className="text-center mt-10 sm:mt-12">
+                  <Link
+                    href="/reviews"
+                    className="inline-flex items-center justify-center px-8 py-4 border border-[var(--color-primary)] text-[var(--color-primary)] text-xs uppercase tracking-widest rounded-full hover:bg-[var(--color-primary)] hover:text-white transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] min-h-[48px]"
+                  >
+                    {t2("title")}
+                  </Link>
+                </div>
+              </ScrollReveal>
+            </>
+          ) : (
+            /* Empty state (D-03): invitation, NOT a hidden section */
+            <ScrollReveal>
+              <div className="max-w-2xl mx-auto text-center">
+                <p className="text-[var(--color-text-light)] text-base sm:text-lg mb-8">
+                  {t2("emptyInvite")}
+                </p>
+                <Link
+                  href="/reviews/submit"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] text-xs uppercase tracking-widest font-medium rounded-full hover:bg-[var(--color-accent-light)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] min-h-[48px]"
+                >
+                  {t2("writeReview")}
+                </Link>
+              </div>
+            </ScrollReveal>
+          )}
         </div>
       </section>
 
