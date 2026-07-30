@@ -335,7 +335,7 @@ function HomeContent({
                   reviews.length === 1
                     ? "max-w-md"
                     : reviews.length === 2
-                      ? "sm:grid-cols-2 max-w-3xl"
+                      ? "sm:grid-cols-2 max-w-4xl"
                       : "sm:grid-cols-2 md:grid-cols-3"
                 }`}
               >
