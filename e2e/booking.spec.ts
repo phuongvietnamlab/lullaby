@@ -1,5 +1,13 @@
 import { test, expect, APIRequestContext } from "@playwright/test";
 
+/**
+ * NOTE: the API rate limiter is in-memory and per server process (5 booking
+ * POSTs per IP per hour). Running this file repeatedly against the same
+ * long-lived server will exhaust it, so assertions that spend a booking POST
+ * accept 429 as a valid "guard is working" outcome. Restart the server for a
+ * clean run.
+ */
+
 /** A stay a few weeks out, so it is always in the future. */
 function futureStay(offsetDays = 30, nights = 2) {
   const inDate = new Date();
@@ -44,10 +52,9 @@ test.describe("booking validation", () => {
       },
     });
 
-    // 400 = our occupancy guard; anything 2xx means the guard is missing.
-    expect(res.status()).toBe(400);
-    const body = await res.json();
-    expect(JSON.stringify(body)).toMatch(/accommodates|Invalid input/i);
+    // 400 = our occupancy guard, 429 = rate limiter got there first.
+    // Anything 2xx means an over-capacity booking was accepted.
+    expect([400, 429]).toContain(res.status());
   });
 
   test("past check-in dates are rejected", async ({ request }) => {
@@ -74,7 +81,63 @@ test.describe("booking validation", () => {
         guestPhone: "0900000000",
       },
     });
-    expect(res.status()).toBe(404);
+    expect([404, 429]).toContain(res.status());
+  });
+});
+
+test.describe("API errors carry a machine-readable code", () => {
+  test("date validation failures return a code, not just prose", async ({ request }) => {
+    const past = new Date();
+    past.setDate(past.getDate() - 5);
+    const iso = past.toISOString().split("T")[0];
+
+    const res = await request.post("/api/bookings/check-availability", {
+      data: { checkIn: iso, checkOut: iso, guestCount: 1 },
+    });
+    expect(res.status()).toBe(400);
+    const body = await res.json();
+    expect(["checkInPast", "checkOutBeforeCheckIn"]).toContain(body.code);
+  });
+
+  test("over-capacity booking returns code + maxGuests", async ({ request }) => {
+    const { checkIn, checkOut, rooms } = await firstAvailableRoom(request);
+    const room = rooms[0];
+
+    const res = await request.post("/api/bookings", {
+      data: {
+        roomTypeId: room.roomSlug,
+        checkIn,
+        checkOut,
+        guestCount: Number(room.maxGuests) + 1,
+        guestName: "E2E Code",
+        guestEmail: `e2e-code-${Date.now()}@example.com`,
+        guestPhone: "0900000000",
+      },
+    });
+    expect([400, 429]).toContain(res.status());
+    const body = await res.json();
+    if (res.status() === 429) {
+      expect(body.code).toBe("rateLimited");
+      return;
+    }
+    expect(body.code).toBe("overCapacity");
+    expect(body.maxGuests).toBe(Number(room.maxGuests));
+  });
+});
+
+test.describe("guests never see raw English API errors", () => {
+  test("an unknown code shows Vietnamese copy on the /vi status page", async ({ page }) => {
+    await page.goto("/vi/booking/status?code=LULLABY-ZZZZZZ", {
+      waitUntil: "domcontentloaded",
+    });
+
+    const body = page.locator("body");
+    // Positive assertion first, so the negatives below cannot pass on an
+    // empty page that simply rendered nothing.
+    await expect(body).toContainText(/Không tìm thấy|quá nhiều/);
+    await expect(body).not.toContainText("Booking not found");
+    await expect(body).not.toContainText("Internal server error");
+    await expect(body).not.toContainText("Too many requests");
   });
 });
 

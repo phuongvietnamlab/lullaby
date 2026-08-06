@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const { allowed } = rateLimit(`check-avail:${ip}`, 20, 60 * 60 * 1000);
     if (!allowed) {
       return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
+        { error: "Too many requests. Please try again later.", code: "rateLimited" },
         { status: 429 }
       );
     }
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: parsed.error.issues },
+        { error: "Invalid input", code: "invalidInput", details: parsed.error.issues },
         { status: 400 }
       );
     }
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     const dateValidation = validateDates(checkIn, checkOut);
     if (!dateValidation.valid) {
       return NextResponse.json(
-        { error: dateValidation.error },
+        { error: dateValidation.error, code: dateValidation.code },
         { status: 400 }
       );
     }
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Check availability error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", code: "serverError" },
       { status: 500 }
     );
   }

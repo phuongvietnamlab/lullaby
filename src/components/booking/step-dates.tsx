@@ -6,7 +6,10 @@ import { Calendar, Users, Search } from "lucide-react";
 import { format } from "date-fns";
 import { vi, enUS } from "date-fns/locale";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { translateApiError } from "@/lib/booking/error-messages";
 import type { BookingData, AvailableRoom } from "./booking-wizard";
+
+type TranslateFn = (key: string, values?: Record<string, string | number>) => string;
 
 type Props = {
   initialData: BookingData;
@@ -81,7 +84,8 @@ export function StepDates({ initialData, roomFilter, onSubmit }: Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || t("errors.checkFailed"));
+        // Never surface the API's raw English string to the guest
+        setError(translateApiError(data, t as TranslateFn, "errors.checkFailed"));
         return;
       }
 

@@ -287,7 +287,16 @@
       "bookingFailed": "Failed to create booking. Please try again.",
       "networkError": "Network error. Please check your connection.",
       "tooManyRequests": "Too many lookups. Please try again later.",
-      "noRoomsForType": "This room type is sold out for the selected dates. Try other dates or view all rooms."
+      "noRoomsForType": "This room type is sold out for the selected dates. Try other dates or view all rooms.",
+      "checkInPast": "Check-in date must be today or later.",
+      "checkOutBeforeCheckIn": "Check-out must be after check-in.",
+      "maxStayExceeded": "Maximum stay is 30 nights.",
+      "rateLimited": "Too many requests. Please try again later.",
+      "invalidInput": "Some details are invalid. Please check and try again.",
+      "roomNotFound": "That room type could not be found.",
+      "soldOut": "This room is sold out for the selected dates. Please try other dates.",
+      "overCapacity": "This room type accommodates at most {maxGuests} guests.",
+      "serverError": "Something went wrong on our side. Please try again shortly."
     },
     "status": {
       "title": "Check Booking Status",

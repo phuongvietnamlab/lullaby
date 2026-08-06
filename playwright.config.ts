@@ -1,7 +1,11 @@
 import { defineConfig } from "@playwright/test";
 
 const PORT = Number(process.env.E2E_PORT || 3000);
-const BASE_URL = `http://127.0.0.1:${PORT}`;
+// Must be "localhost", not "127.0.0.1": the Next dev server's HMR client binds
+// to localhost and fails its websocket handshake over the loopback IP, which
+// leaves the page un-hydrated. Every interaction test then passes vacuously
+// against dead server-rendered HTML.
+const BASE_URL = `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: "./e2e",

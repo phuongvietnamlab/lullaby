@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { ArrowLeft, Calendar, Users, User, Mail, Phone, CreditCard, Tag, X } from "lucide-react";
 import { formatPrice } from "@/lib/data/rooms";
+import { translateApiError } from "@/lib/booking/error-messages";
 import type { BookingData, BookingResult } from "./booking-wizard";
+
+type TranslateFn = (key: string, values?: Record<string, string | number>) => string;
 
 type Props = {
   bookingData: BookingData;
@@ -114,7 +117,8 @@ export function StepConfirmation({
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || t("errors.bookingFailed"));
+        // Never surface the API's raw English string to the guest
+        setError(translateApiError(data, t as TranslateFn, "errors.bookingFailed"));
         return;
       }
 

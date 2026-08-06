@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Search, Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Hourglass } from "lucide-react";
 import { formatPrice } from "@/lib/data/rooms";
+import { translateApiError } from "@/lib/booking/error-messages";
+
+type TranslateFn = (key: string, values?: Record<string, string | number>) => string;
 
 type BookingStatus = {
   bookingCode: string;
@@ -38,7 +41,9 @@ export function BookingStatusChecker() {
   const locale = useLocale();
   const searchParams = useSearchParams();
 
-  const [code, setCode] = useState(searchParams.get("code") || "");
+  const urlCode = searchParams.get("code") || "";
+
+  const [code, setCode] = useState(urlCode);
   const [booking, setBooking] = useState<BookingStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -61,13 +66,13 @@ export function BookingStatusChecker() {
         const data = await res.json();
 
         if (!res.ok) {
-          if (res.status === 429) {
-            setError(t("errors.tooManyRequests"));
-          } else {
-            setError(
-              data.error === "Booking not found" ? t("status.notFound") : data.error
-            );
-          }
+          // "notFound" gets the dedicated status copy; everything else resolves
+          // through the shared code map so no raw English reaches the guest.
+          setError(
+            data?.code === "notFound"
+              ? t("status.notFound")
+              : translateApiError(data, t as TranslateFn, "errors.checkFailed")
+          );
           return;
         }
 
@@ -81,16 +86,18 @@ export function BookingStatusChecker() {
     [t]
   );
 
-  // Auto-search if code is in URL
+  // Auto-search when the guest arrives with ?code= (the link in the booking
+  // confirmation email). The ref keeps this to one lookup per distinct URL
+  // code, so a client-side navigation to a different code still searches while
+  // typing in the box never re-fetches.
+  const autoSearchedFor = useRef<string | null>(null);
+
   useEffect(() => {
-    const urlCode = searchParams.get("code");
-    if (urlCode) {
-      runSearch(urlCode);
-    }
-    // Mount-only: re-running on every searchParams change would re-fetch
-    // while the guest is typing.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!urlCode || autoSearchedFor.current === urlCode) return;
+    autoSearchedFor.current = urlCode;
+    setCode(urlCode);
+    runSearch(urlCode);
+  }, [urlCode, runSearch]);
 
   const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault();

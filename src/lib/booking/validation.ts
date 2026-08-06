@@ -32,9 +32,22 @@ export type CreateBookingInput = z.infer<typeof createBookingSchema>;
 export type ValidatePromoInput = z.infer<typeof validatePromoSchema>;
 
 /**
+ * Stable machine-readable reasons. The client maps these to translated copy —
+ * the English `error` string is a developer-facing fallback and must never be
+ * rendered to a guest.
+ */
+export type DateValidationCode =
+  | "checkInPast"
+  | "checkOutBeforeCheckIn"
+  | "maxStayExceeded";
+
+/**
  * Validate that check-in is before check-out and both are in the future
  */
-export function validateDates(checkIn: string, checkOut: string): { valid: boolean; error?: string } {
+export function validateDates(
+  checkIn: string,
+  checkOut: string
+): { valid: boolean; error?: string; code?: DateValidationCode } {
   // `new Date("2026-08-06")` is parsed as UTC midnight, so `today` has to be
   // built in UTC too. Mixing it with a local midnight rejects today's date on
   // any server west of UTC.
@@ -47,17 +60,29 @@ export function validateDates(checkIn: string, checkOut: string): { valid: boole
   const checkOutDate = new Date(checkOut);
 
   if (checkInDate < today) {
-    return { valid: false, error: "Check-in date must be today or later" };
+    return {
+      valid: false,
+      code: "checkInPast",
+      error: "Check-in date must be today or later",
+    };
   }
 
   if (checkOutDate <= checkInDate) {
-    return { valid: false, error: "Check-out must be after check-in" };
+    return {
+      valid: false,
+      code: "checkOutBeforeCheckIn",
+      error: "Check-out must be after check-in",
+    };
   }
 
   // Maximum stay: 30 nights
   const diffDays = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays > 30) {
-    return { valid: false, error: "Maximum stay is 30 nights" };
+    return {
+      valid: false,
+      code: "maxStayExceeded",
+      error: "Maximum stay is 30 nights",
+    };
   }
 
   return { valid: true };

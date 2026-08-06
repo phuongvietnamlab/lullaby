@@ -24,7 +24,7 @@ export async function GET(
     const { allowed } = rateLimit(`booking-lookup:${ip}`, 20, 60 * 60 * 1000);
     if (!allowed) {
       return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
+        { error: "Too many requests. Please try again later.", code: "rateLimited" },
         { status: 429 }
       );
     }
@@ -44,7 +44,7 @@ export async function GET(
 
     if (!booking) {
       return NextResponse.json(
-        { error: "Booking not found" },
+        { error: "Booking not found", code: "notFound" },
         { status: 404 }
       );
     }
@@ -88,7 +88,7 @@ export async function GET(
   } catch (error) {
     console.error("Get booking error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", code: "serverError" },
       { status: 500 }
     );
   }

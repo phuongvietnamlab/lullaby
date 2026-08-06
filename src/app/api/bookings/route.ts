@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
     const { allowed } = rateLimit(`booking:${ip}`, 5, 60 * 60 * 1000);
     if (!allowed) {
       return NextResponse.json(
-        { error: "Too many requests. Please try again later." },
+        { error: "Too many requests. Please try again later.", code: "rateLimited" },
         { status: 429 }
       );
     }
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: "Invalid input", details: parsed.error.issues },
+        { error: "Invalid input", code: "invalidInput", details: parsed.error.issues },
         { status: 400 }
       );
     }
@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     const dateValidation = validateDates(checkIn, checkOut);
     if (!dateValidation.valid) {
       return NextResponse.json(
-        { error: dateValidation.error },
+        { error: dateValidation.error, code: dateValidation.code },
         { status: 400 }
       );
     }
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
 
     if (!rt) {
       return NextResponse.json(
-        { error: "Room type not found" },
+        { error: "Room type not found", code: "roomNotFound" },
         { status: 404 }
       );
     }
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
     // A room type hidden from the public site must not be bookable
     if (!rt.isActive) {
       return NextResponse.json(
-        { error: "Room is no longer available for the selected dates" },
+        { error: "Room is no longer available for the selected dates", code: "soldOut" },
         { status: 409 }
       );
     }
@@ -138,7 +138,11 @@ export async function POST(request: NextRequest) {
     // The client filters by occupancy, but the API is callable directly
     if (guestCount > rt.maxGuests) {
       return NextResponse.json(
-        { error: `This room type accommodates at most ${rt.maxGuests} guests` },
+        {
+          error: `This room type accommodates at most ${rt.maxGuests} guests`,
+          code: "overCapacity",
+          maxGuests: rt.maxGuests,
+        },
         { status: 400 }
       );
     }
@@ -272,7 +276,7 @@ export async function POST(request: NextRequest) {
     }
     console.error("Create booking error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", code: "serverError" },
       { status: 500 }
     );
   }

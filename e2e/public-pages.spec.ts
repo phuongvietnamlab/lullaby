@@ -66,3 +66,26 @@ test.describe("booking wizard", () => {
     await expect(page.getByRole("button").first()).toBeVisible();
   });
 });
+
+test.describe("client JS actually boots", () => {
+  /**
+   * Canary. Asserting that an element is merely *visible* passes against dead
+   * server-rendered HTML, so every interaction test can go green while the page
+   * is not hydrated at all. This one requires a real client-side fetch.
+   */
+  test("the status form performs a client-side lookup", async ({ page }) => {
+    const apiCalls: string[] = [];
+    page.on("request", (r) => {
+      if (r.url().includes("/api/bookings/")) apiCalls.push(r.url());
+    });
+
+    await page.goto("/vi/booking/status", { waitUntil: "domcontentloaded" });
+
+    await page.locator("input").first().fill("LULLABY-ZZZZZZ");
+    await page.getByRole("button", { name: /Tìm/i }).first().click();
+
+    await expect(page.locator("body")).toContainText(/Không tìm thấy|quá nhiều/);
+    expect(apiCalls.length, "no client-side fetch fired — page is not hydrated")
+      .toBeGreaterThan(0);
+  });
+});
