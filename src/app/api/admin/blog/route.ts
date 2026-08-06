@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdminApi } from "@/lib/auth-utils";
+import { revalidateBlog } from "@/lib/revalidate";
 
 // Helper: save a revision snapshot of a blog post
 async function saveRevision(
@@ -140,6 +141,8 @@ export async function POST(request: NextRequest) {
       authorId
     );
 
+    revalidateBlog();
+
     return NextResponse.json({ post }, { status: 201 });
   } catch (error) {
     console.error("Failed to create blog post:", error);
@@ -250,6 +253,8 @@ export async function PUT(request: NextRequest) {
       guard.user.id
     );
 
+    revalidateBlog();
+
     return NextResponse.json({ post });
   } catch (error) {
     console.error("Failed to update blog post:", error);
@@ -289,6 +294,8 @@ export async function DELETE(request: NextRequest) {
       }),
       db.blogPost.delete({ where: { id } }),
     ]);
+
+    revalidateBlog();
 
     return NextResponse.json({ success: true });
   } catch (error) {

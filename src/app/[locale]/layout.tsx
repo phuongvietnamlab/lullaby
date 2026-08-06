@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { LiveChat } from "@/components/ui/live-chat";
 import { RegisterSW } from "@/components/pwa/register-sw";
+import { getSiteSettings } from "@/lib/data/settings";
 import "../globals.css";
 
 export const viewport: Viewport = {
@@ -17,26 +18,48 @@ export const viewport: Viewport = {
   themeColor: "#1a1a2e",
 };
 
-export const metadata: Metadata = {
-  title: {
-    default: "Lullaby Sky Villa | Luxury Hotel in Ha Long Bay",
-    template: "%s | Lullaby Sky Villa",
-  },
-  description:
-    "Experience luxury amidst Ha Long Bay's natural wonder. Lullaby Sky Villa offers premium rooms, stunning views, and world-class service.",
-  keywords: [
-    "Lullaby Sky Villa",
-    "Ha Long Bay hotel",
-    "luxury hotel Vietnam",
-    "khách sạn Hạ Long",
-    "khách sạn sang trọng",
-  ],
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "Lullaby Sky Villa",
-  },
-};
+const FALLBACK_TITLE = "Lullaby Sky Villa | Luxury Hotel in Ha Long Bay";
+const FALLBACK_DESCRIPTION =
+  "Experience luxury amidst Ha Long Bay's natural wonder. Lullaby Sky Villa offers premium rooms, stunning views, and world-class service.";
+
+/**
+ * Title and description come from /admin/settings (SEO section) so staff can
+ * change them without a deploy; the constants above are the fallback when
+ * those fields are left blank.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+
+  const title = settings.seo.metaTitle || FALLBACK_TITLE;
+  const description = settings.seo.metaDescription || FALLBACK_DESCRIPTION;
+  const siteName = settings.hotelName || "Lullaby Sky Villa";
+
+  return {
+    title: {
+      default: title,
+      template: `%s | ${siteName}`,
+    },
+    description,
+    keywords: [
+      siteName,
+      "Ha Long Bay hotel",
+      "luxury hotel Vietnam",
+      "khách sạn Hạ Long",
+      "khách sạn sang trọng",
+    ],
+    openGraph: {
+      title,
+      description,
+      siteName,
+      ...(settings.seo.ogImage ? { images: [settings.seo.ogImage] } : {}),
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: siteName,
+    },
+  };
+}
 
 type Props = {
   children: React.ReactNode;

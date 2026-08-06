@@ -1,11 +1,14 @@
 ﻿import type { MetadataRoute } from "next";
 import { getAllRoomSlugs } from "@/lib/data/rooms";
+import { getAllPostSlugs } from "@/lib/data/blog";
 
 const BASE_URL = "https://lullabyskyvillahahalong.com";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const locales = ["vi", "en"];
   const roomSlugs = getAllRoomSlugs();
+  // Published posts, so anything an admin writes gets indexed
+  const postSlugs = await getAllPostSlugs();
 
   const staticPages = [
     "",
@@ -14,6 +17,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/about",
     "/contact",
     "/booking",
+    "/blog",
+    "/promotions",
+    "/reviews",
   ];
 
   const entries: MetadataRoute.Sitemap = [];
@@ -38,6 +44,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.7,
       });
     }
+  }
+
+  // Blog posts (each row serves both locales)
+  for (const { slug, locale } of postSlugs) {
+    entries.push({
+      url: `${BASE_URL}/${locale}/blog/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    });
   }
 
   return entries;

@@ -1,9 +1,13 @@
-import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import Image from "next/image";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
 import { notFound } from "next/navigation";
-import { getPostBySlug, getAllPostSlugs, getPublishedPosts } from "@/lib/data/blog";
+import {
+  getPostBySlug,
+  getAllPostSlugs,
+  getPublishedPosts,
+  type BlogPost,
+} from "@/lib/data/blog";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import type { Metadata } from "next";
 
@@ -13,7 +17,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
-  const post = getPostBySlug(slug, locale);
+  const post = await getPostBySlug(slug, locale);
   if (!post) return { title: "Post Not Found" };
 
   return {
@@ -22,40 +26,45 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return getAllPostSlugs().map(({ slug, locale }) => ({ slug, locale }));
+export async function generateStaticParams() {
+  const slugs = await getAllPostSlugs();
+  return slugs.map(({ slug, locale }) => ({ slug, locale }));
 }
 
 export default async function BlogDetailPage({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const post = getPostBySlug(slug, locale);
+  const post = await getPostBySlug(slug, locale);
   if (!post) notFound();
 
-  return <BlogDetailContent post={post} locale={locale} />;
-}
-
-function BlogDetailContent({
-  post,
-  locale,
-}: {
-  post: NonNullable<ReturnType<typeof getPostBySlug>>;
-  locale: string;
-}) {
-  const t = useTranslations("blog");
-
-  // Get related posts (same locale, different slug)
-  const relatedPosts = getPublishedPosts(locale)
+  // Same locale, different post
+  const relatedPosts = (await getPublishedPosts(locale))
     .filter((p) => p.slug !== post.slug)
     .slice(0, 2);
+
+  return (
+    <BlogDetailContent post={post} locale={locale} relatedPosts={relatedPosts} />
+  );
+}
+
+async function BlogDetailContent({
+  post,
+  locale,
+  relatedPosts,
+}: {
+  post: BlogPost;
+  locale: string;
+  relatedPosts: BlogPost[];
+}) {
+  const t = await getTranslations("blog");
 
   return (
     <>
       {/* Hero */}
       <section className="relative pt-24 pb-0">
         <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
-          <Image
+          <ImageWithFallback
             src={post.coverImage}
             alt={post.title}
             fill
@@ -66,9 +75,14 @@ function BlogDetailContent({
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
             <div className="max-w-4xl mx-auto">
-              <span className="inline-block px-3 py-1 bg-white/90 backdrop-blur-sm text-xs uppercase tracking-widest text-[var(--color-primary)] mb-4">
-                {t(`categories.${post.category}` as never)}
-              </span>
+              {(post.categoryLabel || post.categoryKey) && (
+                <span className="inline-block px-3 py-1 bg-white/90 backdrop-blur-sm text-xs uppercase tracking-widest text-[var(--color-primary)] mb-4">
+                  {post.categoryLabel ??
+                    (post.categoryKey
+                      ? t(`categories.${post.categoryKey}` as never)
+                      : "")}
+                </span>
+              )}
               <h1 className="font-[family-name:var(--font-heading)] text-3xl md:text-5xl text-white leading-tight">
                 {post.title}
               </h1>
@@ -95,7 +109,13 @@ function BlogDetailContent({
 
             {/* Content */}
             <article className="prose prose-lg max-w-none prose-headings:font-[family-name:var(--font-heading)] prose-headings:font-medium prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-p:text-[var(--color-text-light)] prose-p:leading-relaxed prose-strong:text-[var(--color-text)] prose-a:text-[var(--color-accent-dark)] prose-li:text-[var(--color-text-light)] prose-hr:border-[var(--color-border)]">
-              {post.content.split("\n\n").map((block, idx) => {
+              {post.format === "html" ? (
+                // Admin-authored posts come out of the editor as HTML. It is
+                // run through a tag/attribute allow-list in lib/data/blog.ts
+                // (no script, no style, no event handlers) before it gets here.
+                <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              ) : (
+                post.content.split("\n\n").map((block, idx) => {
                 if (block.startsWith("## ")) {
                   return (
                     <h2 key={idx}>{block.replace("## ", "")}</h2>
@@ -121,8 +141,9 @@ function BlogDetailContent({
                     </ul>
                   );
                 }
-                return <p key={idx}>{block}</p>;
-              })}
+                  return <p key={idx}>{block}</p>;
+                })
+              )}
             </article>
           </ScrollReveal>
 
@@ -150,7 +171,7 @@ function BlogDetailContent({
                     className="group block overflow-hidden rounded-sm border border-[var(--color-border)] hover:shadow-[var(--shadow-medium)] transition-shadow"
                   >
                     <div className="relative aspect-[16/10] overflow-hidden">
-                      <Image
+                      <ImageWithFallback
                         src={relPost.coverImage}
                         alt={relPost.title}
                         fill

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdminApi } from "@/lib/auth-utils";
+import { revalidateRooms } from "@/lib/revalidate";
 
 // GET: Fetch all room types from DB
 export async function GET() {
@@ -89,6 +90,8 @@ export async function PUT(request: NextRequest) {
       },
     });
 
+    revalidateRooms();
+
     return NextResponse.json({ roomType });
   } catch (error) {
     console.error("Failed to update room type:", error);
@@ -151,6 +154,8 @@ export async function POST(request: NextRequest) {
         amenities: amenities ?? [],
       },
     });
+
+    revalidateRooms();
 
     return NextResponse.json({ roomType }, { status: 201 });
   } catch (error) {

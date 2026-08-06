@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdminApi } from "@/lib/auth-utils";
+import { revalidateContent } from "@/lib/revalidate";
 
 // GET: Fetch site config by key or category
 export async function GET(request: NextRequest) {
@@ -63,6 +64,8 @@ export async function PUT(request: NextRequest) {
         category: category || undefined,
       },
     });
+
+    revalidateContent();
 
     return NextResponse.json({ config });
   } catch (error) {

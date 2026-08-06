@@ -464,7 +464,8 @@
     "followUs": "Follow Us",
     "copyright": "© {year} Lullaby Sky Villa. All rights reserved.",
     "privacy": "Privacy Policy",
-    "terms": "Terms of Service"
+    "terms": "Terms of Service",
+    "socialsComingSoon": "Coming soon"
   },
   "payment": {
     "successTitle": "Payment Successful!",

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdminApi } from "@/lib/auth-utils";
+import { revalidateRooms } from "@/lib/revalidate";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +98,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    revalidateRooms();
+
     return NextResponse.json({ room }, { status: 201 });
   } catch (error) {
     console.error("Admin room create error:", error);
@@ -173,6 +176,8 @@ export async function PUT(request: NextRequest) {
       },
     });
 
+    revalidateRooms();
+
     return NextResponse.json({ room });
   } catch (error) {
     console.error("Admin room update error:", error);
@@ -213,6 +218,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     await db.room.delete({ where: { id } });
+
+    revalidateRooms();
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -34,7 +34,7 @@ export default defineConfig({
     {
       // Specs that need a staff session, reusing the one sign-in from setup
       name: "authenticated",
-      testMatch: /(admin-session|admin-pages)\.spec\.ts/,
+      testMatch: /(admin-session|admin-pages|blog-and-settings)\.spec\.ts/,
       dependencies: ["setup"],
       use: { storageState: ADMIN_STATE },
     },
