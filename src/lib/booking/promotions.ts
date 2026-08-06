@@ -92,6 +92,16 @@ export async function validatePromoCode(
         total: subtotal - discountAmount,
       };
     }
+
+    // The query succeeded and this code is not in the table. Falling through to
+    // the static list here would keep honouring the built-in demo codes
+    // (EARLY2025, WEEKEND30, ...) forever — a code an admin deleted, or never
+    // created, would still take money off the booking. Only bootstrap from
+    // static data while the table is genuinely empty.
+    const promoCount = await db.promotion.count();
+    if (promoCount > 0) {
+      return { valid: false, reason: "notFound" };
+    }
   } catch (error) {
     console.error("Promotion DB lookup failed, falling back to static data:", error);
   }

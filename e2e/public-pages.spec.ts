@@ -81,8 +81,20 @@ test.describe("client JS actually boots", () => {
 
     await page.goto("/vi/booking/status", { waitUntil: "domcontentloaded" });
 
-    await page.locator("input").first().fill("LULLABY-ZZZZZZ");
-    await page.getByRole("button", { name: /Tìm/i }).first().click();
+    const form = page.locator("form").filter({ has: page.locator("input") }).first();
+    const input = form.locator("input").first();
+    const submit = form.locator("button").first();
+
+    // Retry the fill rather than just waiting on the button. Typing before
+    // hydration finishes sets the DOM value, then React re-renders from its
+    // own empty state and wipes it — leaving the button disabled forever. The
+    // retry is what makes this a hydration check instead of a race.
+    await expect(async () => {
+      await input.fill("LULLABY-ZZZZZZ");
+      await expect(submit).toBeEnabled({ timeout: 1000 });
+    }).toPass({ timeout: 20_000 });
+
+    await submit.click();
 
     await expect(page.locator("body")).toContainText(/Không tìm thấy|quá nhiều/);
     expect(apiCalls.length, "no client-side fetch fired — page is not hydrated")

@@ -16,6 +16,11 @@ const READ_ROUTES = [
   "/api/admin/content",
   "/api/admin/reviews",
   "/api/admin/revisions?entityType=blog_post&entityId=x",
+  // Routes added when the mock admin pages were wired to the database
+  "/api/admin/guests",
+  "/api/admin/promotions",
+  "/api/admin/rooms/units",
+  "/api/admin/settings",
 ];
 
 const WRITE_ROUTES: { method: "post" | "put" | "delete"; url: string; data?: unknown }[] = [
@@ -30,6 +35,13 @@ const WRITE_ROUTES: { method: "post" | "put" | "delete"; url: string; data?: unk
   { method: "put", url: "/api/admin/gallery", data: { id: "x", alt: "x" } },
   { method: "delete", url: "/api/admin/gallery?id=x" },
   { method: "post", url: "/api/admin/revisions", data: { entityType: "blog_post", entityId: "x", data: {} } },
+  { method: "post", url: "/api/admin/promotions", data: { name: "x", code: "X", discountType: "PERCENTAGE", discountValue: 10, startDate: "2026-01-01", endDate: "2026-12-31" } },
+  { method: "put", url: "/api/admin/promotions", data: { id: "x", name: "x" } },
+  { method: "delete", url: "/api/admin/promotions?id=x" },
+  { method: "post", url: "/api/admin/rooms/units", data: { roomNumber: "999", roomTypeId: "x" } },
+  { method: "put", url: "/api/admin/rooms/units", data: { id: "x", status: "OUT_OF_ORDER" } },
+  { method: "delete", url: "/api/admin/rooms/units?id=x" },
+  { method: "put", url: "/api/admin/settings", data: { hotelName: "pwned" } },
 ];
 
 test.describe("admin API requires a staff session", () => {
