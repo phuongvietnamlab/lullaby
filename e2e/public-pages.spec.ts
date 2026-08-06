@@ -67,6 +67,67 @@ test.describe("booking wizard", () => {
   });
 });
 
+test.describe("service worker", () => {
+  /**
+   * The worker used to skipWaiting() on install and claim the page, which fired
+   * controllerchange and reloaded it. Every first-time visitor loaded the page
+   * twice, and anything typed into a form was lost.
+   */
+  test("does not reload the page on a first visit", async ({ browser }) => {
+    const measure = async (serviceWorkers: "allow" | "block") => {
+      const ctx = await browser.newContext({
+        serviceWorkers,
+        baseURL: test.info().project.use.baseURL,
+      });
+      const page = await ctx.newPage();
+      let navigations = 0;
+      page.on("framenavigated", (f) => {
+        if (f === page.mainFrame()) navigations++;
+      });
+      await page.goto("/vi", { waitUntil: "networkidle" });
+      await page.waitForTimeout(4000);
+      await ctx.close();
+      return navigations;
+    };
+
+    const withSW = await measure("allow");
+    const withoutSW = await measure("block");
+
+    expect(
+      withSW,
+      `registering the service worker added ${withSW - withoutSW} extra page load(s)`
+    ).toBeLessThanOrEqual(withoutSW);
+  });
+
+  test("never caches admin pages", async ({ browser }) => {
+    const ctx = await browser.newContext({
+      baseURL: test.info().project.use.baseURL,
+    });
+    const page = await ctx.newPage();
+
+    await page.goto("/vi", { waitUntil: "networkidle" });
+    await page.waitForTimeout(3000); // let the worker install and claim
+    await page.goto("/admin/login", { waitUntil: "networkidle" });
+    await page.waitForTimeout(2000);
+
+    const cached: string[] = await page.evaluate(async () => {
+      const out: string[] = [];
+      for (const key of await caches.keys()) {
+        const cache = await caches.open(key);
+        for (const req of await cache.keys()) {
+          out.push(new URL(req.url).pathname);
+        }
+      }
+      return out;
+    });
+
+    // Admin pages carry guest names, emails and phone numbers; a cached copy
+    // would outlive the staff member's session on a shared machine.
+    expect(cached.filter((p) => p.startsWith("/admin"))).toEqual([]);
+    await ctx.close();
+  });
+});
+
 test.describe("client JS actually boots", () => {
   /**
    * Canary. Asserting that an element is merely *visible* passes against dead

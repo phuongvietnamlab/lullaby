@@ -8,6 +8,20 @@ export function RegisterSW() {
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
 
+    // Was this page already controlled before we registered? On a first visit
+    // it is not: the worker installs, claims the page, and controllerchange
+    // fires. Reloading on that made every new visitor load the page twice —
+    // and threw away anything they had typed into the booking form. Only an
+    // *update* to an already-controlled page is worth reloading for.
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let refreshing = false;
+
+    const onControllerChange = () => {
+      if (!hadController || refreshing) return;
+      refreshing = true;
+      window.location.reload();
+    };
+
     const registerSW = async () => {
       try {
         const registration = await navigator.serviceWorker.register("/sw.js");
@@ -28,17 +42,23 @@ export function RegisterSW() {
           });
         });
 
-        // Handle controller change (when new SW activates)
-        navigator.serviceWorker.addEventListener("controllerchange", () => {
-          // Auto-reload when new SW takes over
-          window.location.reload();
-        });
+        navigator.serviceWorker.addEventListener(
+          "controllerchange",
+          onControllerChange
+        );
       } catch (err) {
         console.log("SW registration failed:", err);
       }
     };
 
     registerSW();
+
+    return () => {
+      navigator.serviceWorker.removeEventListener(
+        "controllerchange",
+        onControllerChange
+      );
+    };
   }, []);
 
   const handleUpdate = () => {
