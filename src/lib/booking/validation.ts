@@ -35,9 +35,14 @@ export type ValidatePromoInput = z.infer<typeof validatePromoSchema>;
  * Validate that check-in is before check-out and both are in the future
  */
 export function validateDates(checkIn: string, checkOut: string): { valid: boolean; error?: string } {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
+  // `new Date("2026-08-06")` is parsed as UTC midnight, so `today` has to be
+  // built in UTC too. Mixing it with a local midnight rejects today's date on
+  // any server west of UTC.
+  const now = new Date();
+  const today = new Date(
+    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())
+  );
+
   const checkInDate = new Date(checkIn);
   const checkOutDate = new Date(checkOut);
 

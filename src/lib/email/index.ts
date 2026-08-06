@@ -39,6 +39,32 @@ export interface ContactMessageData {
   message: string;
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+/**
+ * Escape every guest-controlled string before it reaches an HTML template.
+ * Guest name, phone and free-text fields land in the hotel's own inbox, so
+ * unescaped markup there is an injection into staff email.
+ */
+function sanitizeBooking(booking: BookingEmailData): BookingEmailData {
+  return {
+    ...booking,
+    bookingCode: escapeHtml(booking.bookingCode),
+    guestName: escapeHtml(booking.guestName),
+    guestEmail: escapeHtml(booking.guestEmail),
+    guestPhone: escapeHtml(booking.guestPhone),
+    roomTypeName: escapeHtml(booking.roomTypeName),
+    promoCode: booking.promoCode ? escapeHtml(booking.promoCode) : undefined,
+  };
+}
+
 /**
  * Send booking confirmation email to guest
  */
@@ -54,7 +80,7 @@ export async function sendBookingConfirmation(
   }
 
   try {
-    const html = buildBookingConfirmationHtml(booking);
+    const html = buildBookingConfirmationHtml(sanitizeBooking(booking));
     await resend.emails.send({
       from: `Lullaby Sky Villa <${FROM_EMAIL}>`,
       to: booking.guestEmail,
@@ -86,7 +112,7 @@ export async function sendAdminNotification(
   }
 
   try {
-    const html = buildAdminNotificationHtml(booking);
+    const html = buildAdminNotificationHtml(sanitizeBooking(booking));
     await resend.emails.send({
       from: `Lullaby Sky Villa Booking <${FROM_EMAIL}>`,
       to: ADMIN_EMAIL,
@@ -101,15 +127,6 @@ export async function sendAdminNotification(
     console.error("[Email] Failed to send admin notification:", error);
     return false;
   }
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
 }
 
 /**

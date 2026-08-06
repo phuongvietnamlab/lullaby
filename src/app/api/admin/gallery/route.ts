@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdminApi } from "@/lib/auth-utils";
 
 // GET: Fetch all gallery images
 export async function GET(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
 
@@ -27,6 +31,9 @@ export async function GET(request: NextRequest) {
 // POST: Add a new gallery image
 export async function POST(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const body = await request.json();
     const { url, alt, altEn, category, roomTypeId } = body;
 
@@ -68,6 +75,9 @@ export async function POST(request: NextRequest) {
 // PUT: Update gallery image (caption, order, category)
 export async function PUT(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const body = await request.json();
     const { id, alt, altEn, category, sortOrder, url } = body;
 
@@ -102,6 +112,9 @@ export async function PUT(request: NextRequest) {
 // DELETE: Remove a gallery image
 export async function DELETE(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 

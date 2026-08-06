@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdminApi } from "@/lib/auth-utils";
 
 // GET: Fetch all room types from DB
 export async function GET() {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const roomTypes = await db.roomType.findMany({
       orderBy: { sortOrder: "asc" },
       include: {
@@ -24,6 +28,10 @@ export async function GET() {
 // PUT: Update a room type
 export async function PUT(request: NextRequest) {
   try {
+    // Pricing changes are managers-and-up only.
+    const guard = await requireAdminApi(["SUPER_ADMIN", "MANAGER"]);
+    if (guard instanceof NextResponse) return guard;
+
     const body = await request.json();
     const {
       id,
@@ -94,6 +102,9 @@ export async function PUT(request: NextRequest) {
 // POST: Create a new room type
 export async function POST(request: NextRequest) {
   try {
+    const guard = await requireAdminApi(["SUPER_ADMIN", "MANAGER"]);
+    if (guard instanceof NextResponse) return guard;
+
     const body = await request.json();
     const {
       name,

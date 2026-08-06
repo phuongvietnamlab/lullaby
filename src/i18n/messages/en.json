@@ -286,6 +286,7 @@
       "noRooms": "No rooms available for the selected dates. Please try different dates.",
       "bookingFailed": "Failed to create booking. Please try again.",
       "networkError": "Network error. Please check your connection.",
+      "tooManyRequests": "Too many lookups. Please try again later.",
       "noRoomsForType": "This room type is sold out for the selected dates. Try other dates or view all rooms."
     },
     "status": {

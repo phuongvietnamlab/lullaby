@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Search, Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Hourglass } from "lucide-react";
@@ -44,38 +44,57 @@ export function BookingStatusChecker() {
   const [error, setError] = useState("");
   const [searched, setSearched] = useState(false);
 
+  // Takes the code as an argument so the mount effect below does not have to
+  // read it from state (which would still be the initial value at that point).
+  const runSearch = useCallback(
+    async (rawCode: string) => {
+      const searchCode = rawCode.trim();
+      if (!searchCode) return;
+
+      setLoading(true);
+      setError("");
+      setBooking(null);
+      setSearched(true);
+
+      try {
+        const res = await fetch(`/api/bookings/${encodeURIComponent(searchCode)}`);
+        const data = await res.json();
+
+        if (!res.ok) {
+          if (res.status === 429) {
+            setError(t("errors.tooManyRequests"));
+          } else {
+            setError(
+              data.error === "Booking not found" ? t("status.notFound") : data.error
+            );
+          }
+          return;
+        }
+
+        setBooking(data.booking);
+      } catch {
+        setError(t("errors.networkError"));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [t]
+  );
+
   // Auto-search if code is in URL
   useEffect(() => {
-    if (searchParams.get("code")) {
-      handleSearch();
+    const urlCode = searchParams.get("code");
+    if (urlCode) {
+      runSearch(urlCode);
     }
+    // Mount-only: re-running on every searchParams change would re-fetch
+    // while the guest is typing.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSearch = async (e?: React.FormEvent) => {
+  const handleSearch = (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!code.trim()) return;
-
-    setLoading(true);
-    setError("");
-    setBooking(null);
-    setSearched(true);
-
-    try {
-      const res = await fetch(`/api/bookings/${encodeURIComponent(code.trim())}`);
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error === "Booking not found" ? t("status.notFound") : data.error);
-        return;
-      }
-
-      setBooking(data.booking);
-    } catch {
-      setError(t("errors.networkError"));
-    } finally {
-      setLoading(false);
-    }
+    return runSearch(code);
   };
 
   const formatDate = (dateStr: string) => {

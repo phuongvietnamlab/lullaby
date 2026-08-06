@@ -286,6 +286,7 @@
       "noRooms": "Không còn phòng trống cho ngày đã chọn. Vui lòng thử ngày khác.",
       "bookingFailed": "Không thể tạo đặt phòng. Vui lòng thử lại.",
       "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
+      "tooManyRequests": "Bạn đã tra cứu quá nhiều lần. Vui lòng thử lại sau.",
       "noRoomsForType": "Loại phòng này đã hết cho ngày đã chọn. Hãy chọn ngày khác hoặc xem tất cả phòng."
     },
     "status": {

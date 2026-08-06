@@ -23,6 +23,9 @@ export const auth = betterAuth({
   ].filter(Boolean),
   emailAndPassword: {
     enabled: true,
+    // Staff accounts are provisioned directly in the DB (see scripts/). Leaving
+    // sign-up open would let anyone self-register and reach the admin panel.
+    disableSignUp: true,
   },
   user: {
     modelName: "users",

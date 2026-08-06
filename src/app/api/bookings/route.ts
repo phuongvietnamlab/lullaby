@@ -15,6 +15,53 @@ import {
   type BookingEmailData,
 } from "@/lib/email";
 
+/** Thrown inside the booking transaction when inventory ran out mid-flight. */
+class SoldOutError extends Error {
+  constructor() {
+    super("SOLD_OUT");
+    this.name = "SoldOutError";
+  }
+}
+
+function prismaErrorCode(e: unknown): string | undefined {
+  if (e && typeof e === "object" && "code" in e) {
+    return (e as { code?: string }).code;
+  }
+  return undefined;
+}
+
+type BookingTx = Parameters<Parameters<typeof db.$transaction>[0]>[0];
+
+/**
+ * Run the availability-check + insert transaction, retrying on the two races
+ * it can legitimately lose:
+ *   P2034 - serialisation conflict with a concurrent booking
+ *   P2002 - the random bookingCode collided with an existing one
+ */
+async function createBookingWithRetry<T>(
+  work: (tx: BookingTx) => Promise<T>,
+  attempts = 4
+): Promise<T> {
+  let lastError: unknown;
+
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await db.$transaction(work, { isolationLevel: "Serializable" });
+    } catch (e) {
+      if (e instanceof SoldOutError) throw e;
+
+      const code = prismaErrorCode(e);
+      if (code !== "P2034" && code !== "P2002") throw e;
+
+      lastError = e;
+      // Small jittered backoff so retries do not collide again immediately
+      await new Promise((r) => setTimeout(r, 25 * (i + 1) + Math.random() * 25));
+    }
+  }
+
+  throw lastError;
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting: 5 bookings per IP per hour
@@ -62,17 +109,16 @@ export async function POST(request: NextRequest) {
     // Release rooms held by expired pending bookings before counting
     await expirePendingBookings();
 
-    // Check availability via DB (prevent double-booking)
-    const roomType = await db.roomType.findFirst({
-      where: { slug: roomTypeId },
-      include: { rooms: true },
-    });
-
-    // Also try by id if slug not found
-    const rt = roomType || await db.roomType.findUnique({
-      where: { id: roomTypeId },
-      include: { rooms: true },
-    });
+    // Resolve by slug first, then by id
+    const rt =
+      (await db.roomType.findFirst({
+        where: { slug: roomTypeId },
+        include: { rooms: { where: { status: { not: "OUT_OF_ORDER" } }, select: { id: true } } },
+      })) ??
+      (await db.roomType.findUnique({
+        where: { id: roomTypeId },
+        include: { rooms: { where: { status: { not: "OUT_OF_ORDER" } }, select: { id: true } } },
+      }));
 
     if (!rt) {
       return NextResponse.json(
@@ -81,21 +127,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Count overlapping active bookings
-    const overlappingBookings = await db.booking.count({
-      where: {
-        roomTypeId: rt.id,
-        status: { in: ["PENDING", "CONFIRMED", "CHECK_IN"] },
-        checkIn: { lt: new Date(checkOut) },
-        checkOut: { gt: new Date(checkIn) },
-      },
-    });
-
-    const totalRooms = rt.rooms.length;
-    if (overlappingBookings >= totalRooms) {
+    // A room type hidden from the public site must not be bookable
+    if (!rt.isActive) {
       return NextResponse.json(
         { error: "Room is no longer available for the selected dates" },
         { status: 409 }
+      );
+    }
+
+    // The client filters by occupancy, but the API is callable directly
+    if (guestCount > rt.maxGuests) {
+      return NextResponse.json(
+        { error: `This room type accommodates at most ${rt.maxGuests} guests` },
+        { status: 400 }
       );
     }
 
@@ -118,41 +162,53 @@ export async function POST(request: NextRequest) {
     }
     const finalPrice = pricing.total - discountAmount;
 
-    // Generate booking code
-    const bookingCode = generateBookingCode();
-
     // Set expiration (48 hours from now)
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 48);
 
-    // Find or create guest
-    let guest = await db.guest.findUnique({ where: { email: guestEmail } });
-    if (!guest) {
-      guest = await db.guest.create({
-        data: {
-          name: guestName,
-          email: guestEmail,
-          phone: guestPhone,
+    // Keep the guest record current — a returning guest may have a new phone
+    // number or a corrected name.
+    const guest = await db.guest.upsert({
+      where: { email: guestEmail },
+      update: { name: guestName, phone: guestPhone },
+      create: { name: guestName, email: guestEmail, phone: guestPhone },
+    });
+
+    const totalRooms = rt.rooms.length;
+
+    // Re-count and insert inside one serialisable transaction. Counting outside
+    // the write lets two concurrent requests both see the last free room and
+    // both succeed.
+    const booking = await createBookingWithRetry(async (tx) => {
+      const overlapping = await tx.booking.count({
+        where: {
+          roomTypeId: rt.id,
+          status: { in: ["PENDING", "CONFIRMED", "CHECK_IN"] },
+          checkIn: { lt: new Date(checkOut) },
+          checkOut: { gt: new Date(checkIn) },
         },
       });
-    }
 
-    // Create booking in database
-    const booking = await db.booking.create({
-      data: {
-        bookingCode,
-        guestId: guest.id,
-        roomTypeId: rt.id,
-        checkIn: new Date(checkIn),
-        checkOut: new Date(checkOut),
-        guestCount,
-        totalPrice: finalPrice,
-        promoCode: appliedCode,
-        discountAmount: discountAmount || null,
-        status: "PENDING",
-        specialRequests: specialRequests || null,
-        expiresAt,
-      },
+      if (overlapping >= totalRooms) {
+        throw new SoldOutError();
+      }
+
+      return tx.booking.create({
+        data: {
+          bookingCode: generateBookingCode(),
+          guestId: guest.id,
+          roomTypeId: rt.id,
+          checkIn: new Date(checkIn),
+          checkOut: new Date(checkOut),
+          guestCount,
+          totalPrice: finalPrice,
+          promoCode: appliedCode,
+          discountAmount: discountAmount || null,
+          status: "PENDING",
+          specialRequests: specialRequests || null,
+          expiresAt,
+        },
+      });
     });
 
     const nights = Math.ceil(
@@ -208,6 +264,12 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    if (error instanceof SoldOutError) {
+      return NextResponse.json(
+        { error: "Room is no longer available for the selected dates" },
+        { status: 409 }
+      );
+    }
     console.error("Create booking error:", error);
     return NextResponse.json(
       { error: "Internal server error" },

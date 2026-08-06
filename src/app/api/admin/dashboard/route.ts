@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdminApi } from "@/lib/auth-utils";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const todayEnd = new Date(todayStart);
