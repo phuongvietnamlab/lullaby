@@ -3,15 +3,29 @@ import { Pool } from "pg";
 
 const connectionString = process.env.DATABASE_URL;
 
-const pool = new Pool({
-  connectionString,
-  max: 5,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
-  ssl: connectionString?.includes("supabase.com")
-    ? { rejectUnauthorized: false }
-    : undefined,
-});
+const globalForAuthPool = globalThis as unknown as {
+  authPool: Pool | undefined;
+};
+
+// One pool per process, like src/lib/db.ts. Without this, HMR in dev and every
+// warm serverless invocation opened a fresh pool. Combined with the Prisma pool
+// that was enough to blow past Supabase's connection cap
+// ("EMAXCONNSESSION: max clients reached").
+function createAuthPool() {
+  return new Pool({
+    connectionString,
+    max: 2,
+    idleTimeoutMillis: 10000,
+    connectionTimeoutMillis: 10000,
+    allowExitOnIdle: true,
+    ssl: connectionString?.includes("supabase.com")
+      ? { rejectUnauthorized: false }
+      : undefined,
+  });
+}
+
+const pool = globalForAuthPool.authPool ?? createAuthPool();
+globalForAuthPool.authPool = pool;
 
 export const auth = betterAuth({
   database: pool,
