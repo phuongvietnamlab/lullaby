@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdminApi } from "@/lib/auth-utils";
 
 // GET: Fetch revisions for an entity
 export async function GET(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const { searchParams } = new URL(request.url);
     const entityType = searchParams.get("entityType");
     const entityId = searchParams.get("entityId");
@@ -33,6 +37,9 @@ export async function GET(request: NextRequest) {
 // POST: Create a new revision
 export async function POST(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const body = await request.json();
     const { entityType, entityId, data, createdBy, note } = body;
 

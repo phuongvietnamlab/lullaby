@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdminApi } from "@/lib/auth-utils";
+import { revalidateGallery } from "@/lib/revalidate";
 
 // GET: Fetch all gallery images
 export async function GET(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const { searchParams } = new URL(request.url);
     const category = searchParams.get("category");
 
@@ -27,6 +32,9 @@ export async function GET(request: NextRequest) {
 // POST: Add a new gallery image
 export async function POST(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const body = await request.json();
     const { url, alt, altEn, category, roomTypeId } = body;
 
@@ -55,6 +63,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    revalidateGallery();
+
     return NextResponse.json({ image }, { status: 201 });
   } catch (error) {
     console.error("Failed to create gallery image:", error);
@@ -68,6 +78,9 @@ export async function POST(request: NextRequest) {
 // PUT: Update gallery image (caption, order, category)
 export async function PUT(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const body = await request.json();
     const { id, alt, altEn, category, sortOrder, url } = body;
 
@@ -89,6 +102,8 @@ export async function PUT(request: NextRequest) {
       },
     });
 
+    revalidateGallery();
+
     return NextResponse.json({ image });
   } catch (error) {
     console.error("Failed to update gallery image:", error);
@@ -102,6 +117,9 @@ export async function PUT(request: NextRequest) {
 // DELETE: Remove a gallery image
 export async function DELETE(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
 
@@ -113,6 +131,8 @@ export async function DELETE(request: NextRequest) {
     }
 
     await db.galleryImage.delete({ where: { id } });
+
+    revalidateGallery();
 
     return NextResponse.json({ success: true });
   } catch (error) {

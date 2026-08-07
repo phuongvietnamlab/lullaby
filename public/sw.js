@@ -8,12 +8,17 @@ const PRECACHE_URLS = [
   '/offline.html',
 ];
 
-// Install event: precache essential pages
+// Install event: precache essential pages.
+//
+// Deliberately NOT calling skipWaiting() here: activating immediately made the
+// new worker claim the page mid-session, which fired controllerchange and
+// reloaded whatever the guest was doing. It also meant the "new version
+// available" prompt could never appear, because the worker never waited.
+// The client asks for SKIP_WAITING (see the message handler below) once the
+// guest accepts the update.
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_URLS))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
   );
 });
 
@@ -43,6 +48,11 @@ self.addEventListener('fetch', (event) => {
 
   // API calls: network only, no cache
   if (url.pathname.startsWith('/api/')) return;
+
+  // Never cache the admin panel. These pages contain guest names, emails and
+  // phone numbers, and a cached copy would outlive the staff member's session
+  // on a shared machine.
+  if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) return;
 
   // Static assets (images, fonts, css, js): cache first
   if (

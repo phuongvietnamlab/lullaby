@@ -7,6 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "test:e2e": "playwright test",
+    "create-staff": "tsx scripts/create-staff.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -31,14 +33,17 @@
     "react-day-picker": "^10.0.1",
     "react-dom": "19.2.4",
     "resend": "^6.17.1",
+    "sanitize-html": "^2.17.6",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sanitize-html": "^2.16.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",

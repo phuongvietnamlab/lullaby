@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdminApi } from "@/lib/auth-utils";
+import { revalidateContent } from "@/lib/revalidate";
 
 // GET: Fetch site config by key or category
 export async function GET(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const { searchParams } = new URL(request.url);
     const key = searchParams.get("key");
     const category = searchParams.get("category");
@@ -34,6 +39,9 @@ export async function GET(request: NextRequest) {
 // PUT: Upsert a site config entry
 export async function PUT(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const body = await request.json();
     const { key, value, category } = body;
 
@@ -56,6 +64,8 @@ export async function PUT(request: NextRequest) {
         category: category || undefined,
       },
     });
+
+    revalidateContent();
 
     return NextResponse.json({ config });
   } catch (error) {

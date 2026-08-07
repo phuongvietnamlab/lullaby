@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdminApi } from "@/lib/auth-utils";
 
 // GET: Fetch all blog categories
 export async function GET() {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const categories = await db.blogCategory.findMany({
       orderBy: { name: "asc" },
     });

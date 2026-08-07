@@ -1,225 +1,436 @@
 "use client";
 
-import { Save } from "lucide-react";
-import { mockSiteSettings } from "@/lib/admin/mock-data";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Save, CreditCard, RefreshCw } from "lucide-react";
 
-// TODO: Replace with real settings from database
-const settings = mockSiteSettings;
+type Settings = {
+  hotelName: string;
+  tagline: string;
+  email: string;
+  phone: string;
+  address: string;
+  checkInTime: string;
+  checkOutTime: string;
+  currency: string;
+  defaultLocale: string;
+  socialMedia: { facebook: string; instagram: string; twitter: string };
+  seo: { metaTitle: string; metaDescription: string; ogImage: string };
+  bookingPolicy: {
+    cancellationHours: number;
+    depositPercentage: number;
+    maxAdvanceBookingDays: number;
+    childAgeLimit: number;
+  };
+};
+
+const inputClass =
+  "w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500";
+
+/**
+ * Plain fetch with no setState, so the mount effect below has nothing to call
+ * synchronously (react-hooks/set-state-in-effect) and can cancel cleanly.
+ */
+async function fetchSettings(): Promise<{ settings: Settings }> {
+  const res = await fetch("/api/admin/settings");
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error || "Failed to load settings");
+  }
+  return res.json();
+}
 
 export default function AdminSettingsPage() {
+  const [settings, setSettings] = useState<Settings | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchSettings()
+      .then((data) => {
+        if (!cancelled) setSettings(data.settings);
+      })
+      .catch((e: Error) => {
+        if (!cancelled) setError(e.message);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function load() {
+    setLoading(true);
+    setError("");
+    try {
+      setSettings((await fetchSettings()).settings);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleSave() {
+    if (!settings) return;
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || "Failed to save settings");
+        return;
+      }
+      const data = await res.json();
+      // Re-seed from the server so any value it normalised is reflected here
+      setSettings(data.settings);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading || !settings) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-gray-500">Loading settings...</div>
+      </div>
+    );
+  }
+
+  const set = <K extends keyof Settings>(key: K, value: Settings[K]) =>
+    setSettings({ ...settings, [key]: value });
+
   return (
     <div className="space-y-6 max-w-4xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Configure hotel and site settings
+            Hotel details, policies and SEO defaults
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-700 transition-colors">
-          <Save size={16} />
-          Save Changes
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => load()}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            <RefreshCw size={15} />
+            Reload
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-slate-800 text-white rounded-md hover:bg-slate-700 disabled:opacity-50"
+          >
+            <Save size={15} />
+            {saving ? "Saving..." : saved ? "Saved" : "Save changes"}
+          </button>
+        </div>
       </div>
 
-      {/* General Settings */}
-      <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">General</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Hotel Name</label>
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      <Section title="Hotel information">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Hotel name">
             <input
-              type="text"
-              defaultValue={settings.hotelName}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.hotelName}
+              onChange={(e) => set("hotelName", e.target.value)}
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
+          </Field>
+          <Field label="Tagline">
             <input
-              type="text"
-              defaultValue={settings.tagline}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.tagline}
+              onChange={(e) => set("tagline", e.target.value)}
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          </Field>
+          <Field label="Contact email">
             <input
               type="email"
-              defaultValue={settings.email}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.email}
+              onChange={(e) => set("email", e.target.value)}
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+          </Field>
+          <Field label="Phone">
             <input
-              type="text"
-              defaultValue={settings.phone}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.phone}
+              onChange={(e) => set("phone", e.target.value)}
+              className={inputClass}
             />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+          </Field>
+          <Field label="Address" className="sm:col-span-2">
             <input
-              type="text"
-              defaultValue={settings.address}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.address}
+              onChange={(e) => set("address", e.target.value)}
+              className={inputClass}
             />
-          </div>
+          </Field>
         </div>
-      </section>
+      </Section>
 
-      {/* Operations Settings */}
-      <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Operations</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Check-in Time</label>
+      <Section title="Stay defaults">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <Field label="Check-in time">
             <input
               type="time"
-              defaultValue={settings.checkInTime}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.checkInTime}
+              onChange={(e) => set("checkInTime", e.target.value)}
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Check-out Time</label>
+          </Field>
+          <Field label="Check-out time">
             <input
               type="time"
-              defaultValue={settings.checkOutTime}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.checkOutTime}
+              onChange={(e) => set("checkOutTime", e.target.value)}
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+          </Field>
+          <Field label="Currency">
+            <input
+              value={settings.currency}
+              onChange={(e) => set("currency", e.target.value)}
+              className={inputClass}
+            />
+          </Field>
+          <Field label="Default language">
             <select
-              defaultValue={settings.currency}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.defaultLocale}
+              onChange={(e) => set("defaultLocale", e.target.value)}
+              className={inputClass}
             >
-              <option value="VND">VND - Vietnamese Dong</option>
-              <option value="USD">USD - US Dollar</option>
+              <option value="vi">Tiếng Việt</option>
+              <option value="en">English</option>
             </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Default Locale</label>
-            <select
-              defaultValue={settings.defaultLocale}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
-            >
-              <option value="vi">Vietnamese (vi)</option>
-              <option value="en">English (en)</option>
-            </select>
-          </div>
+          </Field>
         </div>
-      </section>
+      </Section>
 
-      {/* Booking Policy */}
-      <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Booking Policy</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Cancellation Window (hours)
-            </label>
+      <Section title="Booking policy">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <Field label="Free cancellation (hours)">
             <input
               type="number"
-              defaultValue={settings.bookingPolicy.cancellationHours}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              min={0}
+              max={720}
+              value={settings.bookingPolicy.cancellationHours}
+              onChange={(e) =>
+                set("bookingPolicy", {
+                  ...settings.bookingPolicy,
+                  cancellationHours: Number(e.target.value),
+                })
+              }
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Deposit Required (%)
-            </label>
+          </Field>
+          <Field label="Deposit (%)">
             <input
               type="number"
-              defaultValue={settings.bookingPolicy.depositPercentage}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              min={0}
+              max={100}
+              value={settings.bookingPolicy.depositPercentage}
+              onChange={(e) =>
+                set("bookingPolicy", {
+                  ...settings.bookingPolicy,
+                  depositPercentage: Number(e.target.value),
+                })
+              }
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Max Advance Booking (days)
-            </label>
+          </Field>
+          <Field label="Max advance (days)">
             <input
               type="number"
-              defaultValue={settings.bookingPolicy.maxAdvanceBookingDays}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              min={1}
+              max={1095}
+              value={settings.bookingPolicy.maxAdvanceBookingDays}
+              onChange={(e) =>
+                set("bookingPolicy", {
+                  ...settings.bookingPolicy,
+                  maxAdvanceBookingDays: Number(e.target.value),
+                })
+              }
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Child Age Limit (free stay)
-            </label>
+          </Field>
+          <Field label="Child age limit">
             <input
               type="number"
-              defaultValue={settings.bookingPolicy.childAgeLimit}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              min={0}
+              max={18}
+              value={settings.bookingPolicy.childAgeLimit}
+              onChange={(e) =>
+                set("bookingPolicy", {
+                  ...settings.bookingPolicy,
+                  childAgeLimit: Number(e.target.value),
+                })
+              }
+              className={inputClass}
             />
-          </div>
+          </Field>
         </div>
-      </section>
+        <p className="mt-3 text-xs text-gray-500">
+          These values are stored for the public policy copy. The booking engine
+          itself still enforces a fixed 48-hour payment hold and a 30-night
+          maximum stay.
+        </p>
+      </Section>
 
-      {/* Social Media */}
-      <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Social Media</h2>
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Facebook URL</label>
+      <Section title="Social media">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <Field label="Facebook">
             <input
-              type="url"
-              defaultValue={settings.socialMedia.facebook}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.socialMedia.facebook}
+              onChange={(e) =>
+                set("socialMedia", {
+                  ...settings.socialMedia,
+                  facebook: e.target.value,
+                })
+              }
+              placeholder="https://facebook.com/..."
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Instagram URL</label>
+          </Field>
+          <Field label="Instagram">
             <input
-              type="url"
-              defaultValue={settings.socialMedia.instagram}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.socialMedia.instagram}
+              onChange={(e) =>
+                set("socialMedia", {
+                  ...settings.socialMedia,
+                  instagram: e.target.value,
+                })
+              }
+              placeholder="https://instagram.com/..."
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Twitter URL</label>
+          </Field>
+          <Field label="Twitter / X">
             <input
-              type="url"
-              defaultValue={settings.socialMedia.twitter}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.socialMedia.twitter}
+              onChange={(e) =>
+                set("socialMedia", {
+                  ...settings.socialMedia,
+                  twitter: e.target.value,
+                })
+              }
+              placeholder="https://x.com/..."
+              className={inputClass}
             />
-          </div>
+          </Field>
         </div>
-      </section>
+        <p className="mt-3 text-xs text-gray-500">
+          Only http(s) links are stored. Anything else is discarded on save.
+        </p>
+      </Section>
 
-      {/* SEO */}
-      <section className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">SEO</h2>
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Meta Title</label>
+      <Section title="SEO defaults">
+        <div className="space-y-4">
+          <Field label="Meta title">
             <input
-              type="text"
-              defaultValue={settings.seo.metaTitle}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.seo.metaTitle}
+              onChange={(e) =>
+                set("seo", { ...settings.seo, metaTitle: e.target.value })
+              }
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
+          </Field>
+          <Field label="Meta description">
             <textarea
-              defaultValue={settings.seo.metaDescription}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 resize-none"
+              value={settings.seo.metaDescription}
+              onChange={(e) =>
+                set("seo", { ...settings.seo, metaDescription: e.target.value })
+              }
+              className={inputClass}
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">OG Image Path</label>
+          </Field>
+          <Field label="OG image URL">
             <input
-              type="text"
-              defaultValue={settings.seo.ogImage}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+              value={settings.seo.ogImage}
+              onChange={(e) =>
+                set("seo", { ...settings.seo, ogImage: e.target.value })
+              }
+              className={inputClass}
             />
+          </Field>
+        </div>
+      </Section>
+
+      <section className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+              <CreditCard size={16} />
+              Payment
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              VNPay credentials are managed separately so the secret is never
+              displayed here.
+            </p>
           </div>
+          <Link
+            href="/admin/settings/payment"
+            className="shrink-0 px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+          >
+            Open
+          </Link>
         </div>
       </section>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+      <h2 className="font-semibold text-gray-900 mb-4">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+function Field({
+  label,
+  className = "",
+  children,
+}: {
+  label: string;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={className}>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        {label}
+      </label>
+      {children}
     </div>
   );
 }

@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdminApi } from "@/lib/auth-utils";
+import { revalidateBlog } from "@/lib/revalidate";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 // Helper: save a revision snapshot of a blog post
 async function saveRevision(
@@ -19,6 +22,25 @@ async function saveRevision(
   });
 }
 
+/**
+ * Normalise an optional text field for a partial update: an absent field is
+ * left untouched (`undefined`), an explicitly emptied one is cleared (`null`).
+ */
+function optionalText(value: unknown): string | null | undefined {
+  if (value === undefined) return undefined;
+  return value ? String(value) : null;
+}
+
+/**
+ * Clean the editor's HTML before it is stored. The admin preview and revision
+ * screens render this back with dangerouslySetInnerHTML, so an unsanitised post
+ * written by one staff member would run in another's session.
+ */
+function cleanRichText(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  return sanitizeRichText(value);
+}
+
 // Helper: determine post status label
 function getPostStatus(post: { isPublished: boolean; scheduledAt: Date | null }) {
   if (post.isPublished) return "published";
@@ -29,6 +51,9 @@ function getPostStatus(post: { isPublished: boolean; scheduledAt: Date | null })
 // GET: Fetch all blog posts with author and category info
 export async function GET() {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const posts = await db.blogPost.findMany({
       include: {
         author: { select: { id: true, name: true, email: true } },
@@ -56,6 +81,9 @@ export async function GET() {
 // POST: Create a new blog post
 export async function POST(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const body = await request.json();
     const {
       title,
@@ -69,8 +97,10 @@ export async function POST(request: NextRequest) {
       categoryId,
       isPublished,
       scheduledAt,
-      authorId,
     } = body;
+
+    // Authorship comes from the session, never from the request body.
+    const authorId = guard.user.id;
 
     if (!title || !content || !slug) {
       return NextResponse.json(
@@ -96,8 +126,8 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         titleEn: titleEn || null,
-        content,
-        contentEn: contentEn || null,
+        content: sanitizeRichText(content),
+        contentEn: contentEn ? sanitizeRichText(contentEn) : null,
         excerpt: excerpt || null,
         excerptEn: excerptEn || null,
         slug,
@@ -122,6 +152,8 @@ export async function POST(request: NextRequest) {
       authorId
     );
 
+    revalidateBlog();
+
     return NextResponse.json({ post }, { status: 201 });
   } catch (error) {
     console.error("Failed to create blog post:", error);
@@ -135,6 +167,9 @@ export async function POST(request: NextRequest) {
 // PUT: Update an existing blog post
 export async function PUT(request: NextRequest) {
   try {
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const body = await request.json();
     const {
       id,
@@ -177,9 +212,15 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    let publishedAt = currentPost.publishedAt;
-    const shouldPublish = isPublished && !scheduledAt;
+    // A partial update must not silently unpublish. Only recompute the publish
+    // state when the caller actually sent `isPublished`; otherwise keep what is
+    // already stored.
+    const publishFieldSent = isPublished !== undefined;
+    const shouldPublish = publishFieldSent
+      ? Boolean(isPublished) && !scheduledAt
+      : currentPost.isPublished;
 
+    let publishedAt = currentPost.publishedAt;
     if (shouldPublish && !currentPost.isPublished) {
       publishedAt = new Date();
     } else if (!shouldPublish) {
@@ -190,17 +231,22 @@ export async function PUT(request: NextRequest) {
       where: { id },
       data: {
         title,
-        titleEn: titleEn || null,
-        content,
-        contentEn: contentEn || null,
-        excerpt: excerpt || null,
-        excerptEn: excerptEn || null,
+        titleEn: optionalText(titleEn),
+        content: cleanRichText(content),
+        contentEn:
+          contentEn === undefined
+            ? undefined
+            : contentEn
+              ? sanitizeRichText(String(contentEn))
+              : null,
+        excerpt: optionalText(excerpt),
+        excerptEn: optionalText(excerptEn),
         slug,
-        coverImage: coverImage || null,
-        categoryId: categoryId || null,
+        coverImage: optionalText(coverImage),
+        categoryId: optionalText(categoryId),
         isPublished: shouldPublish,
         publishedAt,
-        scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
+        scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
       },
       include: {
         author: { select: { id: true, name: true } },
@@ -219,14 +265,59 @@ export async function PUT(request: NextRequest) {
     await saveRevision(
       post.id,
       { title, titleEn, content, contentEn, excerpt, excerptEn, slug, coverImage, categoryId, isPublished: shouldPublish, scheduledAt },
-      note
+      note,
+      guard.user.id
     );
+
+    revalidateBlog();
 
     return NextResponse.json({ post });
   } catch (error) {
     console.error("Failed to update blog post:", error);
     return NextResponse.json(
       { error: "Failed to update blog post" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE: Remove a blog post (and its revision history)
+export async function DELETE(request: NextRequest) {
+  try {
+    const guard = await requireAdminApi(["SUPER_ADMIN", "MANAGER"]);
+    if (guard instanceof NextResponse) return guard;
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Post ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const post = await db.blogPost.findUnique({ where: { id } });
+    if (!post) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    // ContentRevision has no FK to BlogPost, so its rows have to go explicitly
+    // or they outlive the post they describe.
+    await db.$transaction([
+      db.contentRevision.deleteMany({
+        where: { entityType: "blog_post", entityId: id },
+      }),
+      db.blogPost.delete({ where: { id } }),
+    ]);
+
+    revalidateBlog();
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Failed to delete blog post:", error);
+    return NextResponse.json(
+      { error: "Failed to delete blog post" },
       { status: 500 }
     );
   }

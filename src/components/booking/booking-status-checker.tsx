@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Search, Calendar, Clock, User, CheckCircle, XCircle, AlertCircle, Hourglass } from "lucide-react";
 import { formatPrice } from "@/lib/data/rooms";
+import { translateApiError } from "@/lib/booking/error-messages";
+
+type TranslateFn = (key: string, values?: Record<string, string | number>) => string;
 
 type BookingStatus = {
   bookingCode: string;
@@ -38,44 +41,67 @@ export function BookingStatusChecker() {
   const locale = useLocale();
   const searchParams = useSearchParams();
 
-  const [code, setCode] = useState(searchParams.get("code") || "");
+  const urlCode = searchParams.get("code") || "";
+
+  const [code, setCode] = useState(urlCode);
   const [booking, setBooking] = useState<BookingStatus | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searched, setSearched] = useState(false);
 
-  // Auto-search if code is in URL
-  useEffect(() => {
-    if (searchParams.get("code")) {
-      handleSearch();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Takes the code as an argument so the mount effect below does not have to
+  // read it from state (which would still be the initial value at that point).
+  const runSearch = useCallback(
+    async (rawCode: string) => {
+      const searchCode = rawCode.trim();
+      if (!searchCode) return;
 
-  const handleSearch = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!code.trim()) return;
+      setLoading(true);
+      setError("");
+      setBooking(null);
+      setSearched(true);
 
-    setLoading(true);
-    setError("");
-    setBooking(null);
-    setSearched(true);
+      try {
+        const res = await fetch(`/api/bookings/${encodeURIComponent(searchCode)}`);
+        const data = await res.json();
 
-    try {
-      const res = await fetch(`/api/bookings/${encodeURIComponent(code.trim())}`);
-      const data = await res.json();
+        if (!res.ok) {
+          // "notFound" gets the dedicated status copy; everything else resolves
+          // through the shared code map so no raw English reaches the guest.
+          setError(
+            data?.code === "notFound"
+              ? t("status.notFound")
+              : translateApiError(data, t as TranslateFn, "errors.checkFailed")
+          );
+          return;
+        }
 
-      if (!res.ok) {
-        setError(data.error === "Booking not found" ? t("status.notFound") : data.error);
-        return;
+        setBooking(data.booking);
+      } catch {
+        setError(t("errors.networkError"));
+      } finally {
+        setLoading(false);
       }
+    },
+    [t]
+  );
 
-      setBooking(data.booking);
-    } catch {
-      setError(t("errors.networkError"));
-    } finally {
-      setLoading(false);
-    }
+  // Auto-search when the guest arrives with ?code= (the link in the booking
+  // confirmation email). The ref keeps this to one lookup per distinct URL
+  // code, so a client-side navigation to a different code still searches while
+  // typing in the box never re-fetches.
+  const autoSearchedFor = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!urlCode || autoSearchedFor.current === urlCode) return;
+    autoSearchedFor.current = urlCode;
+    setCode(urlCode);
+    runSearch(urlCode);
+  }, [urlCode, runSearch]);
+
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    return runSearch(code);
   };
 
   const formatDate = (dateStr: string) => {

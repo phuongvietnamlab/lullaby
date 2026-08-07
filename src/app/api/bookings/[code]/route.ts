@@ -1,11 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { rateLimit } from "@/lib/rate-limit";
+
+/** Mask an address so the guest can recognise it without it being harvestable. */
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return "";
+  const head = local.slice(0, 2);
+  return `${head}${"*".repeat(Math.max(local.length - 2, 1))}@${domain}`;
+}
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ code: string }> }
 ) {
   try {
+    // Booking codes are only 6 random characters, so an unthrottled lookup is
+    // brute-forceable into a guest-data dump.
+    const ip =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    const { allowed } = rateLimit(`booking-lookup:${ip}`, 20, 60 * 60 * 1000);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later.", code: "rateLimited" },
+        { status: 429 }
+      );
+    }
+
     const { code } = await params;
 
     // Find booking by code in database
@@ -21,7 +44,7 @@ export async function GET(
 
     if (!booking) {
       return NextResponse.json(
-        { error: "Booking not found" },
+        { error: "Booking not found", code: "notFound" },
         { status: 404 }
       );
     }
@@ -47,7 +70,8 @@ export async function GET(
         checkOut: booking.checkOut.toISOString(),
         guestCount: booking.guestCount,
         guestName: booking.guest.name,
-        guestEmail: booking.guest.email,
+        // Masked: the code alone is not proof of identity (D-06)
+        guestEmail: maskEmail(booking.guest.email),
         totalPrice: Number(booking.totalPrice),
         specialRequests: booking.specialRequests,
         createdAt: booking.createdAt.toISOString(),
@@ -64,7 +88,7 @@ export async function GET(
   } catch (error) {
     console.error("Get booking error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", code: "serverError" },
       { status: 500 }
     );
   }

@@ -94,14 +94,6 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          {/* Demo credentials hint */}
-          <div className="mt-6 p-3 bg-blue-50 rounded-md">
-            <p className="text-xs text-blue-700 font-medium">Demo Credentials:</p>
-            <p className="text-xs text-blue-600 mt-1">
-              Email: admin@lullaby.com<br />
-              Password: admin123
-            </p>
-          </div>
         </div>
       </div>
     </div>

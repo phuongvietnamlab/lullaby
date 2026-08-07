@@ -1,23 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { requireAdminApi } from "@/lib/auth-utils";
 
 // GET: Return a blog post for preview (even if unpublished)
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    // Preview serves unpublished drafts, so it is staff-only.
+    const guard = await requireAdminApi();
+    if (guard instanceof NextResponse) return guard;
+
     const { id } = await params;
-
-    // Simple token-based or admin access check
-    // In production, validate admin session here
-    const { searchParams } = new URL(request.url);
-    const token = searchParams.get("token");
-
-    // Accept requests with preview token or from admin (no strict auth for now)
-    if (!token && !request.headers.get("cookie")?.includes("session")) {
-      // Allow anyway for development, in prod add proper auth
-    }
 
     const post = await db.blogPost.findUnique({
       where: { id },

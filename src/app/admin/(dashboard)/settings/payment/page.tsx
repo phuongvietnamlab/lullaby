@@ -143,6 +143,10 @@ export default function AdminPaymentSettingsPage() {
                 {showSecret ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
+            <p className="mt-1.5 text-xs text-gray-500">
+              The stored secret is never sent back to the browser. Leave the
+              masked value untouched to keep it, or type a new secret to replace it.
+            </p>
           </div>
         </div>
       </section>
@@ -150,9 +154,9 @@ export default function AdminPaymentSettingsPage() {
       {/* Info */}
       <section className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <p className="text-sm text-blue-800">
-          <strong>Note:</strong> If VNPay credentials are not configured here, the system will use
-          environment variables (VNPAY_TMN_CODE, VNPAY_HASH_SECRET). For sandbox testing,
-          default demo credentials are used automatically.
+          <strong>Note:</strong> If VNPay credentials are not configured here, the system falls back
+          to the environment variables (VNPAY_TMN_CODE, VNPAY_HASH_SECRET). There are no built-in
+          demo credentials — with neither source set, online payment stays disabled.
         </p>
       </section>
     </div>

@@ -33,8 +33,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
 
-  // Try DB first
+  // Try DB first. An inactive room type 404s, so do not advertise it here.
   const dbRoom = await getRoomTypeBySlugFromDB(slug);
+  if (dbRoom && !dbRoom.isActive) return {};
   if (dbRoom) {
     const name = locale === "vi" ? dbRoom.name : dbRoom.nameEn;
     return {
@@ -83,6 +84,14 @@ export default async function RoomDetailPage({ params }: Props) {
 
   // Try DB first
   const dbRoom = await getRoomTypeBySlugFromDB(slug);
+
+  // A room type an admin took off sale disappears from the rooms list (that
+  // query filters isActive) but used to stay reachable at its own URL, price
+  // and Book button included — the guest only hit the wall when the booking
+  // API rejected it at the last step. 404 instead. Note this must come before
+  // the static fallback, or a deactivated room would simply render from the
+  // built-in data.
+  if (dbRoom && !dbRoom.isActive) notFound();
 
   // Fall back to static data if not in DB
   if (!dbRoom) {

@@ -286,7 +286,17 @@
       "noRooms": "Không còn phòng trống cho ngày đã chọn. Vui lòng thử ngày khác.",
       "bookingFailed": "Không thể tạo đặt phòng. Vui lòng thử lại.",
       "networkError": "Lỗi mạng. Vui lòng kiểm tra kết nối của bạn.",
-      "noRoomsForType": "Loại phòng này đã hết cho ngày đã chọn. Hãy chọn ngày khác hoặc xem tất cả phòng."
+      "tooManyRequests": "Bạn đã tra cứu quá nhiều lần. Vui lòng thử lại sau.",
+      "noRoomsForType": "Loại phòng này đã hết cho ngày đã chọn. Hãy chọn ngày khác hoặc xem tất cả phòng.",
+      "checkInPast": "Ngày nhận phòng phải từ hôm nay trở đi.",
+      "checkOutBeforeCheckIn": "Ngày trả phòng phải sau ngày nhận phòng.",
+      "maxStayExceeded": "Thời gian lưu trú tối đa là 30 đêm.",
+      "rateLimited": "Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau.",
+      "invalidInput": "Thông tin chưa hợp lệ. Vui lòng kiểm tra lại.",
+      "roomNotFound": "Không tìm thấy loại phòng này.",
+      "soldOut": "Phòng đã hết cho ngày đã chọn. Vui lòng chọn ngày khác.",
+      "overCapacity": "Loại phòng này chỉ ở tối đa {maxGuests} khách.",
+      "serverError": "Hệ thống đang gặp sự cố. Vui lòng thử lại sau."
     },
     "status": {
       "title": "Kiểm Tra Trạng Thái Đặt Phòng",
@@ -454,7 +464,8 @@
     "followUs": "Theo Dõi Chúng Tôi",
     "copyright": "© {year} Lullaby Sky Villa. Mọi quyền được bảo lưu.",
     "privacy": "Chính Sách Bảo Mật",
-    "terms": "Điều Khoản Dịch Vụ"
+    "terms": "Điều Khoản Dịch Vụ",
+    "socialsComingSoon": "Sắp cập nhật"
   },
   "payment": {
     "successTitle": "Thanh Toán Thành Công!",

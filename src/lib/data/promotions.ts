@@ -35,6 +35,13 @@ export async function getActivePromotions(
       include: { roomTypes: { include: { roomType: true } } },
     });
 
+    // Reachable table, no live promotions: advertise nothing. Showing the demo
+    // list here would print codes that checkout now rejects.
+    const anyPromotions = await db.promotion.count();
+    if (promos.length === 0 && anyPromotions > 0) {
+      return [];
+    }
+
     if (promos.length > 0) {
       return promos.map((promo) => ({
         id: promo.id,

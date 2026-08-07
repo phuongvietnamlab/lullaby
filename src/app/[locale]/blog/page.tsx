@@ -1,8 +1,7 @@
-import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import Image from "next/image";
-import { getPublishedPosts } from "@/lib/data/blog";
+import { ImageWithFallback } from "@/components/ui/image-with-fallback";
+import { getPublishedPosts, type BlogPost } from "@/lib/data/blog";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import type { Metadata } from "next";
 
@@ -25,12 +24,19 @@ export default async function BlogPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <BlogContent locale={locale} />;
+  const posts = await getPublishedPosts(locale);
+
+  return <BlogContent locale={locale} posts={posts} />;
 }
 
-function BlogContent({ locale }: { locale: string }) {
-  const t = useTranslations("blog");
-  const posts = getPublishedPosts(locale);
+async function BlogContent({
+  locale,
+  posts,
+}: {
+  locale: string;
+  posts: BlogPost[];
+}) {
+  const t = await getTranslations("blog");
 
   return (
     <>
@@ -65,18 +71,23 @@ function BlogContent({ locale }: { locale: string }) {
                     className="group block overflow-hidden rounded-sm bg-white border border-[var(--color-border)] hover:shadow-[var(--shadow-medium)] transition-shadow duration-[var(--duration-slow)]"
                   >
                     <div className="relative aspect-[16/10] overflow-hidden">
-                      <Image
+                      <ImageWithFallback
                         src={post.coverImage}
                         alt={post.title}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                       />
+                      {(post.categoryLabel || post.categoryKey) && (
                       <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
                         <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-xs uppercase tracking-widest text-[var(--color-primary)]">
-                          {t(`categories.${post.category}` as never)}
+                          {post.categoryLabel ??
+                            (post.categoryKey
+                              ? t(`categories.${post.categoryKey}` as never)
+                              : "")}
                         </span>
                       </div>
+                      )}
                     </div>
                     <div className="p-4 sm:p-6 space-y-3">
                       <time className="text-xs text-[var(--color-text-light)] uppercase tracking-wider">
