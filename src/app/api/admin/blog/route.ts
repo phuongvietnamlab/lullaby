@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdminApi } from "@/lib/auth-utils";
 import { revalidateBlog } from "@/lib/revalidate";
+import { sanitizeRichText } from "@/lib/sanitize";
 
 // Helper: save a revision snapshot of a blog post
 async function saveRevision(
@@ -28,6 +29,16 @@ async function saveRevision(
 function optionalText(value: unknown): string | null | undefined {
   if (value === undefined) return undefined;
   return value ? String(value) : null;
+}
+
+/**
+ * Clean the editor's HTML before it is stored. The admin preview and revision
+ * screens render this back with dangerouslySetInnerHTML, so an unsanitised post
+ * written by one staff member would run in another's session.
+ */
+function cleanRichText(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  return sanitizeRichText(value);
 }
 
 // Helper: determine post status label
@@ -115,8 +126,8 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         titleEn: titleEn || null,
-        content,
-        contentEn: contentEn || null,
+        content: sanitizeRichText(content),
+        contentEn: contentEn ? sanitizeRichText(contentEn) : null,
         excerpt: excerpt || null,
         excerptEn: excerptEn || null,
         slug,
@@ -221,8 +232,13 @@ export async function PUT(request: NextRequest) {
       data: {
         title,
         titleEn: optionalText(titleEn),
-        content,
-        contentEn: optionalText(contentEn),
+        content: cleanRichText(content),
+        contentEn:
+          contentEn === undefined
+            ? undefined
+            : contentEn
+              ? sanitizeRichText(String(contentEn))
+              : null,
         excerpt: optionalText(excerpt),
         excerptEn: optionalText(excerptEn),
         slug,

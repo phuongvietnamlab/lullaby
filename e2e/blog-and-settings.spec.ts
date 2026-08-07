@@ -116,6 +116,27 @@ test.describe("a published post reaches the public blog", () => {
     }
   });
 
+  test("content is sanitised on write, not just on read", async ({ request }) => {
+    // The admin preview and revision-history screens render stored content with
+    // dangerouslySetInnerHTML, so a post written by a receptionist must not be
+    // able to run code in a super-admin's session.
+    const { post } = await createPost(request, {
+      content: `<p>ok</p><script>alert(1)</script><a href="javascript:alert(1)">x</a>`,
+    });
+
+    try {
+      const res = await request.get("/api/admin/blog");
+      const { posts } = await res.json();
+      const stored = posts.find((p: { id: string }) => p.id === post.id);
+
+      expect(stored.content).toContain("ok");
+      expect(stored.content).not.toContain("<script");
+      expect(stored.content).not.toContain("javascript:");
+    } finally {
+      await request.delete(`/api/admin/blog?id=${post.id}`);
+    }
+  });
+
   test("a deleted post stops being public", async ({ request, page }) => {
     const { post, slug } = await createPost(request);
     expect((await request.delete(`/api/admin/blog?id=${post.id}`)).status()).toBe(

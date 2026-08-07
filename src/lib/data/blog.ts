@@ -6,8 +6,8 @@
  * matching how rooms, promotions and the gallery behave.
  */
 
-import sanitizeHtml from "sanitize-html";
 import { db } from "@/lib/db";
+import { sanitizeRichText, stripTags } from "@/lib/sanitize";
 import { staticBlogPosts } from "./blog-static";
 
 export type BlogPost = {
@@ -31,49 +31,9 @@ export type BlogPost = {
   content: string;
 };
 
-/**
- * Allow-list for admin-authored HTML.
- *
- * The editor is staff-only, but blog content is the classic stored-XSS vector
- * and there are three staff roles — so the markup is filtered rather than
- * trusted. Note there is no `script`, no `style`, no event handlers, and only
- * http/https/mailto/tel URLs.
- */
-const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
-  allowedTags: [
-    "p", "br", "hr",
-    "h1", "h2", "h3", "h4", "h5", "h6",
-    "strong", "b", "em", "i", "u", "s", "code", "pre", "blockquote",
-    "ul", "ol", "li",
-    "a", "img",
-    "table", "thead", "tbody", "tr", "th", "td",
-    "span", "div",
-  ],
-  allowedAttributes: {
-    a: ["href", "title", "target", "rel"],
-    img: ["src", "alt", "title", "width", "height", "loading"],
-    "*": ["class"],
-  },
-  allowedSchemes: ["http", "https", "mailto", "tel"],
-  allowedSchemesAppliedToAttributes: ["href", "src"],
-  transformTags: {
-    // Anything the editor links out to opens safely
-    a: sanitizeHtml.simpleTransform("a", {
-      rel: "noopener noreferrer",
-      target: "_blank",
-    }),
-  },
-};
-
-export function sanitizePostHtml(html: string): string {
-  return sanitizeHtml(html, SANITIZE_OPTIONS);
-}
-
-/** Strip tags for a fallback excerpt / meta description. */
-function excerptFromHtml(html: string, maxLength = 200): string {
-  const text = sanitizeHtml(html, { allowedTags: [], allowedAttributes: {} })
-    .replace(/\s+/g, " ")
-    .trim();
+/** Fallback excerpt when the author left the summary field blank. */
+function excerptFrom(html: string, maxLength = 200): string {
+  const text = stripTags(html);
   return text.length > maxLength ? `${text.slice(0, maxLength - 1)}…` : text;
 }
 
@@ -121,7 +81,7 @@ function toBlogPost(post: DbPost, locale: string): BlogPost {
   const excerpt =
     (isEn ? post.excerptEn : post.excerpt) || post.excerpt || "";
 
-  const safeContent = sanitizePostHtml(content);
+  const safeContent = sanitizeRichText(content);
   const categoryLabel = post.category
     ? (isEn ? post.category.nameEn : post.category.name) || post.category.name
     : undefined;
@@ -138,7 +98,7 @@ function toBlogPost(post: DbPost, locale: string): BlogPost {
       post.scheduledAt ??
       post.createdAt
     ).toISOString(),
-    excerpt: excerpt || excerptFromHtml(safeContent),
+    excerpt: excerpt || excerptFrom(safeContent),
     coverImage: post.coverImage ?? "",
     format: "html",
     content: safeContent,
