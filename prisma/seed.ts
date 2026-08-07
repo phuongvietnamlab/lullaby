@@ -3,9 +3,15 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { hashPassword } from "better-auth/crypto";
 import pg from "pg";
 
-const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL || "postgresql://postgres.lushbogwdyiuwjdaqnhn:0e8CNgtV5GHw6a3k@aws-0-ap-southeast-2.pooler.supabase.com:5432/postgres",
-});
+// Never hardcode a fallback connection string here - this file is committed, and
+// an inline password ends up published in the repo history.
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  console.error("DATABASE_URL is not set. Load it from .env before seeding.");
+  process.exit(1);
+}
+
+const pool = new pg.Pool({ connectionString });
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 

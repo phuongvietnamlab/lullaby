@@ -13,6 +13,8 @@ try {
 export default defineConfig({
   schema: path.join(__dirname, "prisma", "schema.prisma"),
   datasource: {
-    url: process.env.DATABASE_URL ?? "",
+    // DIRECT_URL is the session-mode connection. The transaction pooler that
+    // DATABASE_URL points at cannot run migrations (no advisory locks).
+    url: process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? "",
   },
 });
