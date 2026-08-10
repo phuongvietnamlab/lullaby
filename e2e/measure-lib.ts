@@ -1,5 +1,5 @@
 import { expect, type Page } from "@playwright/test";
-import { type AdminRoute } from "./admin-routes";
+import { type AdminRoute, type ModalKind } from "./admin-routes";
 
 /**
  * The DOM sweep behind the VP-02 measuring pass.
@@ -729,4 +729,368 @@ export async function scanPage(
   const sweep = await collectControls(page, route, null);
 
   return { ...proof, ...sweep };
+}
+
+/** How a modal was closed again. "none" means it was never opened. */
+export type DismissStrategy = "declared-selector" | "hard-reset" | "none";
+
+/**
+ * Both viewports, recorded per modal.
+ *
+ * innerHeight is the LAYOUT viewport and visualViewportHeight is the VISUAL one.
+ * Headless Chromium reports the same number for both, so recording only one
+ * would look sufficient — but on a real iOS device the soft keyboard shrinks the
+ * visual viewport without touching the layout viewport, and Phase 14 caps modal
+ * height against one of these two. Which one has to be answerable from the
+ * artifact, not from memory.
+ */
+export type ModalViewportBox = {
+  innerWidth: number;
+  innerHeight: number;
+  visualViewportHeight: number | null;
+};
+
+/**
+ * One modal, opened and measured — the whole of TAP-02's baseline.
+ *
+ * panelControls / panelTextInputs are why this type carries more than geometry.
+ * scanPage runs with every modal CLOSED, so a modal body simply does not exist
+ * in the DOM at that moment and is absent from the baseline entirely. That is not
+ * a narrower baseline, it is a wrong one: rooms/page.tsx:481-482 declares
+ * inputClass = "w-full px-3 py-2 ... text-sm" — roughly 38px tall (under
+ * SUB_TARGET_PX, so TAP-01) at 14px font (under IOS_ZOOM_THRESHOLD_PX, so
+ * TAP-03) — and every input of the room-form modal uses it. ROADMAP criterion 3
+ * asks for EVERY sub-44px control and EVERY text input, so leaving the modal
+ * bodies out would drop the densest defect cluster in the panel. e2e/admin-routes.ts
+ * already makes the same argument for the user menu, whose Sign out item exists
+ * only while the menu is open; this type applies it to all five.
+ */
+export type ModalMeasurement = {
+  name: string;
+  kind: ModalKind;
+  opened: boolean;
+  /** Non-null whenever opened is false. "Not opened" must never read as "clean". */
+  skipReason: string | null;
+  panelBox: BoxRecord | null;
+  viewportBox: ModalViewportBox;
+  clippedTop: boolean;
+  clippedBottom: boolean;
+  clippedLeft: boolean;
+  clippedRight: boolean;
+  fitsViewport: boolean;
+  panelScrollHeight: number | null;
+  panelClientHeight: number | null;
+  panelOverflowY: string | null;
+  bodyScrollsInternally: boolean;
+  dismissed: boolean;
+  dismissStrategy: DismissStrategy;
+  panelControls: ControlRecord[];
+  panelTextInputs: TextInputRecord[];
+  panelControlsScanned: number;
+  panelControlsSubTarget: number;
+};
+
+/**
+ * Native dialogs observed per page, so the guard below can be checked as data
+ * as well as thrown from. A WeakMap keyed on the page keeps this per-test with
+ * no cleanup step to forget.
+ */
+const unexpectedDialogs = new WeakMap<Page, string[]>();
+
+/**
+ * Make an unexpected native dialog loud.
+ *
+ * THE FAILURE MODE THIS EXISTS FOR: Playwright auto-dismisses native dialogs
+ * when no listener is registered, and it does so SILENTLY. This is the first
+ * plan in the phase that clicks anything at all, against the real database with
+ * a SUPER_ADMIN session. If a declared trigger ever reaches a data-destroying
+ * path — blog/history/page.tsx:76 calls window.confirm before reverting a
+ * revision, and /admin/promotions and /admin/rooms both carry row-level delete
+ * buttons — the default behaviour is that the confirm is dismissed, the harness
+ * carries on as if nothing happened, and nothing in the artifact records it.
+ *
+ * With a listener attached the dialog is neither accepted nor dismissed: the
+ * page blocks, the test times out, and the message below names what asked. Both
+ * halves matter. Nothing in this file may ever call dialog.accept().
+ */
+export function installDialogGuard(page: Page): void {
+  if (!unexpectedDialogs.has(page)) unexpectedDialogs.set(page, []);
+
+  page.on("dialog", (dialog) => {
+    const seen = unexpectedDialogs.get(page);
+    const message =
+      `an unexpected native ${dialog.type()} dialog appeared during measurement: ` +
+      `"${dialog.message()}". The harness only operates the preTrigger / trigger / ` +
+      `dismiss selectors declared in e2e/admin-routes.ts, so a dialog here means one ` +
+      `of them reached a mutating path. It is deliberately left unanswered rather ` +
+      `than dismissed — a dismissed dialog leaves no trace, which is exactly how a ` +
+      `destroyed record would go unnoticed. Fix the selector; do not answer the dialog.`;
+    if (seen) seen.push(message);
+    throw new Error(message);
+  });
+}
+
+/**
+ * Fail the current test if installDialogGuard saw anything.
+ *
+ * Belt and braces on top of the throw inside the handler: an exception raised
+ * from an EventEmitter callback can surface as a worker-level error rather than
+ * a test failure depending on where Playwright dispatched it, and "the run went
+ * red somewhere" is not the same as "this route named the dialog it triggered".
+ */
+export function assertNoUnexpectedDialogs(page: Page): void {
+  const seen = unexpectedDialogs.get(page) ?? [];
+  expect(seen, seen.join(" | ")).toEqual([]);
+}
+
+/** Reads a box back from Playwright at the same precision the DOM sweep uses. */
+function round1(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
+/**
+ * Open, measure and close every modal a route declares.
+ *
+ * ABSOLUTE SAFETY CONSTRAINT — read before editing:
+ * this function operates ONLY the `preTrigger`, `trigger` and `dismiss`
+ * selectors written in e2e/admin-routes.ts, exactly as declared. There is no
+ * branch that activates "the first button in the panel", no discovery loop, no
+ * "click everything and see what opens". Every panel measured here sits on a
+ * live database behind a SUPER_ADMIN session and contains destructive controls:
+ * booking-detail holds status transitions, promotion-form and room-form sit on
+ * pages with row-level deletes, and the user-menu panel holds the session-ending
+ * Sign out item — which is why that modal's `dismiss` is a second press of its
+ * own trigger rather than anything inside the panel. Measuring a control's
+ * geometry never requires activating it.
+ *
+ * It REPORTS. The only assertions are about the instrument: that the panel
+ * really is the panel and not the overlay, that the panel actually contained
+ * controls, and that no native dialog appeared. Nothing about fitsViewport or
+ * clipped* is asserted anywhere — those are Phase 14's TAP-02 gate.
+ */
+export async function measureModals(
+  page: Page,
+  route: AdminRoute,
+  url: string,
+  viewportId: string
+): Promise<ModalMeasurement[]> {
+  const out: ModalMeasurement[] = [];
+  const modals = route.modals ?? [];
+  if (modals.length === 0) return out;
+
+  const viewportBox: ModalViewportBox = await page.evaluate(() => ({
+    innerWidth: window.innerWidth,
+    innerHeight: window.innerHeight,
+    visualViewportHeight: window.visualViewport?.height ?? null,
+  }));
+
+  for (const modal of modals) {
+    const record: ModalMeasurement = {
+      name: modal.name,
+      kind: modal.kind,
+      opened: false,
+      skipReason: null,
+      panelBox: null,
+      viewportBox,
+      clippedTop: false,
+      clippedBottom: false,
+      clippedLeft: false,
+      clippedRight: false,
+      fitsViewport: false,
+      panelScrollHeight: null,
+      panelClientHeight: null,
+      panelOverflowY: null,
+      bodyScrollsInternally: false,
+      dismissed: false,
+      dismissStrategy: "none",
+      panelControls: [],
+      panelTextInputs: [],
+      panelControlsScanned: 0,
+      panelControlsSubTarget: 0,
+    };
+
+    const panel = page.locator(modal.panel).first();
+    const trigger = page.locator(modal.trigger).first();
+
+    try {
+      // 1. Reach the tab the trigger lives on, and WAIT for the swap to land.
+      //    Switching tabs is a React state update, not a navigation, so there is
+      //    nothing else to await: clicking and moving on would ask isDisabled()
+      //    of an element that does not exist yet, which reads as "not disabled".
+      //    /admin/rooms initialises useState<Tab>("types") (rooms/page.tsx:97) and
+      //    on that tab the top-right control is a <Link href="/admin/rooms/edit">
+      //    (:225-231), so without this the harness would navigate away and measure
+      //    "the modal" on a different page.
+      if (modal.preTrigger) {
+        const pre = page.locator(modal.preTrigger).first();
+        if ((await pre.count()) === 0) {
+          record.skipReason =
+            `${modal.name}: the preTrigger "${modal.preTrigger}" matched nothing on ` +
+            `${url} at ${viewportId}, so the tab carrying the trigger was never ` +
+            `reached. Labels on this page carry live counts, so a selector must ` +
+            `match by substring — check e2e/admin-routes.ts.`;
+          out.push(record);
+          continue;
+        }
+        await pre.click();
+        await trigger.waitFor({ state: "visible", timeout: 5_000 }).catch(() => undefined);
+      }
+
+      // 2. Is the trigger usable at all? An empty data state is a LEGITIMATE
+      //    reading and must be recorded with the precondition in plain words, not
+      //    thrown. What it must never become is a missing row that reads as clean.
+      const triggerCount = await trigger.count();
+      if (triggerCount === 0 || (await trigger.isDisabled())) {
+        record.skipReason =
+          `${modal.name}: ${
+            triggerCount === 0
+              ? `no element matched the trigger "${modal.trigger}"`
+              : `the trigger "${modal.trigger}" is disabled`
+          } on ${url} at ${viewportId}. Precondition: ${
+            modal.requires ?? "none declared in e2e/admin-routes.ts"
+          }. This modal's TAP-02 baseline is MISSING, not clean — seed the data and re-run.`;
+        out.push(record);
+        continue;
+      }
+
+      // 3. Open it, then wait for a real paint. toBeVisible() only checks
+      //    visibility; it does not guarantee the panel has been painted at its
+      //    final size. None of the five panels carries a transition or animate
+      //    class today, so this is not flaky yet — but Phase 14 is likely to add
+      //    one while fixing modals, and Phase 15 reuses this exact function.
+      await trigger.click();
+      await expect(panel).toBeVisible();
+      await panel.evaluate(
+        () =>
+          new Promise<void>((resolve) => {
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+          })
+      );
+      record.opened = true;
+
+      // 4. Playwright's own boundingBox(), not the DOM client-rect call the two
+      //    in-page sweeps above use: its coordinates are relative to the
+      //    main-frame viewport, which is exactly the frame of reference TAP-02's
+      //    clipping flags need, and it returns null when the element is not
+      //    visible. That null is a useful signal — never coerce it to zero.
+      const raw = await panel.boundingBox();
+      if (raw) {
+        record.panelBox = {
+          x: round1(raw.x),
+          y: round1(raw.y),
+          width: round1(raw.width),
+          height: round1(raw.height),
+        };
+      }
+
+      // 6. The panel's own scrolling. max-h-[80vh] overflow-y-auto on
+      //    bookings/page.tsx:304 means a tall booking scrolls INSIDE the panel
+      //    rather than clipping — a materially different defect from a panel that
+      //    simply runs off the bottom of the screen, and Phase 14 fixes them
+      //    differently.
+      const intrinsics = await panel.evaluate((el) => {
+        const cs = window.getComputedStyle(el);
+        return {
+          scrollHeight: el.scrollHeight,
+          clientHeight: el.clientHeight,
+          overflowY: cs.overflowY,
+        };
+      });
+      record.panelScrollHeight = intrinsics.scrollHeight;
+      record.panelClientHeight = intrinsics.clientHeight;
+      record.panelOverflowY = intrinsics.overflowY;
+      record.bodyScrollsInternally =
+        intrinsics.scrollHeight > intrinsics.clientHeight + 1 &&
+        (intrinsics.overflowY === "auto" || intrinsics.overflowY === "scroll");
+
+      // 6b. Sweep the panel's own controls, with the SAME collector the page scan
+      //     uses. Reusing it is the point: REDACT_PATTERNS, the sensitive-route
+      //     label rule and the labelSource priority all apply unchanged, which
+      //     matters most here — booking-detail and guest-detail open onto real
+      //     guest records. No redaction rule is restated in this function; there
+      //     is exactly one copy of it, in REDACT_PATTERNS.
+      //     The keyPrefix is explicit because collectControls only receives a CSS
+      //     selector and cannot infer a modal name; without it a control inside
+      //     the modal collides with a same-classed control on the page behind it
+      //     and Phase 15 loses its stable identity.
+      const sweep = await collectControls(page, route, modal.panel, `modal:${modal.name}::`);
+      record.panelControls = sweep.controls;
+      record.panelTextInputs = sweep.textInputs;
+      record.panelControlsScanned = sweep.controlsScanned;
+      record.panelControlsSubTarget = sweep.controlsSubTarget;
+
+      // 8. Clipping, from the box against the layout viewport.
+      if (record.panelBox) {
+        record.clippedTop = record.panelBox.y < 0;
+        record.clippedBottom =
+          record.panelBox.y + record.panelBox.height > viewportBox.innerHeight;
+        record.clippedLeft = record.panelBox.x < 0;
+        record.clippedRight =
+          record.panelBox.x + record.panelBox.width > viewportBox.innerWidth;
+        record.fitsViewport =
+          !record.clippedTop &&
+          !record.clippedBottom &&
+          !record.clippedLeft &&
+          !record.clippedRight;
+      }
+    } catch (error) {
+      // An operational failure (a click that timed out, a panel that never
+      // appeared) is recorded as a loud skip rather than thrown, because
+      // Playwright forks a fresh worker after every failed test and the module
+      // accumulator does not survive it — one bad trigger would otherwise cost
+      // every route after it. The instrument assertions below are deliberately
+      // OUTSIDE this catch: a panel selector that measures the overlay is a
+      // broken tool, not a data state, and has to go red.
+      record.skipReason =
+        `${modal.name}: measurement failed on ${url} at ${viewportId} — ` +
+        `${error instanceof Error ? error.message : String(error)}`;
+      record.opened = false;
+    } finally {
+      // 9/10. Always leave the page usable for the next modal and the next route.
+      //    There is no role="dialog", no aria-modal and no key handler anywhere
+      //    under src/app/admin/, so pressing the Escape key does NOT close these
+      //    modals and cannot be the primary strategy. The declared selector is
+      //    step one; re-navigating is the hard reset, and it works against any
+      //    focus trap because it destroys the whole document.
+      if (record.opened) {
+        try {
+          await page.locator(modal.dismiss).first().click({ timeout: 5_000 });
+          await expect(panel).toBeHidden({ timeout: 3_000 });
+          record.dismissed = true;
+          record.dismissStrategy = "declared-selector";
+        } catch {
+          await page.goto(url, { waitUntil: "domcontentloaded" });
+          await settle(page, route);
+          record.dismissed = !(await panel.isVisible().catch(() => false));
+          record.dismissStrategy = "hard-reset";
+        }
+      }
+    }
+
+    // A dialog seen at any point in the cycle fails the test here, even if the
+    // throw inside the handler was swallowed upstream.
+    assertNoUnexpectedDialogs(page);
+
+    // 5. The instrument check against measuring the overlay instead of the panel.
+    //    Every modal in this repo is a div.fixed.inset-0 wrapping a white panel,
+    //    and inset-0 always measures EXACTLY the viewport — so a wrong selector
+    //    hands TAP-02 a baseline of 375x667 with nothing ever clipped: numbers
+    //    that look clean and mean nothing. Each panel is wrapped in p-4, so at
+    //    375px the widest one can be is 343.
+    if (record.opened && record.panelBox) {
+      expect(
+        record.panelBox.width,
+        `${route.path}/${modal.name} at ${viewportId}: the measured element is ${record.panelBox.width}px wide against a ${viewportBox.innerWidth}px viewport, which means the overlay (div.fixed.inset-0) is being measured and not the panel. Fix ModalSpec.panel in e2e/admin-routes.ts — do not relax this assertion.`
+      ).toBeLessThan(viewportBox.innerWidth);
+
+      expect(
+        record.panelControlsScanned,
+        `${route.path}/${modal.name} at ${viewportId}: the panel is open but its control sweep found nothing, so either ModalSpec.panel in e2e/admin-routes.ts points at the wrong element or the panel had not rendered. An empty sweep would silently drop this modal's inputs from the TAP-01/TAP-03 baseline.`
+      ).toBeGreaterThan(0);
+    }
+
+    out.push(record);
+  }
+
+  return out;
 }
