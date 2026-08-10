@@ -317,6 +317,30 @@ export async function settle(page: Page, route: AdminRoute): Promise<void> {
     await expect(page.locator("body")).toBeVisible();
   }
 
+  /**
+   * The gate that Plan 03 had to add after measuring: step 1 is not enough.
+   *
+   * AdminShell's "Loading..." only covers the SESSION. Each page then does its
+   * own fetch and, while that is in flight, renders a spinner or a skeleton with
+   * no text in it at all — Loader2 with .animate-spin on /admin/content,
+   * /admin/content/about, /admin/rooms/edit and inside the refresh buttons on
+   * /admin/bookings and /admin/reviews, and a .animate-pulse skeleton on /admin
+   * (page.tsx:107-125). <main> is visible the whole time.
+   *
+   * Measured, not assumed: before this line existed, those four routes reported
+   * exactly 13 controls at 375px — the 13 the shell renders — with zero from the
+   * page body, and the numeric floor in Task 3's Gate 1 passed anyway because the
+   * shell alone clears it. That is Pitfall 4 happening while every check is green.
+   *
+   * Keyed on the repo's own busy idiom rather than on a per-route "wait for this
+   * element", because a per-route list has to be extended for every page added
+   * later and is silent when someone forgets. Every occurrence of these two
+   * classes under src/app/admin/ and src/components/admin/ is conditional on
+   * loading / saving / refreshing / uploading — none is decorative — so waiting
+   * for zero of them is waiting for "this page is not busy".
+   */
+  await expect(page.locator(".animate-spin, .animate-pulse")).toHaveCount(0);
+
   if (route.settle) {
     await expect(page.locator(route.settle).first()).toBeVisible();
   }
