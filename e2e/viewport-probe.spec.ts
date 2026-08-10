@@ -58,6 +58,38 @@ type ProbeRow = {
 };
 
 let captured: ProbeRow | null = null;
+let controlClientWidth: number | null = null;
+
+/**
+ * Instrument control, and the only thing that separates "the probe is blind" from
+ * "the defect VP-01 was written against does not exist".
+ *
+ * A document with genuinely no meta viewport must NOT measure the emulated width,
+ * because that is what an ignored tag looks like. If this passes while the
+ * pre/post comparison below reports identical numbers, the probe reads the tag
+ * correctly and the two readings match for a substantive reason.
+ *
+ * The reading goes into the Markdown view only. 12-VP01-PROBE.json stays a
+ * two-row pre/post record; this measures a synthetic page, not a route.
+ */
+test("control: a document with no meta viewport does not measure the emulated width", async ({
+  page,
+}) => {
+  const emulatedWidth = test.info().project.use.viewport?.width;
+
+  await page.setContent("<!doctype html><title>control</title><p>control</p>");
+  const clientWidth = await page.evaluate(
+    () => document.documentElement.clientWidth
+  );
+  controlClientWidth = clientWidth;
+
+  expect(
+    clientWidth,
+    `a page with NO meta viewport measured ${clientWidth}px, the same as the emulated ` +
+      `width — Chromium is ignoring the tag, so isMobile is not in effect on the "probe" ` +
+      `project and every reading in 12-VP01-PROBE.json is meaningless`
+  ).not.toBe(emulatedWidth);
+});
 
 test("probe /admin/login viewport at 375 (isMobile)", async ({ page }) => {
   await page.goto(ROUTE, { waitUntil: "domcontentloaded" });
@@ -148,12 +180,33 @@ function renderMarkdown(rows: ProbeRow[]): string {
   const pre = rows.find((r) => r.phase === "pre-fix");
   const post = rows.find((r) => r.phase === "post-fix");
 
-  const verdict =
-    pre && post
-      ? pre.documentElementClientWidth === post.documentElementClientWidth
-        ? `**NOT DISCRIMINATING** — both runs measured ${pre.documentElementClientWidth}px. Do not trust any Phase 12 measurement until this is explained.`
-        : `**DISCRIMINATING** — ${pre.documentElementClientWidth}px before VP-01, ${post.documentElementClientWidth}px after. The check can fail, so it means something.`
-      : "**INCOMPLETE** — only one run recorded so far; the comparison needs both a pre-fix and a post-fix row.";
+  const instrumentProven =
+    controlClientWidth !== null && String(controlClientWidth) !== VIEWPORT.split("x")[0];
+
+  let verdict: string;
+  if (!pre || !post) {
+    verdict =
+      "**INCOMPLETE** — only one run recorded so far; the comparison needs both a pre-fix and a post-fix row.";
+  } else if (
+    pre.documentElementClientWidth !== post.documentElementClientWidth
+  ) {
+    verdict =
+      `**DISCRIMINATING** — ${pre.documentElementClientWidth}px before VP-01, ` +
+      `${post.documentElementClientWidth}px after. The check can fail, so it means something.`;
+  } else if (instrumentProven) {
+    verdict =
+      `**PREMISE FALSIFIED** — both runs measured ${pre.documentElementClientWidth}px, but the ` +
+      `instrument control below proves the meta viewport tag IS being read. The admin panel was ` +
+      `never laying out at ~980px: Next already emitted a default \`width=device-width, ` +
+      `initial-scale=1\`, so \`clientWidth === 375\` cannot serve as evidence for VP-01. What the ` +
+      `fix actually changed is the tag's content (\`maximum-scale=5\`, \`viewport-fit=cover\`); ` +
+      `assert that instead.`;
+  } else {
+    verdict =
+      `**NOT DISCRIMINATING** — both runs measured ${pre.documentElementClientWidth}px and the ` +
+      `instrument control did not run or did not pass. Do not trust any Phase 12 measurement ` +
+      `until this is explained.`;
+  }
 
   const header = [
     "| phase | measuredAt | serverMode | route | viewport | isMobile | meta[name=viewport] | documentElement.clientWidth | window.innerWidth | visualViewport.width | visualViewport.scale | devicePixelRatio |",
@@ -195,13 +248,21 @@ function renderMarkdown(rows: ProbeRow[]): string {
     ...header,
     ...body.map((line) => `| ${line} |`),
     "",
+    "## Instrument control",
+    "",
+    controlClientWidth === null
+      ? "Not measured in this run."
+      : `A synthetic document with **no** meta viewport, loaded in the same \`isMobile: true\` ` +
+        `context, measured \`documentElement.clientWidth = ${controlClientWidth}px\` — not ` +
+        `${VIEWPORT.split("x")[0]}px. Chromium is therefore reading the tag, and the two readings ` +
+        `above are equal for a substantive reason rather than because the probe is blind.`,
+    "",
     "## Scope limit",
     "",
-    "This probe runs against the **dev server**, while D-08 requires the measuring pass to",
-    "use a production build. It therefore proves the VP-01 check is discriminating; it does",
-    "**not** on its own establish ROADMAP criterion 1. That credit belongs to Plan 03, which",
-    "re-asserts the meta tag, `clientWidth === 375` and the `aside` computed style across all",
-    "17 admin routes on a production build.",
+    "This probe runs against the **dev server**, while D-08 requires the measuring pass to use a",
+    "production build. It calibrates the VP-01 check; it does **not** on its own establish ROADMAP",
+    "criterion 1. That credit belongs to Plan 03, which re-asserts the meta tag and the `aside`",
+    "computed style across all 17 admin routes on a production build.",
     "",
   ].join("\n");
 }
