@@ -3,19 +3,24 @@ import path from "path";
 import fs from "fs/promises";
 
 /**
- * The VP-01 check was about to be a tautology. Chromium only reads the meta
- * viewport tag when the browser context sets isMobile: true; left at its
- * default of false the tag is ignored, so document.documentElement.clientWidth
- * reports 375 whether or not src/app/admin/layout.tsx exports a viewport.
- * "The admin panel now lays out at device width" would then pass just as
- * loudly before the fix as after it, and Phases 13-15 would be planned on a
- * number that proves nothing.
+ * VP-01 was nearly signed off against a tautology, twice over.
  *
- * This probe measures /admin/login once at 375x667 with isMobile: true and
- * appends the reading to the phase directory. Run it once before VP-01 lands
- * and once after: the afterAll hook compares the two rows and fails if they are
- * identical. That comparison is the only evidence that the VP-01 check can fail
- * at all — it calibrates the instrument, it does not measure the defect.
+ * First trap: Chromium only reads the meta viewport tag when the context sets
+ * isMobile: true. Left at its default the tag is ignored entirely, so any
+ * width reading is just the emulated window size. The control test below pins
+ * that down by measuring a document with no tag at all.
+ *
+ * Second trap, and the one that actually bit: document.documentElement
+ * .clientWidth is NOT evidence for VP-01 on this codebase. Next 16 emits a
+ * default "width=device-width, initial-scale=1" for every App Router layout
+ * (node_modules/next/dist/lib/metadata/default-metadata.js createDefaultViewport),
+ * so /admin/login measured 375px before the viewport export existed and 375px
+ * after. Measured, not assumed — both rows are in 12-VP01-PROBE.json.
+ *
+ * So the pass/fail criterion is the part of the tag Next does NOT default:
+ * maximum-scale=5 and viewport-fit=cover. Neither token appears in the recorded
+ * pre-fix reading, and deleting either field from src/app/admin/layout.tsx turns
+ * this spec red. clientWidth is still recorded as data; it is simply not a gate.
  *
  * Runs in the "probe" project, which only exists when npm_lifecycle_event is
  * "test:probe", so it never joins the default suite.
@@ -41,6 +46,19 @@ const MD_PATH = path.join(OUT_DIR, "12-VP01-PROBE.md");
 const SERVER_MODE = "dev";
 const ROUTE = "/admin/login";
 const VIEWPORT = "375x667";
+
+/**
+ * The two tokens VP-01 actually contributes. Next defaults width and
+ * initial-scale on its own, so asserting those would pass with the export
+ * deleted — which is exactly how the original clientWidth criterion failed.
+ * Each token maps to one field of the export: maximumScale and viewportFit.
+ */
+const VP01_TOKENS = ["maximum-scale=5", "viewport-fit=cover"] as const;
+
+/** Which VP-01 tokens a rendered meta tag carries. Order follows VP01_TOKENS. */
+function vp01TokensIn(metaContent: string | null): string[] {
+  return VP01_TOKENS.filter((token) => (metaContent ?? "").includes(token));
+}
 
 type ProbeRow = {
   phase: "pre-fix" | "post-fix";
@@ -114,14 +132,14 @@ test("probe /admin/login viewport at 375 (isMobile)", async ({ page }) => {
     devicePixelRatio: window.devicePixelRatio,
   }));
 
+  const present = vp01TokensIn(metaViewportContent);
+
   // Self-labelling by the fix's own signature instead of an environment
-  // variable: "maximum-scale=5" can only come from the viewport export VP-01
-  // adds (D-10), and setting an env var per run needs shell syntax that differs
+  // variable: these tokens can only come from the viewport export VP-01 adds
+  // (D-10), and setting an env var per run needs shell syntax that differs
   // between PowerShell and bash.
   captured = {
-    phase: metaViewportContent?.includes("maximum-scale=5")
-      ? "post-fix"
-      : "pre-fix",
+    phase: present.length === VP01_TOKENS.length ? "post-fix" : "pre-fix",
     measuredAt: new Date().toISOString(),
     serverMode: SERVER_MODE,
     route: ROUTE,
@@ -133,8 +151,22 @@ test("probe /admin/login viewport at 375 (isMobile)", async ({ page }) => {
 
   expect(
     captured.isMobileEmulation,
-    'the probe ran without isMobile: true, so Chromium ignored the meta viewport tag and every number below is meaningless; set isMobile on the "probe" project in playwright.config.ts'
+    'the probe ran without isMobile: true, so Chromium ignored the meta viewport tag and every reading is meaningless; set isMobile on the "probe" project in playwright.config.ts'
   ).toBe(true);
+
+  // THE VP-01 GATE. Asserted against the live page rather than against the
+  // persisted rows, so deleting a field from the export cannot be hidden by a
+  // stale post-fix row sitting in the artifact.
+  const missing = VP01_TOKENS.filter((token) => !present.includes(token));
+  expect(
+    missing,
+    `${ROUTE} served meta[name=viewport]="${metaViewportContent}", which is missing ` +
+      `${missing.join(" and ")}. Each token maps to one field of the viewport export in ` +
+      `src/app/admin/layout.tsx: maximum-scale=5 <- maximumScale: 5, viewport-fit=cover <- ` +
+      `viewportFit: "cover". Restore the field rather than relaxing this assertion — ` +
+      `clientWidth cannot substitute for it, because Next defaults width=device-width and ` +
+      `the pre-fix row in 12-VP01-PROBE.json measured the same 375px without the export.`
+  ).toEqual([]);
 });
 
 test.afterAll(async () => {
@@ -150,9 +182,19 @@ test.afterAll(async () => {
     rows = [];
   }
 
-  rows = rows.filter((r) => r.phase !== row.phase);
-  rows.push(row);
-  rows.sort((a, b) => (a.phase === b.phase ? 0 : a.phase === "pre-fix" ? -1 : 1));
+  // The pre-fix row is history and can never be legitimately re-measured now
+  // that VP-01 is in the tree — a run that lacks the tokens today is a
+  // regression, not a fresh baseline. Keep the original reading and let the gate
+  // in the test report the regression instead of quietly rewriting the evidence.
+  const overwritesHistory =
+    row.phase === "pre-fix" && rows.some((r) => r.phase === "pre-fix");
+  if (!overwritesHistory) {
+    rows = rows.filter((r) => r.phase !== row.phase);
+    rows.push(row);
+    rows.sort((a, b) =>
+      a.phase === b.phase ? 0 : a.phase === "pre-fix" ? -1 : 1
+    );
+  }
 
   await fs.mkdir(OUT_DIR, { recursive: true });
   await fs.writeFile(JSON_PATH, `${JSON.stringify(rows, null, 2)}\n`, "utf8");
@@ -162,18 +204,21 @@ test.afterAll(async () => {
   const post = rows.find((r) => r.phase === "post-fix");
   if (!pre || !post) return;
 
-  // No expected pre-fix constant anywhere: the classic "~980px" figure is
-  // contradicted by its own sources, so this compares the two readings instead
-  // of asserting either one.
+  // Proves the gate in the test is not vacuous. The gate demands both tokens;
+  // this shows the pre-fix page carried neither, so the demand is one the
+  // codebase genuinely failed before VP-01. If a future Next release starts
+  // defaulting these tokens the recorded pre-fix row would gain them, and this
+  // line goes red to say the gate has stopped discriminating.
   expect(
-    pre.documentElementClientWidth,
-    `VP-01 probe is NOT discriminating: pre-fix and post-fix both measured ` +
-      `documentElement.clientWidth = ${pre.documentElementClientWidth}px at ${VIEWPORT} ` +
-      `(pre meta=${JSON.stringify(pre.metaViewportContent)}, post meta=${JSON.stringify(
+    vp01TokensIn(pre.metaViewportContent),
+    `VP-01 gate is no longer discriminating: the pre-fix reading ` +
+      `${JSON.stringify(pre.metaViewportContent)} already carries ` +
+      `${vp01TokensIn(pre.metaViewportContent).join(" and ")}, so requiring those tokens ` +
+      `would have passed without the fix. Pick a criterion the pre-fix page fails before ` +
+      `trusting any Phase 12 number. (post-fix reading: ${JSON.stringify(
         post.metaViewportContent
-      )}). A check that passes without the fix proves nothing. Investigate isMobile ` +
-      `on the "probe" project in playwright.config.ts before trusting any Phase 12 number.`
-  ).not.toBe(post.documentElementClientWidth);
+      )})`
+  ).toEqual([]);
 });
 
 function renderMarkdown(rows: ProbeRow[]): string {
@@ -183,30 +228,40 @@ function renderMarkdown(rows: ProbeRow[]): string {
   const instrumentProven =
     controlClientWidth !== null && String(controlClientWidth) !== VIEWPORT.split("x")[0];
 
+  const preTokens = pre ? vp01TokensIn(pre.metaViewportContent) : [];
+  const postTokens = post ? vp01TokensIn(post.metaViewportContent) : [];
+
   let verdict: string;
   if (!pre || !post) {
     verdict =
       "**INCOMPLETE** — only one run recorded so far; the comparison needs both a pre-fix and a post-fix row.";
-  } else if (
-    pre.documentElementClientWidth !== post.documentElementClientWidth
-  ) {
+  } else if (postTokens.length === VP01_TOKENS.length && preTokens.length === 0) {
     verdict =
-      `**DISCRIMINATING** — ${pre.documentElementClientWidth}px before VP-01, ` +
-      `${post.documentElementClientWidth}px after. The check can fail, so it means something.`;
-  } else if (instrumentProven) {
+      `**DISCRIMINATING** — the post-fix tag carries \`${VP01_TOKENS.join("` and `")}\`; the ` +
+      `pre-fix tag carried neither. Deleting \`maximumScale\` or \`viewportFit\` from ` +
+      `\`src/app/admin/layout.tsx\` turns the probe red, so the check can fail and therefore ` +
+      `means something.`;
+  } else if (postTokens.length !== VP01_TOKENS.length) {
     verdict =
-      `**PREMISE FALSIFIED** — both runs measured ${pre.documentElementClientWidth}px, but the ` +
-      `instrument control below proves the meta viewport tag IS being read. The admin panel was ` +
-      `never laying out at ~980px: Next already emitted a default \`width=device-width, ` +
-      `initial-scale=1\`, so \`clientWidth === 375\` cannot serve as evidence for VP-01. What the ` +
-      `fix actually changed is the tag's content (\`maximum-scale=5\`, \`viewport-fit=cover\`); ` +
-      `assert that instead.`;
+      `**REGRESSION** — the post-fix tag is missing ` +
+      `\`${VP01_TOKENS.filter((t) => !postTokens.includes(t)).join("` and `")}\`. Restore the ` +
+      `matching field on the viewport export in \`src/app/admin/layout.tsx\`.`;
   } else {
     verdict =
-      `**NOT DISCRIMINATING** — both runs measured ${pre.documentElementClientWidth}px and the ` +
-      `instrument control did not run or did not pass. Do not trust any Phase 12 measurement ` +
-      `until this is explained.`;
+      `**NOT DISCRIMINATING** — the pre-fix tag already carried ` +
+      `\`${preTokens.join("` and `")}\`, so requiring those tokens would have passed without ` +
+      `the fix. Pick a criterion the pre-fix page fails.`;
   }
+
+  const clientWidthNote =
+    pre && post && pre.documentElementClientWidth === post.documentElementClientWidth
+      ? `\`documentElement.clientWidth\` is recorded below but is **not** the criterion: it read ` +
+        `${pre.documentElementClientWidth}px both before and after VP-01, because Next already ` +
+        `emits a default \`width=device-width, initial-scale=1\` for every App Router layout ` +
+        `(\`next/dist/lib/metadata/default-metadata.js\` → \`createDefaultViewport\`). The ` +
+        `~980px admin defect the roadmap described never existed;` +
+        `${instrumentProven ? ` the control below measures ${controlClientWidth}px, which is what a page with no tag actually looks like.` : ""}`
+      : "`documentElement.clientWidth` is recorded below as data, not as the pass/fail criterion.";
 
   const header = [
     "| phase | measuredAt | serverMode | route | viewport | isMobile | meta[name=viewport] | documentElement.clientWidth | window.innerWidth | visualViewport.width | visualViewport.scale | devicePixelRatio |",
@@ -237,11 +292,16 @@ function renderMarkdown(rows: ProbeRow[]): string {
     "> Do not edit by hand; re-run the probe instead.",
     "",
     `Route \`${ROUTE}\` at ${VIEWPORT}, Chromium with \`isMobile: true\` so the meta viewport`,
-    "tag is honoured. One row is captured before VP-01 lands and one after.",
+    "tag is honoured. One row was captured before VP-01 landed and one after; the pre-fix row is",
+    "preserved verbatim on every later run, because it can no longer be re-measured.",
+    "",
+    `Criterion: the rendered tag must carry \`${VP01_TOKENS.join("` and `")}\`.`,
     "",
     "## Verdict",
     "",
     verdict,
+    "",
+    clientWidthNote,
     "",
     "## Readings",
     "",
@@ -254,8 +314,8 @@ function renderMarkdown(rows: ProbeRow[]): string {
       ? "Not measured in this run."
       : `A synthetic document with **no** meta viewport, loaded in the same \`isMobile: true\` ` +
         `context, measured \`documentElement.clientWidth = ${controlClientWidth}px\` — not ` +
-        `${VIEWPORT.split("x")[0]}px. Chromium is therefore reading the tag, and the two readings ` +
-        `above are equal for a substantive reason rather than because the probe is blind.`,
+        `${VIEWPORT.split("x")[0]}px. Chromium is therefore reading the tag, and the equal ` +
+        `clientWidth readings above reflect Next's default viewport rather than a blind probe.`,
     "",
     "## Scope limit",
     "",
