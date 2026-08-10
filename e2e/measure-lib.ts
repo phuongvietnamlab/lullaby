@@ -113,7 +113,21 @@ export type ViewportProof = {
   isMobileEmulation: boolean;
   sidebarPresent: boolean;
   sidebarPosition: string | null;
+  /**
+   * Computed `transform`. On Tailwind v4 this reads "none" even when the drawer
+   * IS off-canvas: -translate-x-full compiles to the standalone `translate`
+   * property, not to a transform function. Recorded anyway, because a v3-era
+   * assumption about it is exactly what a later reader would make.
+   */
   sidebarTransform: string | null;
+  /** Computed `translate` — where Tailwind v4 actually puts -translate-x-full. */
+  sidebarTranslate: string | null;
+  /**
+   * The sidebar's own box. This is the property-agnostic evidence that the
+   * drawer is off-canvas: whichever CSS property moved it, a box whose right
+   * edge is at or left of 0 is off the screen.
+   */
+  sidebarBox: BoxRecord | null;
 };
 
 export type OverflowingElement = {
@@ -589,6 +603,7 @@ export async function scanPage(
     const metaTag = document.querySelector('meta[name="viewport"]');
     const aside = document.querySelector("aside");
     const asideStyle = aside ? window.getComputedStyle(aside) : null;
+    const asideRect = aside ? aside.getBoundingClientRect() : null;
 
     const viewportProof: ViewportProof = {
       documentElementClientWidth: clientWidth,
@@ -601,6 +616,15 @@ export async function scanPage(
       sidebarPresent: aside !== null,
       sidebarPosition: asideStyle ? asideStyle.position : null,
       sidebarTransform: asideStyle ? asideStyle.transform : null,
+      sidebarTranslate: asideStyle ? asideStyle.translate : null,
+      sidebarBox: asideRect
+        ? {
+            x: round1(asideRect.x),
+            y: round1(asideRect.y),
+            width: round1(asideRect.width),
+            height: round1(asideRect.height),
+          }
+        : null,
     };
 
     /**
