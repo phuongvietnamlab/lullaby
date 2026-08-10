@@ -3,7 +3,16 @@ import path from "path";
 import fs from "fs/promises";
 import { execSync } from "child_process";
 import { ADMIN_ROUTES, SENSITIVE_NOTE, type AdminRoute } from "./admin-routes";
-import { buildUrl, scanPage, settle, type PageScan } from "./measure-lib";
+import {
+  assertNoUnexpectedDialogs,
+  buildUrl,
+  installDialogGuard,
+  measureModals,
+  scanPage,
+  settle,
+  type ModalMeasurement,
+  type PageScan,
+} from "./measure-lib";
 
 /**
  * The VP-02 measuring harness. It REPORTS, it does not assert defects.
@@ -89,8 +98,12 @@ type RouteMeasurement = {
   status: "measured" | "skipped" | "error";
   skipReason: string | null;
   scan: PageScan | null;
-  /** Plan 04 fills these in; an empty array here means "not measured yet". */
-  modals: unknown[];
+  /**
+   * Empty for a route that declares no modal — a legitimate value, not a gap.
+   * A route that DOES declare one always contributes an entry, carrying
+   * skipReason when the modal could not be opened.
+   */
+  modals: ModalMeasurement[];
 };
 
 /**
@@ -236,6 +249,12 @@ async function measureRoute(
   isMobileEmulation: boolean,
   route: AdminRoute
 ): Promise<void> {
+  // Installed before anything navigates, not just before the modal clicks: a
+  // native dialog can also be raised while a page loads, and Playwright's
+  // default is to dismiss it silently and carry on. Nothing in this harness may
+  // answer one — see installDialogGuard.
+  installDialogGuard(page);
+
   expect(
     preflightOk,
     `the preflight test did not run or went red in this worker (worker=${test.info().workerIndex} pid=${process.pid}), so neither the build mode nor the admin session has been established — refusing to record measurements that cannot be trusted`
@@ -335,6 +354,20 @@ async function measureRoute(
     ).toBe("static");
   }
 
+  // Nothing has been clicked up to this point. Everything below does, which is
+  // why the dialog guard went in before the first goto.
+  assertNoUnexpectedDialogs(page);
+
+  /**
+   * Modals are measured at BOTH viewports, not only at 375px.
+   *
+   * The 1440x900 column is the evidence ROADMAP criterion 5 asks for — that the
+   * desktop experience is unchanged — and Phase 14 will read the two columns
+   * side by side when it caps modal height, because a fix that makes a panel fit
+   * a phone must not shrink it on a desktop. One column alone cannot show that.
+   */
+  const modals = await measureModals(page, route, url, viewportId);
+
   results[viewportId].push({
     path: route.path,
     url,
@@ -342,7 +375,7 @@ async function measureRoute(
     status: "measured",
     skipReason: null,
     scan,
-    modals: [],
+    modals,
   });
 }
 

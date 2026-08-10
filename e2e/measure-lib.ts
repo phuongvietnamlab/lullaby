@@ -735,18 +735,35 @@ export async function scanPage(
 export type DismissStrategy = "declared-selector" | "hard-reset" | "none";
 
 /**
- * Both viewports, recorded per modal.
+ * Every frame of reference a modal can be judged against, recorded together
+ * because they are NOT interchangeable — measured, not assumed.
  *
- * innerHeight is the LAYOUT viewport and visualViewportHeight is the VISUAL one.
- * Headless Chromium reports the same number for both, so recording only one
- * would look sufficient — but on a real iOS device the soft keyboard shrinks the
- * visual viewport without touching the layout viewport, and Phase 14 caps modal
- * height against one of these two. Which one has to be answerable from the
- * artifact, not from memory.
+ * window.innerWidth is the initial containing block, and under Chromium's mobile
+ * emulation the ICB EXPANDS to the overflowing content. On the six admin routes
+ * that overflow at 375px it reads exactly documentElement.scrollWidth — 467 on
+ * /admin, 943 on /admin/bookings, 645 on /admin/rooms — while
+ * documentElement.clientWidth and visualViewport.width both stay 375 and
+ * visualViewport.scale stays 1. So innerWidth answers "how wide is the box a
+ * fixed, inset-0 overlay stretches to", which is the right question for catching
+ * a panel selector that grabbed the overlay, and the WRONG question for "does
+ * this panel fit on the screen".
+ *
+ * The screen is documentElementClientWidth x documentElementClientHeight, and
+ * that is what the clipping flags are computed against. Judging a 448px panel
+ * against a 645px ICB reports fitsViewport: true for a panel that runs 105px off
+ * a 375px phone — a clean-looking number, on exactly the routes where TAP-02
+ * matters most.
+ *
+ * visualViewport is kept as well: on a real iOS device the soft keyboard shrinks
+ * the visual viewport without touching the layout viewport, and Phase 14 has to
+ * be able to tell which number it is capping modal height against.
  */
 export type ModalViewportBox = {
   innerWidth: number;
   innerHeight: number;
+  documentElementClientWidth: number;
+  documentElementClientHeight: number;
+  visualViewportWidth: number | null;
   visualViewportHeight: number | null;
 };
 
@@ -771,6 +788,23 @@ export type ModalMeasurement = {
   opened: boolean;
   /** Non-null whenever opened is false. "Not opened" must never read as "clean". */
   skipReason: string | null;
+  /**
+   * The trigger's own box, recorded whether or not the modal opened.
+   *
+   * Added after the first full run measured something the plan did not
+   * anticipate: on the routes that overflow at 375px the trigger sits beyond the
+   * right edge of the screen and the document cannot be scrolled to it, so the
+   * modal is unreachable by a person, not merely unmeasured. "opened: false"
+   * with no geometry would leave Phase 13/14 unable to tell that apart from an
+   * empty database.
+   */
+  triggerBox: BoxRecord | null;
+  /**
+   * Playwright's own actionability verdict on the trigger, taken with a TRIAL
+   * click that dispatches no event. False means a real user could not operate it
+   * either — this is a measurement, not a harness limitation.
+   */
+  triggerReachable: boolean;
   panelBox: BoxRecord | null;
   viewportBox: ModalViewportBox;
   clippedTop: boolean;
@@ -881,6 +915,9 @@ export async function measureModals(
   const viewportBox: ModalViewportBox = await page.evaluate(() => ({
     innerWidth: window.innerWidth,
     innerHeight: window.innerHeight,
+    documentElementClientWidth: document.documentElement.clientWidth,
+    documentElementClientHeight: document.documentElement.clientHeight,
+    visualViewportWidth: window.visualViewport?.width ?? null,
     visualViewportHeight: window.visualViewport?.height ?? null,
   }));
 
@@ -890,6 +927,8 @@ export async function measureModals(
       kind: modal.kind,
       opened: false,
       skipReason: null,
+      triggerBox: null,
+      triggerReachable: false,
       panelBox: null,
       viewportBox,
       clippedTop: false,
@@ -932,7 +971,7 @@ export async function measureModals(
           out.push(record);
           continue;
         }
-        await pre.click();
+        await pre.click({ timeout: 10_000 });
         await trigger.waitFor({ state: "visible", timeout: 5_000 }).catch(() => undefined);
       }
 
@@ -953,13 +992,85 @@ export async function measureModals(
         continue;
       }
 
+      const rawTrigger = await trigger.boundingBox();
+      if (rawTrigger) {
+        record.triggerBox = {
+          x: round1(rawTrigger.x),
+          y: round1(rawTrigger.y),
+          width: round1(rawTrigger.width),
+          height: round1(rawTrigger.height),
+        };
+      }
+
+      /**
+       * 2b. Can the trigger actually be operated? Measured, not assumed.
+       *
+       * A TRIAL click runs Playwright's full actionability check — visible,
+       * stable, enabled, and receiving pointer events at its own hit point — and
+       * dispatches NOTHING. It is therefore safe to run against a live admin
+       * panel, and it is the same verdict the real click would reach.
+       *
+       * This exists because the first full run of this harness spent the whole
+       * 60s test budget retrying a click that could never land. On the routes
+       * that overflow at 375px the trigger sits past the right edge of the
+       * screen, and `body { overflow-x: hidden }` (globals.css:88) propagates to
+       * the viewport, so the document cannot be scrolled to reach it — measured:
+       * window.scrollTo(9999, 0) leaves scrollLeft at 0 while
+       * documentElement.scrollWidth reads 943. Retrying is pointless and hides
+       * the finding behind a timeout; recording it with the geometry is the
+       * finding.
+       */
+      let unreachableDetail: string | null = null;
+      try {
+        await trigger.click({ trial: true, timeout: 3_000 });
+        record.triggerReachable = true;
+      } catch (error) {
+        record.triggerReachable = false;
+        unreachableDetail = (error instanceof Error ? error.message : String(error))
+          .split("\n")[0]
+          .trim();
+      }
+
+      if (!record.triggerReachable) {
+        const geometry = await page.evaluate(() => {
+          const de = document.documentElement;
+          const before = de.scrollLeft || document.body.scrollLeft || window.scrollX;
+          window.scrollTo(9_999, 0);
+          const reached = de.scrollLeft || document.body.scrollLeft || window.scrollX;
+          window.scrollTo(before, 0);
+          return {
+            scrollWidth: de.scrollWidth,
+            clientWidth: de.clientWidth,
+            maxScrollLeftReached: reached,
+            bodyOverflowX: window.getComputedStyle(document.body).overflowX,
+          };
+        });
+        const box = record.triggerBox;
+        record.skipReason =
+          `${modal.name}: the trigger "${modal.trigger}" is present and enabled on ` +
+          `${url} at ${viewportId} but cannot be operated (${unreachableDetail}). ` +
+          `Its box is x=${box ? box.x : "unknown"} width=${box ? box.width : "unknown"} ` +
+          `(right edge ${box ? round1(box.x + box.width) : "unknown"}) against a ` +
+          `${geometry.clientWidth}px viewport, the document measures ` +
+          `${geometry.scrollWidth}px wide, and scrolling right reaches ` +
+          `scrollLeft=${geometry.maxScrollLeftReached} because body computes ` +
+          `overflow-x: ${geometry.bodyOverflowX}. So the control is off the screen AND ` +
+          `the screen cannot be scrolled to it: this modal is unreachable to a person ` +
+          `at this viewport, not merely unmeasured. Its TAP-02 baseline is MISSING and ` +
+          `it stays missing until the overflow is fixed — do not read it as clean, and ` +
+          `do not force the click, which would fabricate a baseline for a panel nobody ` +
+          `can open.`;
+        out.push(record);
+        continue;
+      }
+
       // 3. Open it, then wait for a real paint. toBeVisible() only checks
       //    visibility; it does not guarantee the panel has been painted at its
       //    final size. None of the five panels carries a transition or animate
       //    class today, so this is not flaky yet — but Phase 14 is likely to add
       //    one while fixing modals, and Phase 15 reuses this exact function.
-      await trigger.click();
-      await expect(panel).toBeVisible();
+      await trigger.click({ timeout: 10_000 });
+      await expect(panel).toBeVisible({ timeout: 10_000 });
       await panel.evaluate(
         () =>
           new Promise<void>((resolve) => {
@@ -1019,14 +1130,20 @@ export async function measureModals(
       record.panelControlsScanned = sweep.controlsScanned;
       record.panelControlsSubTarget = sweep.controlsSubTarget;
 
-      // 8. Clipping, from the box against the layout viewport.
+      // 8. Clipping, judged against the SCREEN — documentElement's client box —
+      //    and deliberately not against window.innerWidth/innerHeight. See the
+      //    note on ModalViewportBox: on an overflowing route the ICB expands to
+      //    the content, so innerWidth reads 645 on a 375px phone and every panel
+      //    on the worst routes would report itself as fitting.
       if (record.panelBox) {
         record.clippedTop = record.panelBox.y < 0;
         record.clippedBottom =
-          record.panelBox.y + record.panelBox.height > viewportBox.innerHeight;
+          record.panelBox.y + record.panelBox.height >
+          viewportBox.documentElementClientHeight;
         record.clippedLeft = record.panelBox.x < 0;
         record.clippedRight =
-          record.panelBox.x + record.panelBox.width > viewportBox.innerWidth;
+          record.panelBox.x + record.panelBox.width >
+          viewportBox.documentElementClientWidth;
         record.fitsViewport =
           !record.clippedTop &&
           !record.clippedBottom &&
@@ -1074,13 +1191,15 @@ export async function measureModals(
     // 5. The instrument check against measuring the overlay instead of the panel.
     //    Every modal in this repo is a div.fixed.inset-0 wrapping a white panel,
     //    and inset-0 always measures EXACTLY the viewport — so a wrong selector
-    //    hands TAP-02 a baseline of 375x667 with nothing ever clipped: numbers
-    //    that look clean and mean nothing. Each panel is wrapped in p-4, so at
-    //    375px the widest one can be is 343.
+    //    hands TAP-02 a baseline with nothing ever clipped: numbers that look
+    //    clean and mean nothing. innerWidth is the right comparand for THIS
+    //    question and only this one — a fixed, inset-0 box stretches to the
+    //    initial containing block, so an overlay measures exactly innerWidth
+    //    whether or not the route overflows.
     if (record.opened && record.panelBox) {
       expect(
         record.panelBox.width,
-        `${route.path}/${modal.name} at ${viewportId}: the measured element is ${record.panelBox.width}px wide against a ${viewportBox.innerWidth}px viewport, which means the overlay (div.fixed.inset-0) is being measured and not the panel. Fix ModalSpec.panel in e2e/admin-routes.ts — do not relax this assertion.`
+        `${route.path}/${modal.name} at ${viewportId}: the measured element is ${record.panelBox.width}px wide against a ${viewportBox.innerWidth}px initial containing block, which means the overlay (div.fixed.inset-0) is being measured and not the panel. Fix ModalSpec.panel in e2e/admin-routes.ts — do not relax this assertion.`
       ).toBeLessThan(viewportBox.innerWidth);
 
       expect(
