@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:e2e": "playwright test",
+    "test:probe": "playwright test --project=probe",
     "create-staff": "tsx scripts/create-staff.ts",
     "postinstall": "prisma generate"
   },
