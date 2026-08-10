@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test:e2e": "playwright test",
     "test:probe": "playwright test --project=probe",
+    "test:measure": "playwright test --project=measure",
     "create-staff": "tsx scripts/create-staff.ts",
     "postinstall": "prisma generate"
   },

@@ -17,6 +17,10 @@ const ADMIN_STATE = path.join(__dirname, "e2e", ".auth", "admin.json");
 // on every run.
 const LIFECYCLE = process.env.npm_lifecycle_event ?? "";
 const PROBE = LIFECYCLE === "test:probe";
+// Same gate for the VP-02 measuring pass. It also decides which server gets
+// started below, so a run that is not "npm run test:measure" can neither collect
+// the measure spec nor pay for a production build.
+const MEASURE = LIFECYCLE === "test:measure";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -70,13 +74,55 @@ export default defineConfig({
           },
         ]
       : []),
+    // The VP-02 measuring pass; only exists under "npm run test:measure", so it
+    // stays out of the default 86-test suite and out of its runtime budget.
+    //
+    // No viewport / isMobile here on purpose. The two passes D-06 asks for are
+    // declared with test.use() inside two test.describe blocks in the spec
+    // itself, because isMobile is a CONTEXT-level option: page.setViewportSize()
+    // cannot change it, so the "parameterised loop" option CONTEXT.md left open
+    // is unusable — the 375px pass would silently run in desktop mode. Two
+    // separate projects would work but do not reliably share module scope, which
+    // would force two partial artifacts plus a teardown project to merge them.
+    // With fullyParallel: false and workers: 1, two describes in ONE file give
+    // one accumulator, one afterAll and one artifact — D-06's "one run", exactly.
+    ...(MEASURE
+      ? [
+          {
+            name: "measure",
+            testMatch: /admin-measure\.spec\.ts/,
+            dependencies: ["setup"],
+            use: { storageState: ADMIN_STATE },
+          },
+        ]
+      : []),
   ],
-  webServer: {
-    command: `npx next dev -p ${PORT}`,
-    url: BASE_URL,
-    reuseExistingServer: true,
-    timeout: 180_000,
-    stdout: "pipe",
-    stderr: "pipe",
-  },
+  // Measure runs on a production build (D-08) but on the SAME port as everything
+  // else, and that is deliberate. The setup project signs in with a relative URL
+  // resolved against its own project baseURL (auth.setup.ts:17); on a different
+  // port the cookie would be scoped to the wrong domain+port, all 16
+  // authenticated routes would redirect to /admin/login, and the artifact would
+  // hold 16 measurements of the login page while looking perfectly well-formed.
+  // The cost of sharing the port is that reuseExistingServer: false makes an
+  // already-running dev server on :3000 fail as a busy port — a loud failure,
+  // which is the point: the alternative is silently measuring the dev server.
+  // 600_000 covers a cold build, since "npm run build" runs prisma generate
+  // before next build.
+  webServer: MEASURE
+    ? {
+        command: `npm run build && npx next start -p ${PORT}`,
+        url: BASE_URL,
+        reuseExistingServer: false,
+        timeout: 600_000,
+        stdout: "pipe",
+        stderr: "pipe",
+      }
+    : {
+        command: `npx next dev -p ${PORT}`,
+        url: BASE_URL,
+        reuseExistingServer: true,
+        timeout: 180_000,
+        stdout: "pipe",
+        stderr: "pipe",
+      },
 });
