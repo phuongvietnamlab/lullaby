@@ -2,6 +2,7 @@ import { setRequestLocale } from "next-intl/server";
 import { useTranslations } from "next-intl";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { ContactForm } from "@/components/contact/contact-form";
+import Image from "next/image";
 import type { Metadata } from "next";
 
 type Props = {
@@ -33,8 +34,16 @@ function ContactContent() {
     <>
       {/* Hero */}
       <section className="relative h-[40vh] sm:h-[50vh] min-h-[300px] sm:min-h-[350px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-primary-dark)] via-[var(--color-primary)] to-[var(--color-primary-light)]" />
-        <div className="absolute inset-0 bg-black/20" />
+        <Image
+          src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=2200&q=85"
+          alt="Luxury resort exterior with pool and hospitality setting"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-[var(--color-primary-dark)]/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-[var(--color-primary-dark)]/75" />
         <div className="relative z-10 text-center text-white px-4 sm:px-6">
           <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-medium mb-4">
             {t("title")}

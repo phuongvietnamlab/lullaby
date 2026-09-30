@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ImageWithFallback } from "@/components/ui/image-with-fallback";
+import Image from "next/image";
 import { rooms, formatPrice, getRoomI18nKey } from "@/lib/data/rooms";
 import { getRoomTypesFromDB, type RoomTypeFromDB } from "@/lib/data/rooms-db";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
@@ -58,8 +59,16 @@ function RoomsContent({ locale, dbRooms }: { locale: string; dbRooms: RoomTypeFr
     <>
       {/* Hero */}
       <section className="relative h-[50vh] sm:h-[60vh] min-h-[350px] sm:min-h-[400px] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-primary-dark)] via-[var(--color-primary)] to-[var(--color-primary-light)]" />
-        <div className="absolute inset-0 bg-black/20" />
+        <Image
+          src="https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=2200&q=85"
+          alt="Luxury hotel suite with refined interior details"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-[var(--color-primary-dark)]/55" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/20 to-[var(--color-primary-dark)]/70" />
         <div className="relative z-10 text-center text-white px-4 sm:px-6">
           <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-medium mb-4">
             {t("title")}

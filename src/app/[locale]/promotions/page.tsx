@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import Image from "next/image";
 import {
   getActivePromotions,
   formatDiscount,
@@ -45,8 +46,18 @@ function PromotionsContent({
   return (
     <>
       {/* Hero */}
-      <section className="pt-32 pb-16 px-4 bg-[var(--color-primary)]">
-        <div className="max-w-6xl mx-auto text-center">
+      <section className="relative overflow-hidden pt-32 pb-16 px-4">
+        <Image
+          src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=2200&q=85"
+          alt="Luxury resort pool surrounded by palms"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-[var(--color-primary-dark)]/65" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-[var(--color-primary-dark)]/80" />
+        <div className="relative z-10 max-w-6xl mx-auto text-center">
           <ScrollReveal>
             <h1 className="font-[family-name:var(--font-heading)] text-4xl md:text-6xl text-white mb-4">
               {t("title")}
