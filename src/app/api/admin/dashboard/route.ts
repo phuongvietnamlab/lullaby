@@ -1,22 +1,50 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAdminApi } from "@/lib/auth-utils";
+import { expirePendingBookings } from "@/lib/booking";
 
 export const dynamic = "force-dynamic";
+
+const VIETNAM_OFFSET_MS = 7 * 60 * 60 * 1000;
+const ACTIVE_STAY_STATUSES = ["CONFIRMED", "CHECK_IN"] as const;
+const CHECKOUT_STATUSES = ["CHECK_IN", "CHECK_OUT", "COMPLETED"] as const;
+const REVENUE_STATUSES = ["CONFIRMED", "CHECK_IN", "CHECK_OUT", "COMPLETED"] as const;
+
+function getVietnamDateRanges(now: Date) {
+  const vietnamNow = new Date(now.getTime() + VIETNAM_OFFSET_MS);
+  const todayStart = new Date(
+    Date.UTC(
+      vietnamNow.getUTCFullYear(),
+      vietnamNow.getUTCMonth(),
+      vietnamNow.getUTCDate()
+    ) - VIETNAM_OFFSET_MS
+  );
+  const todayEnd = new Date(todayStart);
+  todayEnd.setUTCDate(todayEnd.getUTCDate() + 1);
+
+  const monthStart = new Date(
+    Date.UTC(vietnamNow.getUTCFullYear(), vietnamNow.getUTCMonth(), 1) -
+      VIETNAM_OFFSET_MS
+  );
+  const lastMonthStart = new Date(
+    Date.UTC(vietnamNow.getUTCFullYear(), vietnamNow.getUTCMonth() - 1, 1) -
+      VIETNAM_OFFSET_MS
+  );
+  const lastMonthEnd = monthStart;
+
+  return { todayStart, todayEnd, monthStart, lastMonthStart, lastMonthEnd };
+}
 
 export async function GET() {
   try {
     const guard = await requireAdminApi();
     if (guard instanceof NextResponse) return guard;
 
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const todayEnd = new Date(todayStart);
-    todayEnd.setDate(todayEnd.getDate() + 1);
+    await expirePendingBookings();
 
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 1);
+    const now = new Date();
+    const { todayStart, todayEnd, monthStart, lastMonthStart, lastMonthEnd } =
+      getVietnamDateRanges(now);
 
     // Run all queries in parallel for performance
     const [
@@ -35,9 +63,20 @@ export async function GET() {
       totalGuests,
       recentBookings,
     ] = await Promise.all([
-      // Bookings today: count of bookings where checkIn is today
+      // Bookings today: new bookings created today in Vietnam time.
       db.booking.count({
         where: {
+          createdAt: {
+            gte: todayStart,
+            lt: todayEnd,
+          },
+        },
+      }),
+
+      // Check-ins today: active arrivals scheduled for today.
+      db.booking.count({
+        where: {
+          status: { in: [...ACTIVE_STAY_STATUSES] },
           checkIn: {
             gte: todayStart,
             lt: todayEnd,
@@ -45,21 +84,10 @@ export async function GET() {
         },
       }),
 
-      // Check-ins today: status = CHECK_IN and checkIn is today
+      // Check-outs today: stays that are due out or already checked out today.
       db.booking.count({
         where: {
-          status: "CHECK_IN",
-          checkIn: {
-            gte: todayStart,
-            lt: todayEnd,
-          },
-        },
-      }),
-
-      // Check-outs today: status = CHECK_OUT and checkOut is today
-      db.booking.count({
-        where: {
-          status: "CHECK_OUT",
+          status: { in: [...CHECKOUT_STATUSES] },
           checkOut: {
             gte: todayStart,
             lt: todayEnd,
@@ -70,7 +98,7 @@ export async function GET() {
       // Total rooms
       db.room.count(),
 
-      // Occupied rooms: rooms with active CHECK_IN status booking for today
+      // Occupied rooms: guests currently checked in.
       db.booking.count({
         where: {
           status: "CHECK_IN",
@@ -84,36 +112,39 @@ export async function GET() {
         where: { status: "MAINTENANCE" },
       }),
 
-      // Revenue today: sum of totalPrice for bookings created today
+      // Revenue today: confirmed revenue recognized today.
       db.booking.aggregate({
         _sum: { totalPrice: true },
         where: {
-          createdAt: {
-            gte: todayStart,
-            lt: todayEnd,
-          },
+          status: { in: [...REVENUE_STATUSES] },
+          OR: [
+            { confirmedAt: { gte: todayStart, lt: todayEnd } },
+            { confirmedAt: null, createdAt: { gte: todayStart, lt: todayEnd } },
+          ],
         },
       }),
 
-      // Revenue this month
+      // Revenue this month: confirmed revenue recognized in Vietnam month.
       db.booking.aggregate({
         _sum: { totalPrice: true },
         where: {
-          createdAt: {
-            gte: monthStart,
-            lt: todayEnd,
-          },
+          status: { in: [...REVENUE_STATUSES] },
+          OR: [
+            { confirmedAt: { gte: monthStart, lt: todayEnd } },
+            { confirmedAt: null, createdAt: { gte: monthStart, lt: todayEnd } },
+          ],
         },
       }),
 
-      // Revenue last month
+      // Revenue last month: confirmed revenue recognized in Vietnam month.
       db.booking.aggregate({
         _sum: { totalPrice: true },
         where: {
-          createdAt: {
-            gte: lastMonthStart,
-            lt: lastMonthEnd,
-          },
+          status: { in: [...REVENUE_STATUSES] },
+          OR: [
+            { confirmedAt: { gte: lastMonthStart, lt: lastMonthEnd } },
+            { confirmedAt: null, createdAt: { gte: lastMonthStart, lt: lastMonthEnd } },
+          ],
         },
       }),
 
