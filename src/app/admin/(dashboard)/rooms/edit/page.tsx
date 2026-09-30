@@ -474,9 +474,9 @@ export default function RoomTypeEditPage() {
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
               <div className="mb-4 flex items-start justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">Room Images</h3>
+                  <h3 className="text-sm font-medium text-gray-900">Default Type Images</h3>
                   <p className="mt-1 text-xs text-gray-500">
-                    Drag images here or paste a URL. These appear on the public room page.
+                    Optional fallback images for this category. Add unique photos in each individual room.
                   </p>
                 </div>
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
@@ -528,7 +528,7 @@ export default function RoomTypeEditPage() {
                   )}
                 </span>
                 <span className="text-sm font-medium text-gray-900">
-                  {uploadingImages ? "Uploading images..." : "Drop room photos here"}
+                  {uploadingImages ? "Uploading images..." : "Drop default images here"}
                 </span>
                 <span className="mt-1 text-xs text-gray-500">
                   JPG, PNG, WebP or GIF, up to 5MB each

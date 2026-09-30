@@ -114,6 +114,16 @@ model Room {
   id         String     @id @default(cuid())
   roomNumber String     @unique
   roomTypeId String
+  name       String?
+  nameEn     String?
+  description String?   @db.Text
+  descriptionEn String? @db.Text
+  basePriceOverride Decimal? @db.Decimal(10, 2)
+  maxGuestsOverride Int?
+  bedTypeOverride String?
+  sizeOverride Int?
+  images     Json       @default("[]")
+  amenities  Json       @default("[]")
   floor      Int        @default(1)
   status     RoomStatus @default(AVAILABLE)
   notes      String?

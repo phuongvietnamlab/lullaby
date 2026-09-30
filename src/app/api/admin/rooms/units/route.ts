@@ -36,6 +36,18 @@ export async function GET() {
       rooms: rooms.map((room) => ({
         id: room.id,
         roomNumber: room.roomNumber,
+        name: room.name || "",
+        nameEn: room.nameEn || "",
+        description: room.description || "",
+        descriptionEn: room.descriptionEn || "",
+        basePriceOverride:
+          room.basePriceOverride === null ? "" : String(room.basePriceOverride),
+        maxGuestsOverride:
+          room.maxGuestsOverride === null ? "" : String(room.maxGuestsOverride),
+        bedTypeOverride: room.bedTypeOverride || "",
+        sizeOverride: room.sizeOverride === null ? "" : String(room.sizeOverride),
+        images: (room.images as string[]) || [],
+        amenities: (room.amenities as string[]) || [],
         floor: room.floor,
         status: room.status,
         notes: room.notes || "",
@@ -92,6 +104,25 @@ export async function POST(request: NextRequest) {
       data: {
         roomNumber,
         roomTypeId,
+        name: body.name ? String(body.name) : null,
+        nameEn: body.nameEn ? String(body.nameEn) : null,
+        description: body.description ? String(body.description) : null,
+        descriptionEn: body.descriptionEn ? String(body.descriptionEn) : null,
+        basePriceOverride:
+          body.basePriceOverride === "" || body.basePriceOverride === undefined
+            ? null
+            : Number(body.basePriceOverride),
+        maxGuestsOverride:
+          body.maxGuestsOverride === "" || body.maxGuestsOverride === undefined
+            ? null
+            : Number(body.maxGuestsOverride),
+        bedTypeOverride: body.bedTypeOverride ? String(body.bedTypeOverride) : null,
+        sizeOverride:
+          body.sizeOverride === "" || body.sizeOverride === undefined
+            ? null
+            : Number(body.sizeOverride),
+        images: Array.isArray(body.images) ? body.images : [],
+        amenities: Array.isArray(body.amenities) ? body.amenities : [],
         floor: Number.isFinite(Number(body.floor)) ? Number(body.floor) : 1,
         status,
         notes: body.notes ? String(body.notes) : null,
@@ -167,6 +198,52 @@ export async function PUT(request: NextRequest) {
           body.roomNumber === undefined ? undefined : String(body.roomNumber).trim(),
         roomTypeId:
           body.roomTypeId === undefined ? undefined : String(body.roomTypeId),
+        name: body.name === undefined ? undefined : body.name ? String(body.name) : null,
+        nameEn:
+          body.nameEn === undefined ? undefined : body.nameEn ? String(body.nameEn) : null,
+        description:
+          body.description === undefined
+            ? undefined
+            : body.description
+              ? String(body.description)
+              : null,
+        descriptionEn:
+          body.descriptionEn === undefined
+            ? undefined
+            : body.descriptionEn
+              ? String(body.descriptionEn)
+              : null,
+        basePriceOverride:
+          body.basePriceOverride === undefined
+            ? undefined
+            : body.basePriceOverride === ""
+              ? null
+              : Number(body.basePriceOverride),
+        maxGuestsOverride:
+          body.maxGuestsOverride === undefined
+            ? undefined
+            : body.maxGuestsOverride === ""
+              ? null
+              : Number(body.maxGuestsOverride),
+        bedTypeOverride:
+          body.bedTypeOverride === undefined
+            ? undefined
+            : body.bedTypeOverride
+              ? String(body.bedTypeOverride)
+              : null,
+        sizeOverride:
+          body.sizeOverride === undefined
+            ? undefined
+            : body.sizeOverride === ""
+              ? null
+              : Number(body.sizeOverride),
+        images: body.images === undefined ? undefined : Array.isArray(body.images) ? body.images : [],
+        amenities:
+          body.amenities === undefined
+            ? undefined
+            : Array.isArray(body.amenities)
+              ? body.amenities
+              : [],
         floor:
           body.floor === undefined || !Number.isFinite(Number(body.floor))
             ? undefined

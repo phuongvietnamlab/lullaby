@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Edit, Trash2, X, RefreshCw } from "lucide-react";
+import { Plus, Edit, Trash2, X, RefreshCw, UploadCloud, ImageIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { uploadImage } from "@/lib/upload";
 
 type Tab = "types" | "rooms";
 
@@ -31,6 +32,16 @@ type RoomType = {
 type Room = {
   id: string;
   roomNumber: string;
+  name: string;
+  nameEn: string;
+  description: string;
+  descriptionEn: string;
+  basePriceOverride: string;
+  maxGuestsOverride: string;
+  bedTypeOverride: string;
+  sizeOverride: string;
+  images: string[];
+  amenities: string[];
   floor: number;
   status: RoomStatus;
   notes: string;
@@ -43,6 +54,16 @@ type RoomForm = {
   id: string;
   roomNumber: string;
   roomTypeId: string;
+  name: string;
+  nameEn: string;
+  description: string;
+  descriptionEn: string;
+  basePriceOverride: string;
+  maxGuestsOverride: string;
+  bedTypeOverride: string;
+  sizeOverride: string;
+  images: string[];
+  amenities: string[];
   floor: string;
   status: RoomStatus;
   notes: string;
@@ -61,6 +82,16 @@ function emptyRoomForm(roomTypeId: string): RoomForm {
     id: "",
     roomNumber: "",
     roomTypeId,
+    name: "",
+    nameEn: "",
+    description: "",
+    descriptionEn: "",
+    basePriceOverride: "",
+    maxGuestsOverride: "",
+    bedTypeOverride: "",
+    sizeOverride: "",
+    images: [],
+    amenities: [],
     floor: "1",
     status: "AVAILABLE",
     notes: "",
@@ -157,6 +188,16 @@ export default function AdminRoomsPage() {
           ...(editing.id ? { id: editing.id } : {}),
           roomNumber: editing.roomNumber,
           roomTypeId: editing.roomTypeId,
+          name: editing.name,
+          nameEn: editing.nameEn,
+          description: editing.description,
+          descriptionEn: editing.descriptionEn,
+          basePriceOverride: editing.basePriceOverride,
+          maxGuestsOverride: editing.maxGuestsOverride,
+          bedTypeOverride: editing.bedTypeOverride,
+          sizeOverride: editing.sizeOverride,
+          images: editing.images,
+          amenities: editing.amenities,
           floor: Number(editing.floor),
           status: editing.status,
           notes: editing.notes,
@@ -400,6 +441,16 @@ export default function AdminRoomsPage() {
                                 id: room.id,
                                 roomNumber: room.roomNumber,
                                 roomTypeId: room.roomTypeId,
+                                name: room.name,
+                                nameEn: room.nameEn,
+                                description: room.description,
+                                descriptionEn: room.descriptionEn,
+                                basePriceOverride: room.basePriceOverride,
+                                maxGuestsOverride: room.maxGuestsOverride,
+                                bedTypeOverride: room.bedTypeOverride,
+                                sizeOverride: room.sizeOverride,
+                                images: room.images,
+                                amenities: room.amenities,
                                 floor: String(room.floor),
                                 status: room.status,
                                 notes: room.notes,
@@ -478,15 +529,59 @@ function RoomFormModal({
   onCancel: () => void;
   onSave: () => void;
 }) {
+  const [newAmenity, setNewAmenity] = useState("");
+  const [newImageUrl, setNewImageUrl] = useState("");
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [draggingImages, setDraggingImages] = useState(false);
   const inputClass =
     "w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500";
 
   const set = <K extends keyof RoomForm>(key: K, value: RoomForm[K]) =>
     onChange({ ...form, [key]: value });
 
+  function addAmenity() {
+    const trimmed = newAmenity.trim();
+    if (!trimmed || form.amenities.includes(trimmed)) return;
+    set("amenities", [...form.amenities, trimmed]);
+    setNewAmenity("");
+  }
+
+  function removeAmenity(index: number) {
+    set("amenities", form.amenities.filter((_, i) => i !== index));
+  }
+
+  function addImageUrl() {
+    const trimmed = newImageUrl.trim();
+    if (!trimmed) return;
+    set("images", [...form.images, trimmed]);
+    setNewImageUrl("");
+  }
+
+  function removeImage(index: number) {
+    set("images", form.images.filter((_, i) => i !== index));
+  }
+
+  async function uploadRoomImages(files: FileList | File[]) {
+    const imageFiles = Array.from(files).filter((file) =>
+      file.type.startsWith("image/")
+    );
+    if (imageFiles.length === 0) return;
+
+    setUploadingImages(true);
+    try {
+      const urls = await Promise.all(
+        imageFiles.map((file) => uploadImage(file, "rooms"))
+      );
+      set("images", [...form.images, ...urls]);
+    } finally {
+      setUploadingImages(false);
+      setDraggingImages(false);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
           <h2 className="font-semibold text-gray-900">
             {form.id ? "Edit room" : "Add room"}
@@ -500,7 +595,7 @@ function RoomFormModal({
           </button>
         </div>
 
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-5 overflow-y-auto max-h-[calc(90vh-8rem)]">
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-md text-sm text-red-700">
               {error}
@@ -517,6 +612,31 @@ function RoomFormModal({
               placeholder="101"
               className={inputClass}
             />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Display name (VI)
+              </label>
+              <input
+                value={form.name}
+                onChange={(e) => set("name", e.target.value)}
+                placeholder="VD: Phòng 301 Hướng Biển"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Display name (EN)
+              </label>
+              <input
+                value={form.nameEn}
+                onChange={(e) => set("nameEn", e.target.value)}
+                placeholder="e.g. Room 301 Sea View"
+                className={inputClass}
+              />
+            </div>
           </div>
 
           <div>
@@ -536,7 +656,7 @@ function RoomFormModal({
             </select>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Floor
@@ -564,6 +684,248 @@ function RoomFormModal({
                   </option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Price override
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={form.basePriceOverride}
+                onChange={(e) => set("basePriceOverride", e.target.value)}
+                placeholder="Optional"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Max guests
+              </label>
+              <input
+                type="number"
+                min={1}
+                value={form.maxGuestsOverride}
+                onChange={(e) => set("maxGuestsOverride", e.target.value)}
+                placeholder="Default"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Bed type
+              </label>
+              <input
+                value={form.bedTypeOverride}
+                onChange={(e) => set("bedTypeOverride", e.target.value)}
+                placeholder="Optional override"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Size (m²)
+              </label>
+              <input
+                type="number"
+                min={0}
+                value={form.sizeOverride}
+                onChange={(e) => set("sizeOverride", e.target.value)}
+                placeholder="Optional override"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description (VI)
+              </label>
+              <textarea
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+                rows={3}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description (EN)
+              </label>
+              <textarea
+                value={form.descriptionEn}
+                onChange={(e) => set("descriptionEn", e.target.value)}
+                rows={3}
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Room photos
+              </label>
+              <span className="text-xs text-gray-500">
+                {form.images.length} image{form.images.length === 1 ? "" : "s"}
+              </span>
+            </div>
+            <label
+              onDragEnter={(e) => {
+                e.preventDefault();
+                setDraggingImages(true);
+              }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDraggingImages(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                setDraggingImages(false);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                uploadRoomImages(e.dataTransfer.files);
+              }}
+              className={`mb-3 flex min-h-28 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-4 py-5 text-center transition-colors ${
+                draggingImages
+                  ? "border-slate-700 bg-slate-50"
+                  : "border-gray-300 bg-gray-50 hover:border-slate-400 hover:bg-white"
+              }`}
+            >
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                className="sr-only"
+                disabled={uploadingImages}
+                onChange={(e) => {
+                  if (e.target.files?.length) uploadRoomImages(e.target.files);
+                  e.currentTarget.value = "";
+                }}
+              />
+              <span className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm">
+                {uploadingImages ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <UploadCloud size={19} />
+                )}
+              </span>
+              <span className="text-sm font-medium text-gray-900">
+                {uploadingImages ? "Uploading..." : "Drop room photos here"}
+              </span>
+              <span className="mt-1 text-xs text-gray-500">JPG, PNG, WebP or GIF up to 5MB</span>
+            </label>
+
+            {form.images.length > 0 ? (
+              <div className="mb-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {form.images.map((url, index) => (
+                  <div
+                    key={`${url}-${index}`}
+                    className="group overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
+                  >
+                    <div className="relative aspect-[4/3] bg-gray-100">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt="" className="h-full w-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/65 text-white opacity-0 shadow-sm transition-opacity hover:bg-black group-hover:opacity-100"
+                        aria-label="Remove image"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                    <input
+                      value={url}
+                      onChange={(e) => {
+                        const next = [...form.images];
+                        next[index] = e.target.value;
+                        set("images", next);
+                      }}
+                      className="w-full border-0 border-t border-gray-200 bg-white px-2 py-2 text-xs text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-slate-500"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="mb-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 text-center text-sm text-gray-500">
+                <ImageIcon className="mx-auto mb-2 text-gray-400" size={20} />
+                No room photos yet.
+              </div>
+            )}
+
+            <div className="flex gap-2">
+              <input
+                value={newImageUrl}
+                onChange={(e) => setNewImageUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addImageUrl();
+                  }
+                }}
+                placeholder="Paste image URL"
+                className={inputClass}
+              />
+              <button
+                type="button"
+                onClick={addImageUrl}
+                className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200 transition-colors"
+                aria-label="Add image URL"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Room amenities
+            </label>
+            <div className="mb-3 flex flex-wrap gap-2">
+              {form.amenities.map((amenity, index) => (
+                <span
+                  key={`${amenity}-${index}`}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-700 text-xs rounded-full"
+                >
+                  {amenity}
+                  <button
+                    type="button"
+                    onClick={() => removeAmenity(index)}
+                    className="text-slate-400 hover:text-red-500"
+                    aria-label="Remove amenity"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                value={newAmenity}
+                onChange={(e) => setNewAmenity(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addAmenity();
+                  }
+                }}
+                placeholder="Add amenity"
+                className={inputClass}
+              />
+              <button
+                type="button"
+                onClick={addAmenity}
+                className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200 transition-colors"
+                aria-label="Add amenity"
+              >
+                <Plus size={16} />
+              </button>
             </div>
           </div>
 
