@@ -260,6 +260,7 @@
   [class*="px-8"]
 ) {
   border-radius: var(--radius-full);
+  cursor: pointer;
   font-weight: 600;
   letter-spacing: 0.06em;
   box-shadow: 0 12px 28px oklch(0.20 0.015 260 / 0.08);
@@ -323,7 +324,12 @@
   outline-offset: 3px;
 }
 
+:where(button, [role="button"], a[href]):not(:disabled) {
+  cursor: pointer;
+}
+
 :where(button):disabled {
+  cursor: not-allowed;
   box-shadow: none;
   transform: none;
 }
