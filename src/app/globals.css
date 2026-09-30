@@ -210,10 +210,16 @@
 
 @utility luxury-button {
   border-radius: var(--radius-full);
-  padding: 0.875rem 2rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  transition: all var(--duration-normal) var(--ease-luxury);
+  padding: 0.95rem 2rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  box-shadow: 0 12px 28px oklch(0.20 0.015 260 / 0.08);
+  transition:
+    background-color var(--duration-normal) var(--ease-luxury),
+    border-color var(--duration-normal) var(--ease-luxury),
+    color var(--duration-normal) var(--ease-luxury),
+    box-shadow var(--duration-normal) var(--ease-luxury),
+    transform var(--duration-normal) var(--ease-luxury);
 }
 
 @utility luxury-input {
@@ -228,4 +234,96 @@
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px oklch(0.68 0.09 75 / 0.1);
   outline: none;
+}
+
+/* ============================================
+ * Button System
+ * ============================================ */
+
+:where(a, button):where(
+  [class*="bg-[var(--color-accent)]"],
+  [class*="bg-accent"],
+  [class*="bg-[var(--color-primary)]"],
+  [class*="bg-primary"],
+  [class*="bg-slate-800"],
+  [class*="border border-[var(--color-primary)]"],
+  [class*="border-primary"]
+),
+:where(a, button):where(
+  [class*="rounded-sm"],
+  [class*="rounded-lg"]
+):where(
+  [class*="px-3"],
+  [class*="px-4"],
+  [class*="px-5"],
+  [class*="px-6"],
+  [class*="px-8"]
+) {
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  box-shadow: 0 12px 28px oklch(0.20 0.015 260 / 0.08);
+  transition:
+    background-color var(--duration-normal) var(--ease-luxury),
+    border-color var(--duration-normal) var(--ease-luxury),
+    color var(--duration-normal) var(--ease-luxury),
+    box-shadow var(--duration-normal) var(--ease-luxury),
+    opacity var(--duration-normal) var(--ease-luxury),
+    transform var(--duration-normal) var(--ease-luxury);
+}
+
+:where(a, button):where(
+  [class*="bg-[var(--color-accent)]"],
+  [class*="bg-accent"],
+  [class*="bg-[var(--color-primary)]"],
+  [class*="bg-primary"],
+  [class*="bg-slate-800"],
+  [class*="border border-[var(--color-primary)]"],
+  [class*="border-primary"]
+):where(:hover, :focus-visible),
+:where(a, button):where(
+  [class*="rounded-sm"],
+  [class*="rounded-lg"]
+):where(
+  [class*="px-3"],
+  [class*="px-4"],
+  [class*="px-5"],
+  [class*="px-6"],
+  [class*="px-8"]
+):where(:hover, :focus-visible) {
+  box-shadow: 0 16px 34px oklch(0.20 0.015 260 / 0.12);
+  transform: translateY(-1px);
+}
+
+:where(a, button):where(
+  [class*="bg-[var(--color-accent)]"],
+  [class*="bg-accent"],
+  [class*="bg-[var(--color-primary)]"],
+  [class*="bg-primary"],
+  [class*="bg-slate-800"],
+  [class*="border border-[var(--color-primary)]"],
+  [class*="border-primary"]
+):active,
+:where(a, button):where(
+  [class*="rounded-sm"],
+  [class*="rounded-lg"]
+):where(
+  [class*="px-3"],
+  [class*="px-4"],
+  [class*="px-5"],
+  [class*="px-6"],
+  [class*="px-8"]
+):active {
+  box-shadow: 0 8px 18px oklch(0.20 0.015 260 / 0.08);
+  transform: translateY(0);
+}
+
+:where(a, button):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+:where(button):disabled {
+  box-shadow: none;
+  transform: none;
 }
