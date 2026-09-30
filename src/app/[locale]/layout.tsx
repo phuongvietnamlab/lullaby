@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/footer";
 import { LiveChat } from "@/components/ui/live-chat";
 import { RegisterSW } from "@/components/pwa/register-sw";
 import { getSiteSettings } from "@/lib/data/settings";
+import { Cormorant_Garamond, Manrope } from "next/font/google";
 import "../globals.css";
 
 export const viewport: Viewport = {
@@ -21,6 +22,20 @@ export const viewport: Viewport = {
 const FALLBACK_TITLE = "Lullaby Sky Villa | Luxury Hotel in Ha Long Bay";
 const FALLBACK_DESCRIPTION =
   "Experience luxury amidst Ha Long Bay's natural wonder. Lullaby Sky Villa offers premium rooms, stunning views, and world-class service.";
+
+const headingFont = Cormorant_Garamond({
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600"],
+  variable: "--font-heading",
+  display: "swap",
+});
+
+const bodyFont = Manrope({
+  subsets: ["latin", "vietnamese"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
 
 /**
  * Title and description come from /admin/settings (SEO section) so staff can
@@ -83,7 +98,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className="scroll-smooth">
+    <html lang={locale} className={`${headingFont.variable} ${bodyFont.variable} scroll-smooth`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -95,17 +110,6 @@ export default async function LocaleLayout({ children, params }: Props) {
         <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144.png" />
         <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128.png" />
         <link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72.png" />
-        {/* Fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
-          rel="stylesheet"
-        />
       </head>
       <body className="min-h-[100dvh] flex flex-col antialiased overflow-x-hidden">
         <NextIntlClientProvider messages={messages}>

@@ -140,7 +140,7 @@ function HomeContent({
 
         {/* Content */}
         <div className="relative z-10 text-center text-white px-4 sm:px-6 max-w-4xl mx-auto">
-          <h1 className="font-[family-name:var(--font-heading)] text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-medium mb-4 sm:mb-6 tracking-tight">
+          <h1 className="font-[family-name:var(--font-heading)] text-4xl sm:text-5xl md:text-7xl lg:text-[5.75rem] font-semibold leading-[1.06] mb-4 sm:mb-6 tracking-normal">
             {heroTitle}
           </h1>
           <p className="text-base sm:text-lg md:text-xl text-white/80 mb-8 sm:mb-10 max-w-2xl mx-auto leading-relaxed">
