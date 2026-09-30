@@ -39,7 +39,15 @@ export function Header() {
 
   // Pages with a dark full-bleed hero behind the header at scroll top.
   // Other pages have a light background at top, so header text must be dark.
-  const heroRoutes = ["/", "/contact", "/gallery", "/rooms", "/about", "/attractions"];
+  const heroRoutes = [
+    "/",
+    "/contact",
+    "/gallery",
+    "/rooms",
+    "/about",
+    "/attractions",
+    "/promotions",
+  ];
   const hasHero = heroRoutes.some((r) =>
     r === "/" ? pathname === "/" : pathname.startsWith(r)
   );
