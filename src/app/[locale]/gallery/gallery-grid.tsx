@@ -21,6 +21,7 @@ export function GalleryGrid({ images }: GalleryGridProps) {
     activeCategory === "all"
       ? images
       : images.filter((img) => img.category === activeCategory);
+  const selectedIndex = selectedImage ? filteredImages.indexOf(selectedImage) : -1;
 
   return (
     <>
@@ -99,7 +100,7 @@ export function GalleryGrid({ images }: GalleryGridProps) {
         </AnimatePresence>
       </motion.div>
 
-      {/* Lightbox - Modern Design */}
+      {/* Lightbox */}
       <AnimatePresence>
         {selectedImage && (
           <motion.div
@@ -107,63 +108,69 @@ export function GalleryGrid({ images }: GalleryGridProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center"
+            className="fixed inset-0 z-[100] flex items-center justify-center px-4 py-5 sm:px-8 sm:py-8"
             onClick={() => setSelectedImage(null)}
             role="dialog"
             aria-modal="true"
             aria-label={selectedImage.alt}
           >
-            {/* Backdrop with blur */}
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/95 backdrop-blur-xl"
+              className="absolute inset-0 bg-[radial-gradient(circle_at_top,oklch(0.22_0.02_260_/_0.94),oklch(0.08_0.01_260_/_0.98)_58%,black)] backdrop-blur-xl"
             />
+            <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-black/35" />
 
-            {/* Close button */}
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 text-white/60 hover:text-white transition-colors p-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-white/10"
-              aria-label="Close"
-            >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-
-            {/* Image counter */}
-            <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 text-white/60 text-sm font-medium">
-              {filteredImages.indexOf(selectedImage) + 1} / {filteredImages.length}
+            {/* Top bar */}
+            <div className="absolute inset-x-4 top-4 z-20 flex items-center justify-between gap-4 sm:inset-x-8 sm:top-6">
+              <div className="min-w-0 rounded-full border border-white/10 bg-white/10 px-4 py-2 text-white/80 shadow-2xl backdrop-blur-md">
+                <p className="truncate text-xs font-medium tracking-[0.14em]">
+                  {selectedIndex + 1} / {filteredImages.length}
+                  {selectedImage.alt && selectedImage.alt !== "Gallery image" ? (
+                    <span className="ml-3 hidden text-white/55 sm:inline">
+                      {selectedImage.alt}
+                    </span>
+                  ) : null}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full border border-white/10 bg-white/10 text-white/75 shadow-2xl backdrop-blur-md transition-all duration-[var(--duration-normal)] hover:bg-white/15 hover:text-white"
+                aria-label="Close"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
 
             {/* Navigation arrows */}
-            {filteredImages.indexOf(selectedImage) > 0 && (
+            {selectedIndex > 0 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  const idx = filteredImages.indexOf(selectedImage);
-                  setSelectedImage(filteredImages[idx - 1]);
+                  setSelectedImage(filteredImages[selectedIndex - 1]);
                 }}
-                className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-10 text-white/60 hover:text-white transition-colors p-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-white/10"
+                className="absolute left-3 top-1/2 z-20 flex min-h-[46px] min-w-[46px] -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white/70 shadow-2xl backdrop-blur-md transition-all duration-[var(--duration-normal)] hover:bg-white/15 hover:text-white sm:left-8"
                 aria-label="Previous"
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
             )}
-            {filteredImages.indexOf(selectedImage) < filteredImages.length - 1 && (
+            {selectedIndex < filteredImages.length - 1 && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  const idx = filteredImages.indexOf(selectedImage);
-                  setSelectedImage(filteredImages[idx + 1]);
+                  setSelectedImage(filteredImages[selectedIndex + 1]);
                 }}
-                className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-10 text-white/60 hover:text-white transition-colors p-3 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-white/10"
+                className="absolute right-3 top-1/2 z-20 flex min-h-[46px] min-w-[46px] -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white/70 shadow-2xl backdrop-blur-md transition-all duration-[var(--duration-normal)] hover:bg-white/15 hover:text-white sm:right-8"
                 aria-label="Next"
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -176,23 +183,25 @@ export function GalleryGrid({ images }: GalleryGridProps) {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
-              className="relative w-full h-full max-w-6xl max-h-[80vh] mx-4 sm:mx-8"
+              className="relative h-full max-h-[78vh] w-full max-w-6xl overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-2 shadow-[0_28px_90px_oklch(0_0_0_/_0.45)] sm:p-3"
               onClick={(e) => e.stopPropagation()}
             >
-              <Image
-                src={selectedImage.src}
-                alt={selectedImage.alt}
-                fill
-                sizes="100vw"
-                className="object-contain rounded-lg"
-                priority
-              />
+              <div className="relative h-full w-full overflow-hidden rounded-xl bg-black/20">
+                <Image
+                  src={selectedImage.src}
+                  alt={selectedImage.alt}
+                  fill
+                  sizes="100vw"
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </motion.div>
 
-            {/* Caption */}
+            {/* Mobile caption */}
             {selectedImage.alt && selectedImage.alt !== "Gallery image" && (
-              <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-10">
-                <p className="text-white/70 text-sm bg-black/40 backdrop-blur-md px-4 py-2 rounded-full">
+              <div className="absolute bottom-4 left-1/2 z-20 w-[calc(100%-2rem)] -translate-x-1/2 sm:hidden">
+                <p className="truncate rounded-full border border-white/10 bg-white/10 px-4 py-2 text-center text-xs text-white/75 backdrop-blur-md">
                   {selectedImage.alt}
                 </p>
               </div>
