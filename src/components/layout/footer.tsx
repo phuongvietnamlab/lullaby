@@ -24,7 +24,7 @@ export async function Footer() {
   ].filter((s) => s.href);
 
   return (
-    <footer className="bg-[var(--color-primary)] text-white/80 rounded-t-3xl safe-bottom">
+    <footer className="bg-[var(--color-primary)] text-white/80 safe-bottom border-t border-white/10">
       <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-8 py-14 sm:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 sm:gap-12 text-center sm:text-left">
           {/* Brand */}
