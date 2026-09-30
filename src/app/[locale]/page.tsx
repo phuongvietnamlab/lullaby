@@ -377,16 +377,23 @@ function HomeContent({
       </section>
 
       {/* CTA Section */}
-      <section className="py-[var(--spacing-section-sm)] sm:py-[var(--spacing-section)] px-4 sm:px-6 bg-[var(--color-primary)]">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative overflow-hidden px-4 sm:px-6 py-16 sm:py-24 bg-[var(--color-primary)]">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+        <div className="absolute left-1/2 top-0 h-48 w-[42rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[var(--color-accent)]/10 blur-3xl" />
+        <div className="relative max-w-4xl mx-auto text-center">
           <ScrollReveal>
-            <h2 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl md:text-5xl text-white mb-4">
+            <p className="mb-4 text-[11px] uppercase tracking-[0.28em] text-[var(--color-accent)]">
+              Lullaby Sky Villa
+            </p>
+            <h2 className="font-[family-name:var(--font-heading)] text-2xl sm:text-3xl md:text-5xl text-white mb-4 text-balance">
               {ctaTitle}
             </h2>
-            <p className="text-white/70 mb-8 sm:mb-10 text-base sm:text-lg">{ctaSubtitle}</p>
+            <p className="text-white/70 mb-8 sm:mb-10 text-base sm:text-lg max-w-2xl mx-auto text-pretty">
+              {ctaSubtitle}
+            </p>
             <Link
               href="/booking"
-              className="inline-flex items-center justify-center px-8 sm:px-10 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest min-h-[48px]"
+              className="inline-flex items-center justify-center px-8 sm:px-10 py-4 bg-[var(--color-accent)] text-[var(--color-primary-dark)] font-medium rounded-full hover:bg-[var(--color-accent-light)] hover:shadow-[var(--shadow-glow)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-[var(--duration-normal)] ease-[var(--ease-luxury)] text-sm uppercase tracking-widest min-h-[48px]"
             >
               {t("cta.button")}
             </Link>
