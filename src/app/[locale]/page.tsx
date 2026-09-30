@@ -125,11 +125,18 @@ function HomeContent({
     <>
       {/* Hero Section */}
       <section className="relative h-[100dvh] min-h-[600px] flex items-center justify-center overflow-hidden">
-        {/* Background placeholder */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-primary-dark)] via-[var(--color-primary)] to-[var(--color-primary-light)]" />
+        <Image
+          src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=2400&q=85"
+          alt="Ha Long Bay with limestone islands and boats on calm water"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
 
         {/* Overlay */}
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-[var(--color-primary-dark)]/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-[var(--color-primary-dark)]/75" />
 
         {/* Content */}
         <div className="relative z-10 text-center text-white px-4 sm:px-6 max-w-4xl mx-auto">
