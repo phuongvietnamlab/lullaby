@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { ArrowLeft, Save, Plus, X, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Plus, X, Loader2, UploadCloud, ImageIcon } from "lucide-react";
 import Link from "next/link";
+import { uploadImage } from "@/lib/upload";
 
 type RoomTypeData = {
   id: string;
@@ -48,6 +49,8 @@ export default function RoomTypeEditPage() {
   const [newAmenity, setNewAmenity] = useState("");
   const [newImageUrl, setNewImageUrl] = useState("");
   const [activeTab, setActiveTab] = useState<"vi" | "en">("vi");
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [draggingImages, setDraggingImages] = useState(false);
 
   const fetchRoomTypes = useCallback(async () => {
     try {
@@ -122,6 +125,37 @@ export default function RoomTypeEditPage() {
 
   function removeImage(index: number) {
     updateField("images", formData.images.filter((_, i) => i !== index));
+  }
+
+  async function uploadRoomImages(files: FileList | File[]) {
+    const imageFiles = Array.from(files).filter((file) =>
+      file.type.startsWith("image/")
+    );
+    if (imageFiles.length === 0) {
+      setMessage({ type: "error", text: "Please choose image files to upload." });
+      return;
+    }
+
+    setUploadingImages(true);
+    setMessage(null);
+    try {
+      const urls = await Promise.all(
+        imageFiles.map((file) => uploadImage(file, "rooms"))
+      );
+      updateField("images", [...formData.images, ...urls]);
+      setMessage({
+        type: "success",
+        text: `${urls.length} room image${urls.length > 1 ? "s" : ""} uploaded.`,
+      });
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "Image upload failed",
+      });
+    } finally {
+      setUploadingImages(false);
+      setDraggingImages(false);
+    }
   }
 
   async function handleSave(e: React.FormEvent) {
@@ -438,55 +472,135 @@ export default function RoomTypeEditPage() {
 
             {/* Images */}
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Images (URLs)</h3>
-              <div className="space-y-2 mb-3">
-                {formData.images.map((url, idx) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <div className="w-12 h-12 rounded border border-gray-200 overflow-hidden flex-shrink-0 bg-gray-50">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt="" className="w-full h-full object-cover" />
-                    </div>
-                    <input
-                      type="text"
-                      value={url}
-                      onChange={(e) => {
-                        const updated = [...formData.images];
-                        updated[idx] = e.target.value;
-                        updateField("images", updated);
-                      }}
-                      className="flex-1 px-3 py-1.5 border border-gray-200 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(idx)}
-                      className="p-1.5 text-gray-400 hover:text-red-500"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                ))}
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900">Room Images</h3>
+                  <p className="mt-1 text-xs text-gray-500">
+                    Drag images here or paste a URL. These appear on the public room page.
+                  </p>
+                </div>
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+                  {formData.images.length} image{formData.images.length === 1 ? "" : "s"}
+                </span>
               </div>
-              <div className="flex gap-2">
+
+              <label
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  setDraggingImages(true);
+                }}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDraggingImages(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  setDraggingImages(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  uploadRoomImages(e.dataTransfer.files);
+                }}
+                className={`mb-4 flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-4 py-6 text-center transition-colors ${
+                  draggingImages
+                    ? "border-slate-700 bg-slate-50"
+                    : "border-gray-300 bg-gray-50 hover:border-slate-400 hover:bg-white"
+                }`}
+              >
                 <input
-                  type="text"
-                  value={newImageUrl}
-                  onChange={(e) => setNewImageUrl(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addImage();
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="sr-only"
+                  disabled={uploadingImages}
+                  onChange={(e) => {
+                    if (e.target.files?.length) {
+                      uploadRoomImages(e.target.files);
                     }
+                    e.currentTarget.value = "";
                   }}
-                  className="flex-1 px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                  placeholder="https://images.unsplash.com/..."
                 />
-                <button
-                  type="button"
-                  onClick={addImage}
-                  className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200 transition-colors"
-                >
-                  <Plus size={16} />
-                </button>
+                <span className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-700 shadow-sm">
+                  {uploadingImages ? (
+                    <Loader2 size={20} className="animate-spin" />
+                  ) : (
+                    <UploadCloud size={21} />
+                  )}
+                </span>
+                <span className="text-sm font-medium text-gray-900">
+                  {uploadingImages ? "Uploading images..." : "Drop room photos here"}
+                </span>
+                <span className="mt-1 text-xs text-gray-500">
+                  JPG, PNG, WebP or GIF, up to 5MB each
+                </span>
+              </label>
+
+              {formData.images.length > 0 ? (
+                <div className="mb-4 grid grid-cols-2 gap-3 md:grid-cols-3">
+                  {formData.images.map((url, idx) => (
+                    <div
+                      key={`${url}-${idx}`}
+                      className="group overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
+                    >
+                      <div className="relative aspect-[4/3] bg-gray-100">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt="" className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(idx)}
+                          className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/65 text-white opacity-0 shadow-sm transition-opacity hover:bg-black group-hover:opacity-100"
+                          aria-label="Remove image"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={url}
+                        onChange={(e) => {
+                          const updated = [...formData.images];
+                          updated[idx] = e.target.value;
+                          updateField("images", updated);
+                        }}
+                        className="w-full border-0 border-t border-gray-200 bg-white px-2 py-2 text-xs text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-slate-500"
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mb-4 rounded-lg border border-gray-200 bg-gray-50 px-4 py-5 text-center text-sm text-gray-500">
+                  <ImageIcon className="mx-auto mb-2 text-gray-400" size={22} />
+                  No room images yet.
+                </div>
+              )}
+
+              <div>
+                <label className="mb-1 block text-xs font-medium text-gray-500">
+                  Paste image URL
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newImageUrl}
+                    onChange={(e) => setNewImageUrl(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addImage();
+                      }
+                    }}
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+                    placeholder="https://images.unsplash.com/..."
+                  />
+                  <button
+                    type="button"
+                    onClick={addImage}
+                    className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200 transition-colors"
+                    aria-label="Add image URL"
+                  >
+                    <Plus size={16} />
+                  </button>
+                </div>
               </div>
             </div>
 

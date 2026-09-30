@@ -94,7 +94,7 @@ async function fetchRoomData(): Promise<{
 }
 
 export default function AdminRoomsPage() {
-  const [activeTab, setActiveTab] = useState<Tab>("types");
+  const [activeTab, setActiveTab] = useState<Tab>("rooms");
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
@@ -221,15 +221,7 @@ export default function AdminRoomsPage() {
             <RefreshCw size={15} />
             Refresh
           </button>
-          {activeTab === "types" ? (
-            <Link
-              href="/admin/rooms/edit"
-              className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-700"
-            >
-              <Plus size={16} />
-              Manage Room Types
-            </Link>
-          ) : (
+          {activeTab === "rooms" ? (
             <button
               onClick={() => {
                 setFormError("");
@@ -241,6 +233,14 @@ export default function AdminRoomsPage() {
               <Plus size={16} />
               Add Room
             </button>
+          ) : (
+            <Link
+              href="/admin/rooms/edit"
+              className="flex items-center gap-2 bg-slate-800 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-slate-700"
+            >
+              <Plus size={16} />
+              Add / Edit Room Type
+            </Link>
           )}
         </div>
       </div>
@@ -255,16 +255,6 @@ export default function AdminRoomsPage() {
       <div className="border-b border-gray-200">
         <div className="flex gap-6">
           <button
-            onClick={() => setActiveTab("types")}
-            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === "types"
-                ? "border-slate-800 text-slate-800"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Room Types ({roomTypes.length})
-          </button>
-          <button
             onClick={() => setActiveTab("rooms")}
             className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === "rooms"
@@ -273,6 +263,16 @@ export default function AdminRoomsPage() {
             }`}
           >
             Individual Rooms ({rooms.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("types")}
+            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === "types"
+                ? "border-slate-800 text-slate-800"
+                : "border-transparent text-gray-500 hover:text-gray-700"
+            }`}
+          >
+            Room Types ({roomTypes.length})
           </button>
         </div>
       </div>
