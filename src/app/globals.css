@@ -1632,3 +1632,431 @@
     font-size: clamp(1.85rem, 1.45rem + 2vw, 2.5rem) !important;
   }
 }
+
+/* Final CMS redesign: calm luxury operations UI */
+.admin-console {
+  --cms-bg: #f4f2ed;
+  --cms-ink: #141414;
+  --cms-muted: #6d6a64;
+  --cms-soft: #fbfaf7;
+  --cms-panel: #ffffff;
+  --cms-panel-2: #f8f6f0;
+  --cms-line: #e4ded2;
+  --cms-line-strong: #d2c7b7;
+  --cms-gold: #b58a42;
+  --cms-gold-dark: #76561e;
+  --cms-navy: #17191f;
+  --cms-navy-2: #23262d;
+  --cms-success-bg: #eaf7f0;
+  --cms-success: #167346;
+  --cms-warning-bg: #fff6dd;
+  --cms-warning: #9a6207;
+  --cms-danger-bg: #fff0ed;
+  --cms-danger: #b42318;
+  --cms-info-bg: #eef5ff;
+  --cms-info: #245ca8;
+  color: var(--cms-ink) !important;
+  background:
+    radial-gradient(circle at 84% -8%, rgb(181 138 66 / 0.14), transparent 24rem),
+    radial-gradient(circle at 8% 2%, rgb(23 25 31 / 0.06), transparent 21rem),
+    linear-gradient(180deg, #fbfaf7 0%, var(--cms-bg) 100%) !important;
+}
+
+.admin-console::before,
+.admin-console main > div::before,
+.admin-console main > div::after,
+.admin-card::before,
+.admin-card::after,
+.admin-stat-card::before,
+.admin-stat-card::after,
+.admin-hero-panel::before,
+.admin-hero-panel::after,
+.admin-console main :where(.bg-white):where(.border, [class*="shadow"])::before,
+.admin-console main :where(.bg-white):where(.border, [class*="shadow"])::after {
+  content: none !important;
+  display: none !important;
+}
+
+.admin-console :where(*) {
+  scrollbar-color: #cfc7ba transparent;
+}
+
+.admin-console main > div {
+  max-width: 92rem !important;
+}
+
+.admin-sidebar {
+  width: 16rem !important;
+  background:
+    linear-gradient(180deg, #1d1c19 0%, #12110f 100%) !important;
+  border-right: 1px solid rgb(255 255 255 / 0.08) !important;
+  box-shadow: 18px 0 44px rgb(20 20 20 / 0.16) !important;
+}
+
+.admin-sidebar > div:first-child {
+  height: 4.75rem !important;
+  border-bottom-color: rgb(255 255 255 / 0.08) !important;
+}
+
+.admin-sidebar a[href="/admin"] span:first-child {
+  border-radius: 1rem !important;
+  background:
+    linear-gradient(135deg, #f7efe0, var(--cms-gold) 48%, #495f52) !important;
+  box-shadow:
+    inset 0 0 0 4px rgb(29 28 25),
+    0 12px 26px rgb(0 0 0 / 0.28) !important;
+  color: transparent !important;
+}
+
+.admin-sidebar a[href="/admin"] span span:first-child,
+.admin-sidebar a[href="/admin"] span.block:first-child {
+  color: #fffaf0 !important;
+}
+
+.admin-sidebar a[href="/admin"] span.block:last-child {
+  color: #aaa49a !important;
+}
+
+.admin-sidebar nav {
+  margin-top: 1rem !important;
+  padding-inline: 0.75rem !important;
+}
+
+.admin-sidebar nav a {
+  min-height: 2.75rem !important;
+  border: 1px solid transparent !important;
+  border-radius: 0.95rem !important;
+  color: #bdb6aa !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease !important;
+}
+
+.admin-sidebar nav a:hover:not([class*="bg-white"]) {
+  color: #fffaf0 !important;
+  background: rgb(255 255 255 / 0.075) !important;
+  border-color: rgb(255 255 255 / 0.08) !important;
+}
+
+.admin-sidebar nav a[class*="bg-white"] {
+  color: #181714 !important;
+  background: #f6f0e4 !important;
+  border-color: rgb(255 255 255 / 0.62) !important;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.24) !important;
+}
+
+.admin-sidebar nav a span:first-child {
+  border-radius: 0.75rem !important;
+  background: rgb(255 255 255 / 0.08) !important;
+  color: currentColor !important;
+}
+
+.admin-sidebar nav a[class*="bg-white"] span:first-child {
+  background: #181714 !important;
+  color: #fffaf0 !important;
+}
+
+.admin-sidebar > div:last-child > div {
+  border-radius: 1rem !important;
+  background: rgb(255 255 255 / 0.055) !important;
+  ring-color: transparent !important;
+}
+
+.admin-topbar {
+  height: 4.5rem !important;
+  background: rgb(251 250 247 / 0.92) !important;
+  border-bottom: 1px solid var(--cms-line) !important;
+  color: var(--cms-ink) !important;
+  box-shadow: 0 12px 30px rgb(20 20 20 / 0.045) !important;
+  backdrop-filter: blur(18px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+}
+
+.admin-topbar :where(p, h2, span) {
+  color: inherit !important;
+}
+
+.admin-topbar p {
+  color: var(--cms-muted) !important;
+}
+
+.admin-topbar h2 {
+  color: var(--cms-ink) !important;
+  font-weight: 700 !important;
+}
+
+.admin-topbar > div:nth-of-type(2) {
+  max-width: 35rem !important;
+  border: 1px solid var(--cms-line) !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  box-shadow: inset 0 1px 2px rgb(20 20 20 / 0.035) !important;
+}
+
+.admin-topbar button {
+  border: 1px solid var(--cms-line) !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  color: var(--cms-ink) !important;
+  box-shadow: 0 8px 18px rgb(20 20 20 / 0.06) !important;
+}
+
+.admin-topbar button > div {
+  border-radius: 999px !important;
+  background: var(--cms-navy) !important;
+  color: #ffffff !important;
+}
+
+.admin-console main {
+  background: transparent !important;
+}
+
+.admin-console main :where(h1, h2, h3, h4, h5, h6) {
+  font-family: "Aptos", "Segoe UI", var(--font-body), system-ui, sans-serif !important;
+  color: var(--cms-ink) !important;
+  text-shadow: none !important;
+  text-wrap: balance;
+}
+
+.admin-console main h1,
+.admin-hero-panel h1 {
+  max-width: 100% !important;
+  font-size: clamp(2.1rem, 1.65rem + 1.4vw, 3.4rem) !important;
+  font-weight: 760 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.052em !important;
+}
+
+.admin-console main h1 + p,
+.admin-hero-panel p {
+  color: var(--cms-muted) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.55 !important;
+  max-width: 42rem !important;
+}
+
+.admin-hero-panel {
+  min-height: auto !important;
+  border: 1px solid var(--cms-line) !important;
+  border-radius: 1.35rem !important;
+  background:
+    radial-gradient(circle at 92% 12%, rgb(181 138 66 / 0.15), transparent 19rem),
+    linear-gradient(135deg, #ffffff 0%, #f8f5ee 100%) !important;
+  box-shadow: 0 18px 42px rgb(20 20 20 / 0.07) !important;
+}
+
+.admin-hero-panel p:first-child {
+  display: block !important;
+  color: var(--cms-gold-dark) !important;
+  font-size: 0.68rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+}
+
+.admin-card,
+.admin-stat-card,
+.admin-console main :where(.bg-white):where(.border, [class*="shadow"]) {
+  overflow: hidden !important;
+  border: 1px solid var(--cms-line) !important;
+  border-radius: 1.05rem !important;
+  background: var(--cms-panel) !important;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.85) inset,
+    0 10px 30px rgb(20 20 20 / 0.055) !important;
+}
+
+.admin-card:hover,
+.admin-stat-card:hover,
+.admin-console main :where(.bg-white):where(.border, [class*="shadow"]):hover {
+  border-color: var(--cms-line-strong) !important;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.9) inset,
+    0 16px 38px rgb(20 20 20 / 0.075) !important;
+  transform: translateY(-1px) !important;
+}
+
+.admin-stat-card {
+  min-height: 7.25rem !important;
+}
+
+.admin-stat-card [class*="bg-gradient"] {
+  border-radius: 0.95rem !important;
+  background: linear-gradient(135deg, var(--cms-navy), #3a3329) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px rgb(20 20 20 / 0.14) !important;
+}
+
+.admin-stat-card p:first-child,
+.admin-console main th,
+.admin-console main label,
+.admin-card-title {
+  color: #8a8173 !important;
+  font-size: 0.69rem !important;
+  font-weight: 820 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.admin-stat-card p:nth-child(2) {
+  color: var(--cms-ink) !important;
+  font-size: 1.82rem !important;
+  font-weight: 780 !important;
+  letter-spacing: -0.045em !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-info-row {
+  border: 1px solid var(--cms-line) !important;
+  border-radius: 0.85rem !important;
+  background: var(--cms-panel-soft, #faf9f6) !important;
+}
+
+.admin-console main table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+  padding: 0 !important;
+}
+
+.admin-console main thead tr {
+  background: var(--cms-panel-2) !important;
+  border-bottom: 1px solid var(--cms-line) !important;
+}
+
+.admin-console main tbody tr {
+  background: transparent !important;
+  border-bottom: 1px solid var(--cms-line) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.admin-console main tbody tr:hover {
+  background: #fbfaf7 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.admin-console main th {
+  padding: 0.86rem 1rem !important;
+  border: 0 !important;
+  color: #8a8173 !important;
+  text-align: left !important;
+}
+
+.admin-console main td {
+  padding: 0.9rem 1rem !important;
+  border: 0 !important;
+  color: #4f4a43 !important;
+  line-height: 1.45 !important;
+}
+
+.admin-console main tbody tr td:first-child,
+.admin-console main tbody tr td:last-child {
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.admin-console main :where(input, select, textarea) {
+  min-height: 2.55rem !important;
+  border: 1px solid var(--cms-line-strong) !important;
+  border-radius: 0.82rem !important;
+  background: #ffffff !important;
+  color: var(--cms-ink) !important;
+  box-shadow: inset 0 1px 2px rgb(20 20 20 / 0.035) !important;
+}
+
+.admin-console main :where(input, select, textarea):focus {
+  border-color: var(--cms-gold) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgb(181 138 66 / 0.16) !important;
+  outline: none !important;
+}
+
+.admin-console main :where(button, a[href]) {
+  border-radius: 0.82rem !important;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease !important;
+}
+
+.admin-console main :where(button, a[href]):where([class*="bg-slate-800"], [class*="bg-slate-950"], [class*="text-white"]) {
+  border: 1px solid var(--cms-navy) !important;
+  background: var(--cms-navy) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px rgb(20 20 20 / 0.12) !important;
+}
+
+.admin-console main :where(button, a[href]):where([class*="bg-slate-800"], [class*="bg-slate-950"], [class*="text-white"]):hover {
+  background: var(--cms-navy-2) !important;
+  box-shadow: 0 14px 26px rgb(20 20 20 / 0.15) !important;
+  transform: translateY(-1px) !important;
+}
+
+.admin-console main :where(button, a[href]):where(.border):not([class*="bg-slate"]):not([class*="text-white"]) {
+  border: 1px solid var(--cms-line-strong) !important;
+  background: #ffffff !important;
+  color: var(--cms-ink) !important;
+  box-shadow: 0 6px 14px rgb(20 20 20 / 0.045) !important;
+}
+
+.admin-console main :where(button, a[href]):where(.border):not([class*="bg-slate"]):not([class*="text-white"]):hover {
+  border-color: var(--cms-gold) !important;
+  color: var(--cms-gold-dark) !important;
+}
+
+.admin-chip,
+.admin-console main :where(span[class*="rounded-full"]) {
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+}
+
+.admin-console main :where(.bg-green-100) {
+  background: var(--cms-success-bg) !important;
+  color: var(--cms-success) !important;
+}
+
+.admin-console main :where(.bg-yellow-100, .bg-amber-100) {
+  background: var(--cms-warning-bg) !important;
+  color: var(--cms-warning) !important;
+}
+
+.admin-console main :where(.bg-red-100, .bg-red-50) {
+  background: var(--cms-danger-bg) !important;
+  color: var(--cms-danger) !important;
+}
+
+.admin-console main :where(.bg-blue-100, .bg-indigo-100, .bg-slate-100) {
+  background: var(--cms-info-bg) !important;
+  color: var(--cms-info) !important;
+}
+
+.admin-console main :where(.rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl) {
+  border-radius: 0.95rem !important;
+}
+
+.admin-console main :where(.rounded-full) {
+  border-radius: 999px !important;
+}
+
+.admin-console main :where(.fixed.inset-0 > .bg-white) {
+  border: 1px solid var(--cms-line) !important;
+  border-radius: 1.15rem !important;
+  background: #ffffff !important;
+  box-shadow: 0 28px 80px rgb(20 20 20 / 0.22) !important;
+}
+
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    width: 16rem !important;
+  }
+
+  .admin-console main h1,
+  .admin-hero-panel h1 {
+    font-size: clamp(1.85rem, 1.45rem + 2vw, 2.5rem) !important;
+  }
+}
