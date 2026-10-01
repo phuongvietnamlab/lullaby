@@ -83,7 +83,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const displayRole = (user.role as string) || "RECEPTIONIST";
 
   return (
-    <div className="admin-console min-h-screen flex bg-[var(--admin-bg)] text-[var(--admin-ink)]">
+    <div className="admin-console admin-design-v2 min-h-screen flex bg-[var(--admin-bg)] text-[var(--admin-ink)]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div

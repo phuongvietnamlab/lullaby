@@ -1,6 +1,7 @@
 ﻿import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import "../globals.css";
+import "./admin-v2.css";
 
 export const metadata: Metadata = {
   title: "Lullaby Admin Panel",
