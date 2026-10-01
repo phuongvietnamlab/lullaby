@@ -914,3 +914,339 @@
   height: 1px;
   background: linear-gradient(90deg, rgb(168 122 45 / 0.42), transparent);
 }
+
+/* Collective OS inspired admin system */
+.admin-console {
+  --collective-cream: #eeece3;
+  --collective-cream-2: #f8f6ed;
+  --collective-ink: #25211d;
+  --collective-graphite: #524d47;
+  --collective-orange: #eb3f23;
+  --collective-orange-dark: #c92f18;
+  --collective-teal: #2aa8b4;
+  --collective-blue: #337d9f;
+  --collective-line: rgb(37 33 29 / 0.14);
+  --collective-dot: rgb(37 33 29 / 0.13);
+  color: var(--collective-ink);
+  background:
+    radial-gradient(circle at 8% 10%, rgb(235 63 35 / 0.14), transparent 17rem),
+    radial-gradient(circle at 88% 6%, rgb(42 168 180 / 0.11), transparent 18rem),
+    linear-gradient(180deg, var(--collective-cream-2), var(--collective-cream));
+}
+
+.admin-console::before {
+  content: "";
+  position: fixed;
+  inset: 4rem 0 0 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, var(--collective-dot) 1px, transparent 1px),
+    radial-gradient(circle, rgb(235 63 35 / 0.22) 1px, transparent 1px),
+    radial-gradient(circle, rgb(42 168 180 / 0.18) 1px, transparent 1px);
+  background-position: 0 0, 5px 9px, 11px 3px;
+  background-size: 13px 13px, 61px 61px, 47px 47px;
+  mask-image: linear-gradient(180deg, black 0%, rgb(0 0 0 / 0.36) 28%, transparent 72%);
+}
+
+.admin-console > * {
+  position: relative;
+  z-index: 1;
+}
+
+.admin-sidebar {
+  background:
+    linear-gradient(180deg, #524d47 0%, #3b3631 48%, #25211d 100%) !important;
+  border-right: 1px solid rgb(255 255 255 / 0.1);
+  box-shadow: 18px 0 50px rgb(37 33 29 / 0.18);
+}
+
+.admin-sidebar a[href="/admin"] span:first-child {
+  background:
+    conic-gradient(from 90deg, #eb3f23, #f7a03c, #2aa8b4, #337d9f, #eb3f23) !important;
+  color: transparent !important;
+  box-shadow: inset 0 0 0 5px rgb(255 255 255 / 0.9), 0 12px 28px rgb(0 0 0 / 0.2) !important;
+}
+
+.admin-sidebar nav a {
+  border: 1px solid transparent;
+}
+
+.admin-sidebar nav a[class*="bg-white"] {
+  background: #f8f6ed !important;
+  color: #25211d !important;
+  border-color: rgb(255 255 255 / 0.5);
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.22), inset 0 1px 0 rgb(255 255 255 / 0.85) !important;
+}
+
+.admin-sidebar nav a:not([class*="bg-white"]):hover {
+  background: rgb(255 255 255 / 0.08) !important;
+  border-color: rgb(255 255 255 / 0.1);
+}
+
+.admin-topbar {
+  background: #524d47 !important;
+  color: #f8f6ed;
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+  box-shadow: 0 8px 30px rgb(37 33 29 / 0.14);
+}
+
+.admin-topbar :where(p, h2, span) {
+  color: #f8f6ed !important;
+}
+
+.admin-topbar > div:nth-of-type(2),
+.admin-topbar button {
+  border-color: rgb(255 255 255 / 0.14) !important;
+  background: rgb(255 255 255 / 0.08) !important;
+  color: #f8f6ed !important;
+  box-shadow: none !important;
+}
+
+.admin-topbar button > div {
+  background: #f8f6ed !important;
+  color: #25211d !important;
+}
+
+.admin-console main {
+  position: relative;
+}
+
+.admin-console main :where(h1, h2, h3, h4, h5, h6) {
+  font-family: "Aptos", "Segoe UI", var(--font-body), system-ui, sans-serif !important;
+  color: var(--collective-ink) !important;
+  letter-spacing: -0.02em !important;
+}
+
+.admin-console main h1 {
+  font-size: clamp(2.4rem, 1.55rem + 3vw, 5rem) !important;
+  font-weight: 500 !important;
+  line-height: 0.95 !important;
+  max-width: 11ch;
+}
+
+.admin-console main h1 + p {
+  color: rgb(82 77 71 / 0.78) !important;
+  font-size: 1rem !important;
+  max-width: 35rem;
+}
+
+.admin-hero-panel {
+  overflow: hidden;
+  min-height: 15rem;
+  border: 1px solid var(--collective-line) !important;
+  background:
+    linear-gradient(180deg, rgb(248 246 237 / 0.94), rgb(238 236 227 / 0.92)),
+    radial-gradient(circle at 76% 28%, rgb(42 168 180 / 0.18), transparent 24rem) !important;
+  box-shadow: 0 26px 72px rgb(37 33 29 / 0.14) !important;
+}
+
+.admin-hero-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, rgb(37 33 29 / 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, transparent 0 40%, rgb(42 168 180 / 0.45) 40% 40.3%, transparent 40.3%),
+    linear-gradient(0deg, transparent 0 52%, rgb(235 63 35 / 0.35) 52% 52.35%, transparent 52.35%);
+  background-size: 11px 11px, 100% 100%, 100% 100%;
+  mask-image: linear-gradient(90deg, transparent, black 42%, black 100%);
+  pointer-events: none;
+}
+
+.admin-hero-panel::after {
+  content: "";
+  position: absolute;
+  right: clamp(1rem, 8vw, 8rem);
+  top: 3rem;
+  width: 5.2rem;
+  height: 5.2rem;
+  border-radius: 1.4rem;
+  background:
+    conic-gradient(from 90deg, #eb3f23, #f7a03c, #2aa8b4, #337d9f, #eb3f23);
+  box-shadow:
+    inset 0 0 0 12px rgb(248 246 237 / 0.92),
+    0 22px 42px rgb(37 33 29 / 0.16);
+  pointer-events: none;
+}
+
+.admin-hero-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.admin-hero-panel h1 {
+  font-family: "Aptos", "Segoe UI", var(--font-body), system-ui, sans-serif !important;
+  font-size: clamp(3rem, 2rem + 4vw, 6.5rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.055em !important;
+  max-width: 10ch;
+}
+
+.admin-hero-panel p:first-child {
+  display: none;
+}
+
+.admin-card,
+.admin-stat-card,
+.admin-console main :where(.bg-white):where(.border, [class*="shadow"]) {
+  border: 1px solid var(--collective-line) !important;
+  border-radius: 0 !important;
+  background:
+    linear-gradient(180deg, rgb(248 246 237 / 0.98), rgb(238 236 227 / 0.96)) !important;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.7),
+    0 18px 48px rgb(37 33 29 / 0.1) !important;
+}
+
+.admin-card::before,
+.admin-stat-card::before,
+.admin-console main :where(.bg-white):where(.border, [class*="shadow"])::before {
+  height: 5px;
+  background:
+    linear-gradient(90deg, #eb3f23 0 20%, #f7a03c 20% 38%, #2aa8b4 38% 62%, #337d9f 62% 78%, transparent 78%) !important;
+}
+
+.admin-stat-card {
+  min-height: 8.2rem;
+}
+
+.admin-stat-card p:first-child,
+.admin-console main th,
+.admin-console main label,
+.admin-card-title {
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.admin-stat-card p:nth-child(2) {
+  font-size: clamp(1.7rem, 1.2rem + 1.2vw, 2.7rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.05em !important;
+}
+
+.admin-stat-card [class*="bg-gradient"] {
+  border-radius: 0 !important;
+  background: #524d47 !important;
+  color: #f8f6ed !important;
+  box-shadow: 0 14px 24px rgb(37 33 29 / 0.16) !important;
+}
+
+.admin-info-row {
+  border: 1px solid rgb(37 33 29 / 0.12);
+  border-radius: 0 !important;
+  background:
+    linear-gradient(90deg, rgb(248 246 237 / 0.9), rgb(255 255 255 / 0.38)) !important;
+}
+
+.admin-chip,
+.admin-console main :where(span[class*="rounded-full"]) {
+  border-radius: 0 !important;
+  border: 1px solid rgb(37 33 29 / 0.14) !important;
+  background: #f8f6ed !important;
+  color: #25211d !important;
+  box-shadow: inset 4px 0 0 var(--collective-orange) !important;
+}
+
+.admin-console main table {
+  border-spacing: 0 0.55rem !important;
+}
+
+.admin-console main tbody tr {
+  background: #f8f6ed !important;
+  box-shadow: 0 10px 24px rgb(37 33 29 / 0.07) !important;
+}
+
+.admin-console main tbody tr:hover {
+  background: #fffefa !important;
+  transform: translateY(-1px);
+  box-shadow: 0 16px 34px rgb(37 33 29 / 0.11) !important;
+}
+
+.admin-console main tbody tr td {
+  border-top: 1px solid var(--collective-line) !important;
+  border-bottom: 1px solid var(--collective-line) !important;
+}
+
+.admin-console main tbody tr td:first-child,
+.admin-console main tbody tr td:last-child {
+  border-radius: 0 !important;
+}
+
+.admin-console main tbody tr td:first-child {
+  border-left: 5px solid var(--collective-orange) !important;
+}
+
+.admin-console main tbody tr td:last-child {
+  border-right: 1px solid var(--collective-line) !important;
+}
+
+.admin-console main :where(input, select, textarea) {
+  border-radius: 0 !important;
+  border: 1px solid rgb(37 33 29 / 0.18) !important;
+  background: #f8f6ed !important;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.42) !important;
+}
+
+.admin-console main :where(input, select, textarea):focus {
+  border-color: var(--collective-orange) !important;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.7),
+    0 0 0 3px rgb(235 63 35 / 0.16) !important;
+}
+
+.admin-console main :where(button, a[href]):where([class*="bg-slate-800"], [class*="bg-slate-950"], [class*="text-white"]) {
+  border-radius: 0 !important;
+  background: var(--collective-orange) !important;
+  color: #fffefa !important;
+  border: 1px solid var(--collective-orange-dark) !important;
+  box-shadow: 0 12px 22px rgb(235 63 35 / 0.2) !important;
+}
+
+.admin-console main :where(button, a[href]):where([class*="bg-slate-800"], [class*="bg-slate-950"], [class*="text-white"]):hover {
+  background: var(--collective-orange-dark) !important;
+  box-shadow: 0 16px 28px rgb(235 63 35 / 0.25) !important;
+}
+
+.admin-console main :where(button, a[href]):where(.border):not([class*="bg-slate"]):not([class*="text-white"]) {
+  border-radius: 0 !important;
+  background: #f8f6ed !important;
+  color: #25211d !important;
+  border-color: rgb(37 33 29 / 0.18) !important;
+  box-shadow: 0 8px 18px rgb(37 33 29 / 0.06) !important;
+}
+
+.admin-console main :where(button, a[href]):where(.border):not([class*="bg-slate"]):not([class*="text-white"]):hover {
+  border-color: var(--collective-orange) !important;
+  color: var(--collective-orange-dark) !important;
+}
+
+.admin-console main :where(.rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl, .rounded-full) {
+  border-radius: 0 !important;
+}
+
+.admin-console main :where(.bg-green-100) {
+  background: rgb(42 168 180 / 0.12) !important;
+  color: #14636c !important;
+}
+
+.admin-console main :where(.bg-yellow-100, .bg-amber-100) {
+  background: rgb(247 160 60 / 0.16) !important;
+  color: #8f4f12 !important;
+}
+
+.admin-console main :where(.bg-red-100, .bg-red-50) {
+  background: rgb(235 63 35 / 0.12) !important;
+  color: #a32917 !important;
+}
+
+.admin-console main :where(.bg-blue-100, .bg-indigo-100, .bg-slate-100) {
+  background: rgb(51 125 159 / 0.12) !important;
+  color: #235f79 !important;
+}
+
+.admin-console main :where(.fixed.inset-0 > .bg-white) {
+  border-radius: 0 !important;
+  background: #eeece3 !important;
+  border: 1px solid rgb(37 33 29 / 0.18) !important;
+}
