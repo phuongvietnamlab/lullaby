@@ -20,6 +20,8 @@ import {
   ChevronDown,
   PanelTop,
   Search,
+  Bell,
+  Sun,
 } from "lucide-react";
 
 type NavItem = {
@@ -97,14 +99,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-white/10">
-          <Link href="/admin" className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-sm font-black text-slate-950 shadow-lg shadow-black/15">
+        <div className="admin-brand h-[76px] flex items-center justify-between px-5">
+          <Link href="/admin" className="flex items-center gap-3" aria-label="Hasana hotel dashboard">
+            <span className="flex h-10 w-10 items-center justify-center rounded-[0.8rem] bg-[var(--admin-green)] text-xl font-semibold text-white shadow-[0_10px_20px_rgb(48_120_58_/_0.22)]">
               H
             </span>
             <span>
-              <span className="block text-[13px] font-semibold tracking-[0.18em] uppercase text-white">Hasana</span>
-              <span className="block text-xs text-slate-400">Hotel console</span>
+              <span className="block font-[family-name:var(--font-heading)] text-[22px] font-semibold leading-none tracking-[0.02em] text-[var(--admin-ink)]">Hasana</span>
+              <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.17em] text-[var(--admin-muted)]">Hotel operations</span>
             </span>
           </Link>
           <button
@@ -117,20 +119,21 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Navigation */}
-        <nav className="mt-4 px-2.5 space-y-1">
+        <nav className="admin-navigation mt-6 px-3 space-y-1" aria-label="Admin navigation">
+          <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--admin-muted)]">Workspace</p>
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`group flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all ${
+              className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-semibold transition-all ${
                 isActive(item.href)
-                  ? "bg-white text-slate-950 shadow-lg shadow-black/20"
-                  : "text-slate-300 hover:bg-white/8 hover:text-white"
+                  ? "bg-[var(--admin-green-soft)] text-[var(--admin-green-deep)]"
+                  : "text-[var(--admin-ink-soft)] hover:bg-[var(--admin-green-soft)]/65 hover:text-[var(--admin-green-deep)]"
               }`}
             >
               <span
-                className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
-                  isActive(item.href) ? "bg-slate-950 text-white" : "bg-white/8 text-slate-300 group-hover:bg-white/12"
+                className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
+                  isActive(item.href) ? "bg-[var(--admin-green)] text-white" : "text-[var(--admin-muted)] group-hover:text-[var(--admin-green)]"
                 }`}
               >
                 {item.icon}
@@ -141,15 +144,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         {/* Bottom user info */}
-        <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-white/10">
-          <div className="rounded-xl bg-white/8 p-2.5 ring-1 ring-white/10">
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          <div className="admin-profile p-3">
             <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-white text-slate-950 flex items-center justify-center text-xs font-bold uppercase">
+            <div className="w-9 h-9 rounded-full bg-[var(--admin-green-soft)] text-[var(--admin-green-deep)] flex items-center justify-center text-xs font-bold uppercase">
               {displayName.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{displayName}</p>
-              <p className="text-xs text-slate-400 capitalize">{displayRole.replace("_", " ").toLowerCase()}</p>
+              <p className="text-sm font-semibold text-[var(--admin-ink)] truncate">{displayName}</p>
+              <p className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--admin-muted)] capitalize">{displayRole.replace("_", " ").toLowerCase()}</p>
             </div>
             </div>
           </div>
@@ -159,7 +162,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-h-screen">
         {/* Top bar */}
-        <header className="admin-topbar h-16 flex items-center justify-between gap-4 px-4 lg:px-6 sticky top-0 z-30">
+        <header className="admin-topbar h-[76px] flex items-center justify-between gap-4 px-4 lg:px-8 sticky top-0 z-30">
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden p-2 text-gray-600 hover:text-gray-900"
@@ -168,25 +171,31 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <Menu size={24} />
           </button>
 
-          <div className="hidden lg:block min-w-48">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">Workspace</p>
-            <h2 className="text-base font-semibold text-gray-950">
+          <div className="hidden lg:block min-w-44">
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--admin-muted)]">Hotel workspace</p>
+            <h2 className="mt-0.5 text-lg font-semibold text-[var(--admin-ink)]">
               {navItems.find((item) => isActive(item.href))?.label || "Admin"}
             </h2>
           </div>
 
-          <div className="hidden md:flex flex-1 max-w-lg items-center gap-2 rounded-xl border border-gray-200/80 bg-white/80 px-3.5 py-2 shadow-sm shadow-slate-950/5">
-            <Search size={15} className="text-gray-400" />
-            <span className="text-[13px] text-gray-400">Search bookings, guests, rooms...</span>
+          <div className="admin-search hidden md:flex flex-1 max-w-[37rem] items-center gap-2.5 px-4 py-2.5">
+            <Search size={16} className="text-[var(--admin-muted)]" />
+            <span className="flex-1 text-[13px] text-[var(--admin-muted)]">Search bookings, guests, rooms...</span>
+            <kbd className="hidden xl:inline-flex rounded-md bg-[var(--admin-bg)] px-2 py-0.5 text-[10px] font-bold text-[var(--admin-muted)]">Ctrl K</kbd>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2">
+            <button className="admin-icon-button" aria-label="Display settings"><Sun size={17} /></button>
+            <button className="admin-icon-button relative" aria-label="Notifications"><Bell size={17} /><span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--admin-green)]" /></button>
           </div>
 
           {/* User menu */}
           <div className="relative">
             <button
               onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2 rounded-xl border border-gray-200/80 bg-white/85 px-2 py-1.5 text-[13px] text-gray-700 shadow-sm shadow-slate-950/5 hover:text-gray-950"
+              className="admin-user-menu flex items-center gap-2 px-2 py-1.5 text-[13px] text-[var(--admin-ink)]"
             >
-              <div className="w-8 h-8 rounded-lg bg-slate-950 text-white flex items-center justify-center text-[11px] font-bold uppercase">
+              <div className="w-8 h-8 rounded-full bg-[var(--admin-green)] text-white flex items-center justify-center text-[11px] font-bold uppercase">
                 {displayName.charAt(0)}
               </div>
               <span className="hidden sm:inline">{displayName}</span>
@@ -194,7 +203,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-xl shadow-slate-950/10 border border-gray-200/80 py-2 z-50">
+              <div className="absolute right-0 mt-2 w-56 admin-menu-popover py-2 z-50">
                 <div className="px-4 py-3 border-b border-gray-100">
                   <p className="text-sm font-medium text-gray-900">{displayName}</p>
                   <p className="text-xs text-gray-500">{user.email}</p>
@@ -213,7 +222,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
         {/* Page content */}
         <main className="flex-1 overflow-auto">
-          <div className="mx-auto w-full max-w-[1440px] px-4 py-4 sm:px-5 lg:px-6 lg:py-6">
+          <div className="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-10 lg:py-9">
             {children}
           </div>
         </main>

@@ -12,6 +12,7 @@ import {
   AlertCircle,
   RefreshCw,
   ArrowUpRight,
+  Plus,
 } from "lucide-react";
 
 // ============================================
@@ -68,10 +69,10 @@ function StatCard({
   tone?: "slate" | "emerald" | "amber" | "rose";
 }) {
   const tones = {
-    slate: "from-slate-950 to-slate-700 text-white",
-    emerald: "from-emerald-700 to-teal-600 text-white",
-    amber: "from-amber-500 to-orange-500 text-slate-950",
-    rose: "from-rose-600 to-red-500 text-white",
+    slate: "bg-[#edf4e9] text-[#2f7d32]",
+    emerald: "bg-[#e5f3e1] text-[#2f7d32]",
+    amber: "bg-[#fbf0dd] text-[#a96716]",
+    rose: "bg-[#f8e8e4] text-[#ad5142]",
   };
 
   return (
@@ -84,7 +85,7 @@ function StatCard({
             <p className="mt-1 text-sm text-gray-500">{subtext}</p>
           )}
         </div>
-        <div className={`grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br ${tones[tone]} shadow-lg shadow-slate-950/10`}>
+        <div className={`grid h-10 w-10 place-items-center rounded-full ${tones[tone]}`}>
           {icon}
         </div>
       </div>
@@ -117,7 +118,7 @@ function StatusBadge({ status }: { status: string }) {
 
 function LoadingSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse">
+    <div className="space-y-7 animate-pulse">
       <div>
         <div className="h-8 w-40 bg-gray-200 rounded-xl" />
         <div className="h-4 w-60 bg-gray-100 rounded-xl mt-2" />
@@ -156,16 +157,6 @@ function formatCurrency(amount: number): string {
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr);
   return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
-}
-
-function formatDateTime(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
 // ============================================
@@ -235,29 +226,52 @@ export default function AdminDashboardPage() {
     ? Math.round(((stats.revenueThisMonth - stats.revenueLastMonth) / stats.revenueLastMonth) * 100)
     : 0;
 
+  const greetingDate = new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date());
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       {/* Header */}
       <div className="admin-hero-panel">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">Today at Hasana</p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-gray-950 sm:text-4xl">Operations dashboard</h1>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">{greetingDate}</p>
+          <h1 className="mt-2 text-3xl font-black tracking-tight text-gray-950 sm:text-4xl">Good afternoon, team.</h1>
           <p className="mt-2 max-w-2xl text-sm text-gray-600">
-            Track bookings, room readiness, revenue and guest signals from one focused workspace.
+            Here is the live picture of arrivals, rooms and guest activity at Hasana today.
           </p>
         </div>
-        <div className="mt-5 flex flex-col gap-3 sm:mt-0 sm:items-end">
-          <span className="text-xs font-medium text-gray-500">
-            Updated {formatDateTime(stats.lastUpdated)}
-          </span>
+        <div className="mt-5 flex flex-wrap gap-2 sm:mt-0 sm:items-start">
           <button
             onClick={() => fetchDashboard(true)}
             disabled={refreshing}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-slate-950/15 transition hover:-translate-y-0.5 hover:bg-slate-800 disabled:opacity-50"
+            className="admin-secondary-action inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold disabled:opacity-50"
           >
             <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
             Refresh
           </button>
+          <Link href="/admin/bookings" className="admin-primary-action inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold">
+            <Plus size={15} /> New booking
+          </Link>
+        </div>
+      </div>
+
+      <div className="admin-activity-strip">
+        <div>
+          <span className="admin-live-dot" />
+          <p className="admin-kicker">Live operations</p>
+          <p className="admin-activity-title">Hotel floor is open</p>
+          <p className="admin-activity-copy">{stats.checkInsToday} arrivals and {stats.checkOutsToday} departures scheduled today</p>
+        </div>
+        <div className="admin-activity-metric">
+          <span>Occupancy</span>
+          <strong>{stats.occupancyRate}%</strong>
+        </div>
+        <div className="admin-activity-metric">
+          <span>Available rooms</span>
+          <strong>{stats.availableRooms}</strong>
         </div>
       </div>
 

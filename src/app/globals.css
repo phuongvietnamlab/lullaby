@@ -1633,6 +1633,390 @@
   }
 }
 
+/* ========================================================================
+   Hasana admin refresh — calm, editorial operations workspace
+   ======================================================================== */
+.admin-console,
+.admin-login {
+  --admin-bg: #f6f6f1;
+  --admin-panel: #ffffff;
+  --admin-ink: #17201a;
+  --admin-ink-soft: #405046;
+  --admin-muted: #778279;
+  --admin-line: #e4e8e0;
+  --admin-green: #3b9238;
+  --admin-green-deep: #28732d;
+  --admin-green-soft: #eaf5e7;
+  --admin-sidebar: #ffffff;
+  --admin-sidebar-soft: #f4f7f1;
+  --cms-line: #e4e8e0;
+  --cms-success: #28732d;
+  --cms-success-bg: #eaf5e7;
+  --cms-warning: #9b6519;
+  --cms-warning-bg: #fff2df;
+  --cms-danger: #ad5142;
+  --cms-danger-bg: #fbeae7;
+  --cms-info: #3d6a7c;
+  --cms-info-bg: #eaf3f6;
+  background: var(--admin-bg) !important;
+  color: var(--admin-ink) !important;
+  font-family: "Manrope", "Aptos", "Segoe UI", sans-serif !important;
+}
+
+.admin-console::before,
+.admin-console main > div::before,
+.admin-console main > div::after,
+.admin-card::before,
+.admin-card::after,
+.admin-stat-card::before,
+.admin-stat-card::after,
+.admin-hero-panel::before,
+.admin-hero-panel::after,
+.admin-console main :where(.bg-white):where(.border, [class*="shadow"])::before,
+.admin-console main :where(.bg-white):where(.border, [class*="shadow"])::after {
+  content: none !important;
+  display: none !important;
+}
+
+.admin-console > * {
+  position: relative;
+  z-index: 1;
+}
+
+.admin-sidebar {
+  width: 16.25rem !important;
+  background: var(--admin-sidebar) !important;
+  color: var(--admin-ink) !important;
+  border-right: 1px solid var(--admin-line) !important;
+  box-shadow: none !important;
+}
+
+.admin-brand {
+  border-bottom: 1px solid var(--admin-line) !important;
+}
+
+.admin-navigation a {
+  min-height: 2.8rem;
+}
+
+.admin-profile {
+  border: 1px solid var(--admin-line);
+  border-radius: 1rem;
+  background: #fbfcf9;
+}
+
+.admin-topbar {
+  border-bottom: 1px solid var(--admin-line) !important;
+  background: rgb(246 246 241 / 0.9) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.admin-topbar :where(p, h2, span) {
+  color: inherit !important;
+}
+
+.admin-search,
+.admin-user-menu {
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgb(24 38 28 / 0.025);
+}
+
+.admin-icon-button {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--admin-ink-soft);
+  transition: background-color 180ms var(--ease-luxury), color 180ms var(--ease-luxury), transform 180ms var(--ease-luxury);
+}
+
+.admin-icon-button:hover {
+  background: var(--admin-green-soft);
+  color: var(--admin-green-deep);
+  transform: translateY(-1px);
+}
+
+.admin-menu-popover {
+  border: 1px solid var(--admin-line);
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 18px 48px rgb(24 38 28 / 0.12);
+}
+
+.admin-console main {
+  background: var(--admin-bg) !important;
+}
+
+.admin-console main :where(h1, h2, h3, h4, h5, h6) {
+  color: var(--admin-ink) !important;
+  font-family: var(--font-heading), Georgia, serif !important;
+}
+
+.admin-console main h1,
+.admin-hero-panel h1 {
+  font-size: clamp(2.15rem, 1.7rem + 1.6vw, 3.25rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.035em !important;
+  line-height: 0.98 !important;
+}
+
+.admin-hero-panel {
+  align-items: flex-end !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.admin-hero-panel p:first-child,
+.admin-kicker,
+.admin-stat-card p:first-child,
+.admin-console main th,
+.admin-console main label,
+.admin-card-title {
+  color: var(--admin-muted) !important;
+  font-family: "Manrope", "Aptos", sans-serif !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.13em !important;
+  text-transform: uppercase;
+}
+
+.admin-hero-panel p:first-child {
+  color: var(--admin-green-deep) !important;
+}
+
+.admin-hero-panel > div:last-child {
+  justify-content: flex-end;
+}
+
+.admin-primary-action,
+.admin-login-submit {
+  border: 1px solid #2d772e;
+  border-radius: 999px;
+  background: var(--admin-green) !important;
+  color: #ffffff !important;
+  box-shadow: 0 9px 18px rgb(48 120 58 / 0.2);
+  transition: transform 180ms var(--ease-luxury), background-color 180ms var(--ease-luxury), box-shadow 180ms var(--ease-luxury);
+}
+
+.admin-primary-action:hover,
+.admin-login-submit:hover {
+  background: #2f7d32 !important;
+  box-shadow: 0 12px 23px rgb(48 120 58 / 0.26);
+  transform: translateY(-1px);
+}
+
+.admin-secondary-action {
+  border: 1px solid #cce5c8;
+  border-radius: 999px;
+  background: #ffffff !important;
+  color: var(--admin-green-deep) !important;
+  transition: border-color 180ms var(--ease-luxury), background-color 180ms var(--ease-luxury), transform 180ms var(--ease-luxury);
+}
+
+.admin-secondary-action:hover {
+  border-color: #9ac994;
+  background: var(--admin-green-soft) !important;
+  transform: translateY(-1px);
+}
+
+.admin-activity-strip {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: clamp(1.25rem, 4vw, 4.5rem);
+  min-height: 8.8rem;
+  border: 1px solid #cee5ca;
+  border-radius: 1.4rem;
+  background: linear-gradient(105deg, #f5fcf1, #e8f6e5);
+  box-shadow: 0 16px 34px rgb(48 120 58 / 0.07);
+  padding: 1.4rem 2rem;
+}
+
+.admin-live-dot {
+  display: inline-block;
+  width: 0.62rem;
+  height: 0.62rem;
+  margin-right: 0.45rem;
+  border-radius: 999px;
+  background: #57ad43;
+  box-shadow: 0 0 0 4px rgb(87 173 67 / 0.14);
+}
+
+.admin-activity-title {
+  margin-top: 0.35rem;
+  color: var(--admin-ink);
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+
+.admin-activity-copy {
+  margin-top: 0.45rem;
+  color: var(--admin-ink-soft);
+  font-size: 0.78rem;
+}
+
+.admin-activity-metric {
+  min-width: 7.75rem;
+  border-left: 1px solid #cee5ca;
+  padding-left: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.admin-activity-metric span {
+  display: block;
+  color: var(--admin-muted);
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-activity-metric strong {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--admin-ink);
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-card,
+.admin-stat-card,
+.admin-console main :where(.bg-white):where(.border, [class*="shadow"]) {
+  border: 1px solid var(--admin-line) !important;
+  border-radius: 1.2rem !important;
+  background: #ffffff !important;
+  box-shadow: 0 3px 12px rgb(24 38 28 / 0.045) !important;
+}
+
+.admin-card:hover,
+.admin-stat-card:hover,
+.admin-console main :where(.bg-white):where(.border, [class*="shadow"]):hover {
+  border-color: #cadfc6 !important;
+  box-shadow: 0 12px 28px rgb(24 38 28 / 0.075) !important;
+  transform: translateY(-2px);
+}
+
+.admin-stat-card {
+  padding: 1.35rem !important;
+}
+
+.admin-stat-card p:nth-child(2) {
+  color: var(--admin-ink) !important;
+  font-family: var(--font-heading), Georgia, serif !important;
+  font-size: clamp(2rem, 1.65rem + 1vw, 2.6rem) !important;
+  font-weight: 500 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-info-row {
+  border-radius: 0.85rem !important;
+  background: #f8faf6 !important;
+  padding: 0.7rem 0.8rem !important;
+}
+
+.admin-chip,
+.admin-console main :where(span[class*="rounded-full"]) {
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+}
+
+.admin-console main table {
+  border-spacing: 0 !important;
+}
+
+.admin-console main thead tr {
+  background: #f8faf6 !important;
+}
+
+.admin-console main th {
+  padding: 0.8rem 1rem !important;
+}
+
+.admin-console main tbody tr {
+  background: #ffffff !important;
+  transition: background-color 180ms var(--ease-luxury) !important;
+}
+
+.admin-console main tbody tr:hover {
+  background: #f5faf3 !important;
+}
+
+.admin-console main tbody tr td {
+  padding: 0.9rem 1rem !important;
+  border-color: var(--admin-line) !important;
+}
+
+.admin-console main :where(input, select, textarea) {
+  border: 1px solid #dce4d8 !important;
+  border-radius: 0.8rem !important;
+  background: #ffffff !important;
+  color: var(--admin-ink) !important;
+  box-shadow: none !important;
+}
+
+.admin-console main :where(input, select, textarea):focus,
+.admin-login-input:focus {
+  border-color: #73b66c !important;
+  box-shadow: 0 0 0 3px rgb(115 182 108 / 0.16) !important;
+  outline: none;
+}
+
+.admin-login {
+  background: radial-gradient(circle at 14% 8%, #e2f2dd 0, transparent 27rem), radial-gradient(circle at 88% 88%, #f1e6cd 0, transparent 24rem), #f6f6f1;
+}
+
+.admin-login-card {
+  border: 1px solid #e2e8de;
+  border-radius: 1.5rem;
+  background: rgb(255 255 255 / 0.93);
+  box-shadow: 0 26px 70px rgb(24 38 28 / 0.1);
+}
+
+.admin-login-input {
+  border: 1px solid #dce4d8;
+  border-radius: 0.8rem;
+  background: #ffffff;
+  color: var(--admin-ink);
+  transition: border-color 180ms var(--ease-luxury), box-shadow 180ms var(--ease-luxury);
+}
+
+@media (max-width: 700px) {
+  .admin-hero-panel {
+    align-items: flex-start !important;
+  }
+
+  .admin-activity-strip {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    padding: 1.3rem;
+  }
+
+  .admin-activity-strip > div:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .admin-activity-metric {
+    min-width: 0;
+    padding-left: 1rem;
+  }
+}
+
 /* Final CMS redesign: calm luxury operations UI */
 .admin-console {
   --cms-bg: #f4f2ed;

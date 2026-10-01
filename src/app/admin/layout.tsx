@@ -1,4 +1,5 @@
 ﻿import type { Metadata, Viewport } from "next";
+import { Cormorant_Garamond, Manrope } from "next/font/google";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -17,13 +18,27 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+const headingFont = Cormorant_Garamond({
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600"],
+  variable: "--font-heading",
+  display: "swap",
+});
+
+const bodyFont = Manrope({
+  subsets: ["latin", "vietnamese"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
+
 export default function AdminRootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${headingFont.variable} ${bodyFont.variable}`}>
       <body className="bg-gray-50 text-gray-900 antialiased font-sans">
         {children}
       </body>

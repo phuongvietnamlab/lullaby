@@ -32,13 +32,14 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="admin-login min-h-screen flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-lg shadow-md p-8">
+        <div className="admin-login-card p-7 sm:p-9">
           {/* Logo / Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-900">Lullaby</h1>
-            <p className="text-sm text-gray-500 mt-1">Hotel Management System</p>
+          <div className="mb-9 text-center">
+            <span className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[var(--admin-green)] font-[family-name:var(--font-heading)] text-2xl font-semibold text-white">H</span>
+            <h1 className="font-[family-name:var(--font-heading)] text-3xl font-semibold text-[var(--admin-ink)]">Welcome back</h1>
+            <p className="mt-2 text-sm text-[var(--admin-muted)]">Sign in to manage Hasana Hotel.</p>
           </div>
 
           {/* Login Form */}
@@ -46,7 +47,7 @@ export default function AdminLoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="mb-2 block text-sm font-semibold text-[var(--admin-ink)]"
               >
                 Email
               </label>
@@ -56,7 +57,7 @@ export default function AdminLoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
+                className="admin-login-input w-full px-4 py-3"
                 placeholder="admin@lullaby.com"
               />
             </div>
@@ -64,7 +65,7 @@ export default function AdminLoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="mb-2 block text-sm font-semibold text-[var(--admin-ink)]"
               >
                 Password
               </label>
@@ -74,13 +75,13 @@ export default function AdminLoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500"
+                className="admin-login-input w-full px-4 py-3"
                 placeholder="••••••••"
               />
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-700 text-sm p-3 rounded-md">
+              <div className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
                 {error}
               </div>
             )}
@@ -88,7 +89,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-slate-800 text-white py-2.5 rounded-md font-medium hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="admin-login-submit w-full py-3 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
