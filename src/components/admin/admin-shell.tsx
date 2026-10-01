@@ -52,6 +52,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notificationsRead, setNotificationsRead] = useState(false);
   const [dimMode, setDimMode] = useState(false);
 
   const { data: session, isPending } = authClient.useSession();
@@ -99,6 +100,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     router.push(href);
   }
 
+  function openNotification(href: string) {
+    setNotificationsRead(true);
+    setNotificationsOpen(false);
+    router.push(href);
+  }
+
   if (isPending || !session) {
     return (
       <div className="admin-console min-h-screen flex items-center justify-center">
@@ -125,8 +132,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     "--admin-muted": dimMode ? "#9db19d" : "#778279",
     "--admin-line": dimMode ? "#35463a" : "#e4e8e0",
     "--admin-green": "#3b9238",
-    "--admin-green-deep": "#28732d",
-    "--admin-green-soft": "#eaf5e7",
+    "--admin-green-deep": dimMode ? "#b9e8b4" : "#28732d",
+    "--admin-green-soft": dimMode ? "#2b4630" : "#eaf5e7",
   } as React.CSSProperties;
 
   return (
@@ -242,13 +249,16 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               {dimMode ? <Moon size={17} /> : <Sun size={17} />}
             </button>
             <div className="relative">
-              <button type="button" onClick={() => setNotificationsOpen((current) => !current)} className="hasana-icon-button-v2 relative" aria-label="Notifications" aria-expanded={notificationsOpen}><Bell size={17} /><span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--admin-green)]" /></button>
+              <button type="button" onClick={() => setNotificationsOpen((current) => !current)} className="hasana-icon-button-v2 relative" aria-label="Notifications" aria-expanded={notificationsOpen}><Bell size={17} />{!notificationsRead && <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--admin-green)]" />}</button>
               {notificationsOpen && (
                 <>
                   <button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Close notifications" onClick={() => setNotificationsOpen(false)} />
                   <div className="cms-popover absolute right-0 top-full z-50 mt-3 w-80" role="dialog" aria-label="Notifications">
-                    <div className="flex items-center justify-between border-b border-[var(--admin-line)] px-4 py-3"><strong>Notifications</strong><button type="button" onClick={() => setNotificationsOpen(false)} className="text-xs font-semibold text-[var(--admin-green-deep)]">Mark all read</button></div>
-                    <div className="space-y-1 p-2"><div className="cms-notification"><span className="cms-notification-dot" /><div><strong>2 reviews are waiting</strong><p>Review recent guest feedback.</p></div></div><div className="cms-notification"><span className="cms-notification-dot" /><div><strong>15 rooms are ready</strong><p>All available rooms are up to date.</p></div></div></div>
+                    <div className="flex items-center justify-between border-b border-[var(--admin-line)] px-4 py-3"><strong>Notifications</strong><button type="button" onClick={() => setNotificationsRead(true)} className="cms-popover-action text-xs font-semibold text-[var(--admin-green-deep)]">{notificationsRead ? "All caught up" : "Mark all read"}</button></div>
+                    <div className="space-y-1 p-2">
+                      <button type="button" onClick={() => openNotification("/admin/reviews")} className="cms-notification w-full text-left">{!notificationsRead && <span className="cms-notification-dot" />}<span><strong>2 reviews are waiting</strong><p>Review recent guest feedback.</p></span></button>
+                      <button type="button" onClick={() => openNotification("/admin/rooms")} className="cms-notification w-full text-left">{!notificationsRead && <span className="cms-notification-dot" />}<span><strong>15 rooms are ready</strong><p>All available rooms are up to date.</p></span></button>
+                    </div>
                   </div>
                 </>
               )}
