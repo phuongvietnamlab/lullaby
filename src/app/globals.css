@@ -340,18 +340,20 @@
  * ============================================ */
 
 .admin-console {
-  --admin-bg: #f6f4ee;
-  --admin-panel: #fffdf8;
+  --admin-bg: #f7f5f0;
+  --admin-panel: #fffefa;
   --admin-panel-strong: #ffffff;
-  --admin-ink: #171717;
-  --admin-muted: #6b6f76;
-  --admin-border: rgb(31 41 55 / 0.1);
-  --admin-accent: #b7791f;
-  --admin-accent-soft: #fff3d7;
-  font-family: var(--font-body);
+  --admin-ink: #151515;
+  --admin-muted: #6f716f;
+  --admin-border: rgb(35 31 24 / 0.105);
+  --admin-accent: #9a6a20;
+  --admin-accent-soft: #fbefd5;
+  --admin-focus: rgb(154 106 32 / 0.16);
+  font-family: "Aptos", "Segoe UI", var(--font-body), system-ui, sans-serif;
+  font-size: 14px;
   background:
     linear-gradient(135deg, rgb(255 255 255 / 0.65), transparent 34%),
-    radial-gradient(circle at 82% 8%, rgb(183 121 31 / 0.12), transparent 30%),
+    radial-gradient(circle at 82% 8%, rgb(154 106 32 / 0.1), transparent 30%),
     var(--admin-bg);
 }
 
@@ -361,8 +363,42 @@
 .admin-console h4,
 .admin-console h5,
 .admin-console h6 {
-  font-family: var(--font-body);
+  font-family: "Cormorant Garamond", Georgia, serif;
   letter-spacing: 0;
+  color: var(--admin-ink);
+}
+
+.admin-console main h1 {
+  font-size: clamp(1.45rem, 1.1rem + 0.75vw, 2rem) !important;
+  font-weight: 600 !important;
+  line-height: 1.08;
+}
+
+.admin-console main h2 {
+  font-size: 1.05rem !important;
+  font-weight: 650 !important;
+}
+
+.admin-console main h3 {
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+}
+
+.admin-console main p,
+.admin-console main td,
+.admin-console main label,
+.admin-console main input,
+.admin-console main select,
+.admin-console main textarea,
+.admin-console main button,
+.admin-console main a {
+  font-size: 0.8125rem;
+}
+
+.admin-console main :where(.space-y-6 > :not([hidden]) ~ :not([hidden])) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
 
 .admin-sidebar {
@@ -375,7 +411,7 @@
 
 .admin-topbar {
   border-bottom: 1px solid rgb(31 41 55 / 0.08);
-  background: rgb(246 244 238 / 0.82);
+  background: rgb(247 245 240 / 0.86);
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
@@ -383,25 +419,37 @@
 .admin-card,
 .admin-console :where(.bg-white):where(.border, [class*="shadow"]) {
   border: 1px solid var(--admin-border);
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   background:
     linear-gradient(180deg, rgb(255 255 255 / 0.94), rgb(255 253 248 / 0.92));
   box-shadow:
     0 1px 0 rgb(255 255 255 / 0.9) inset,
-    0 18px 45px rgb(23 23 23 / 0.055);
+    0 12px 34px rgb(23 23 23 / 0.045);
+}
+
+.admin-console main :where(.p-6) {
+  padding: 1.1rem !important;
+}
+
+.admin-console main :where(.p-5) {
+  padding: 1rem !important;
+}
+
+.admin-console main :where(.p-4) {
+  padding: 0.875rem !important;
 }
 
 .admin-stat-card {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--admin-border);
-  border-radius: 1.25rem;
+  border-radius: 1rem;
   background:
     linear-gradient(135deg, rgb(255 255 255 / 0.98), rgb(255 250 238 / 0.9));
-  padding: 1.25rem;
+  padding: 1rem;
   box-shadow:
     0 1px 0 rgb(255 255 255 / 0.9) inset,
-    0 18px 45px rgb(23 23 23 / 0.055);
+    0 12px 34px rgb(23 23 23 / 0.045);
   transition: transform 220ms var(--ease-luxury), box-shadow 220ms var(--ease-luxury);
 }
 
@@ -418,21 +466,28 @@
   transform: translateY(-2px);
   box-shadow:
     0 1px 0 rgb(255 255 255 / 0.9) inset,
-    0 24px 60px rgb(23 23 23 / 0.08);
+    0 18px 45px rgb(23 23 23 / 0.065);
 }
 
 .admin-hero-panel {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1.25rem;
   border: 1px solid var(--admin-border);
-  border-radius: 1.75rem;
+  border-radius: 1.25rem;
   background:
     linear-gradient(120deg, rgb(255 255 255 / 0.96), rgb(255 247 229 / 0.88)),
     radial-gradient(circle at 88% 0%, rgb(183 121 31 / 0.16), transparent 34%);
-  padding: clamp(1.25rem, 3vw, 2rem);
-  box-shadow: 0 24px 70px rgb(23 23 23 / 0.07);
+  padding: clamp(1rem, 2.2vw, 1.45rem);
+  box-shadow: 0 18px 52px rgb(23 23 23 / 0.06);
+}
+
+.admin-hero-panel h1 {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(2rem, 1.45rem + 1.45vw, 3rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0;
 }
 
 .admin-card-title {
@@ -440,7 +495,7 @@
   align-items: center;
   gap: 0.5rem;
   color: #1f2937;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 800;
 }
 
@@ -449,10 +504,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  border-radius: 0.95rem;
+  border-radius: 0.8rem;
   background: rgb(249 250 251 / 0.74);
-  padding: 0.7rem 0.8rem;
-  font-size: 0.875rem;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.8125rem;
 }
 
 .admin-chip {
@@ -480,16 +535,50 @@
   border-spacing: 0;
 }
 
+.admin-console main thead tr {
+  background: rgb(248 247 243 / 0.9) !important;
+}
+
+.admin-console main th {
+  padding: 0.62rem 0.85rem !important;
+  color: rgb(104 104 96) !important;
+  font-size: 0.68rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.09em !important;
+  text-transform: uppercase;
+}
+
+.admin-console main td {
+  padding: 0.68rem 0.85rem !important;
+  color: rgb(63 63 61);
+  line-height: 1.35;
+}
+
+.admin-console main tbody tr {
+  transition: background-color 160ms var(--ease-luxury);
+}
+
+.admin-console main tbody tr:hover {
+  background: rgb(251 239 213 / 0.32) !important;
+}
+
 .admin-console main :where(input, select, textarea) {
   border-color: rgb(31 41 55 / 0.14);
-  border-radius: 0.9rem;
+  border-radius: 0.72rem;
   background-color: rgb(255 255 255 / 0.88);
+  min-height: 2.25rem;
+  line-height: 1.35;
 }
 
 .admin-console main :where(input, select, textarea):focus {
-  border-color: rgb(183 121 31 / 0.7);
-  box-shadow: 0 0 0 3px rgb(183 121 31 / 0.14);
+  border-color: rgb(154 106 32 / 0.7);
+  box-shadow: 0 0 0 3px var(--admin-focus);
   outline: none;
+}
+
+.admin-console main :where(label) {
+  color: rgb(74 73 70) !important;
+  font-weight: 650 !important;
 }
 
 .admin-console main :where(button, a[href]) {
@@ -506,7 +595,81 @@
 }
 
 .admin-console main :where(.rounded-md, .rounded-lg) {
-  border-radius: 0.9rem;
+  border-radius: 0.72rem;
+}
+
+.admin-console main :where(.rounded-xl, .rounded-2xl, .rounded-3xl) {
+  border-radius: 1rem;
+}
+
+.admin-console main :where(.text-2xl, .text-3xl, .text-4xl) {
+  letter-spacing: 0 !important;
+}
+
+.admin-console main :where(.text-xl) {
+  font-size: 1.08rem !important;
+}
+
+.admin-console main :where(.text-sm) {
+  font-size: 0.8125rem !important;
+}
+
+.admin-console main :where(.text-xs) {
+  font-size: 0.72rem !important;
+}
+
+.admin-console main :where(.py-3) {
+  padding-top: 0.62rem !important;
+  padding-bottom: 0.62rem !important;
+}
+
+.admin-console main :where(.py-2\.5) {
+  padding-top: 0.55rem !important;
+  padding-bottom: 0.55rem !important;
+}
+
+.admin-console main :where(.px-4) {
+  padding-left: 0.875rem !important;
+  padding-right: 0.875rem !important;
+}
+
+.admin-console main :where(.gap-4) {
+  gap: 0.85rem !important;
+}
+
+.admin-console main :where(.gap-3) {
+  gap: 0.65rem !important;
+}
+
+.admin-console main :where([class*="bg-slate-800"], [class*="bg-slate-950"]) {
+  background-color: #171717 !important;
+}
+
+.admin-console main :where([class*="text-blue-600"], [class*="text-purple-600"]) {
+  color: var(--admin-accent) !important;
+}
+
+.admin-console main :where([class*="bg-blue-50"], [class*="bg-indigo-50"], [class*="bg-purple-50"]) {
+  background-color: var(--admin-accent-soft) !important;
+}
+
+.admin-console main :where(.shadow-xl, .shadow-2xl) {
+  box-shadow: 0 24px 70px rgb(23 23 23 / 0.18) !important;
+}
+
+.admin-console main :where(.fixed.inset-0) {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.admin-console main :where(.font-mono) {
+  font-size: 0.73rem;
+  letter-spacing: 0.02em;
+}
+
+.admin-console main :where(.grid.grid-cols-2.sm\:grid-cols-4 > div, .grid.grid-cols-1.sm\:grid-cols-2.lg\:grid-cols-4 > div) p:last-child {
+  font-size: 1.18rem !important;
+  font-weight: 750 !important;
 }
 
 @media (max-width: 768px) {
