@@ -553,6 +553,25 @@
   box-shadow: 0 24px 60px rgb(24 38 28 / .16);
 }
 
+.admin-design-v2 .cms-command-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 70 !important;
+  display: flex !important;
+  width: auto !important;
+  min-width: 0 !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding-top: 12vh !important;
+}
+
+.admin-design-v2 .cms-command-dialog {
+  position: relative !important;
+  z-index: 71 !important;
+  width: min(100%, 36rem) !important;
+  max-width: 36rem !important;
+}
+
 .cms-popover strong {
   font-size: .8125rem;
   font-weight: 700;
@@ -594,6 +613,70 @@
 .admin-design-v2.cms-dim-mode .hasana-profile-v2 {
   background: #1f2b22 !important;
   color: #edf5ec !important;
+  border-color: #35463a !important;
+}
+
+.admin-design-v2.cms-dim-mode main {
+  background: #17201a !important;
+}
+
+.admin-design-v2.cms-dim-mode {
+  background: #17201a !important;
+}
+
+.admin-design-v2.cms-dim-mode .hasana-sidebar-v2 :where(p,span,a),
+.admin-design-v2.cms-dim-mode .hasana-topbar-v2 :where(p,h2,span),
+.admin-design-v2.cms-dim-mode .hasana-profile-v2 :where(p,span),
+.admin-design-v2.cms-dim-mode .hasana-user-menu-v2 :where(span),
+.admin-design-v2.cms-dim-mode .hasana-icon-button-v2 {
+  color: #d9e8d8 !important;
+}
+
+.admin-design-v2.cms-dim-mode .hasana-navigation-v2 a:hover,
+.admin-design-v2.cms-dim-mode .hasana-navigation-v2 a[class*="bg-white"],
+.admin-design-v2.cms-dim-mode .cms-command-result:hover,
+.admin-design-v2.cms-dim-mode .cms-notification:hover {
+  background: #2b4630 !important;
+  color: #eff9ee !important;
+}
+
+.admin-design-v2.cms-dim-mode main :where(h1,h2,h3,h4,h5,h6),
+.admin-design-v2.cms-dim-mode main :where(.text-gray-900,.text-gray-950) {
+  color: #edf5ec !important;
+}
+
+.admin-design-v2.cms-dim-mode main :where(p,td,label,.text-gray-500,.text-gray-600) {
+  color: #bdccbd !important;
+}
+
+.admin-design-v2.cms-dim-mode :where(.hasana-stat-v2,.admin-card,.hasana-activity-v2,.admin-info-row),
+.admin-design-v2.cms-dim-mode main :where(.bg-gray-50,.bg-gray-100),
+.admin-design-v2.cms-dim-mode main thead tr {
+  background: #1f2b22 !important;
+  border-color: #35463a !important;
+}
+
+.admin-design-v2.cms-dim-mode .hasana-activity-v2 {
+  background: linear-gradient(105deg, #213524, #1b2b1e) !important;
+}
+
+.admin-design-v2.cms-dim-mode .hasana-hero-v2 p:first-child,
+.admin-design-v2.cms-dim-mode .hasana-stat-v2 p:first-child,
+.admin-design-v2.cms-dim-mode .hasana-activity-v2 :where(p,span) {
+  color: #bdccbd !important;
+}
+
+.admin-design-v2.cms-dim-mode .hasana-stat-v2 p:nth-child(2),
+.admin-design-v2.cms-dim-mode .hasana-activity-v2 :where(h1,h2,h3,strong) {
+  color: #edf5ec !important;
+}
+
+.admin-design-v2.cms-dim-mode main tbody tr,
+.admin-design-v2.cms-dim-mode main tbody tr:hover td {
+  background: #1f2b22 !important;
+}
+
+.admin-design-v2.cms-dim-mode main :where(th,td) {
   border-color: #35463a !important;
 }
 
