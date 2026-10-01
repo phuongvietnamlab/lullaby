@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Save, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type AboutContent = {
   title: string;
@@ -131,7 +132,7 @@ export default function ContentAboutPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin text-gray-400" size={32} />
+        <AdminLoading label="Đang tải nội dung giới thiệu" />
       </div>
     );
   }

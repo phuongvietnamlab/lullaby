@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Save, CreditCard, Eye, EyeOff } from "lucide-react";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 export default function AdminPaymentSettingsPage() {
   const [enabled, setEnabled] = useState(false);
@@ -49,7 +50,7 @@ export default function AdminPaymentSettingsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
-        <p className="text-gray-500">Loading...</p>
+        <AdminLoading label="Đang tải thanh toán" />
       </div>
     );
   }

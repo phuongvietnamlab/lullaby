@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
+import { AdminLoading } from "@/components/admin/admin-loading";
 import {
   LayoutDashboard,
   BedDouble,
@@ -109,7 +110,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   if (isPending || !session) {
     return (
       <div className="admin-console min-h-screen flex items-center justify-center">
-        <div className="admin-loader">Loading...</div>
+        <AdminLoading label="Đang mở không gian làm việc" />
       </div>
     );
   }

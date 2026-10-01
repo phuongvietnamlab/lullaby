@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Check, X, MessageSquare, Filter, Star, Undo2, RefreshCw } from "lucide-react";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type Review = {
   id: string;
@@ -243,9 +244,7 @@ export default function AdminReviewsPage() {
 
       {/* Reviews List */}
       {loading ? (
-        <div className="text-center py-12 text-gray-500 text-sm">
-          Loading reviews...
-        </div>
+        <div className="flex justify-center py-12"><AdminLoading label="Đang tải đánh giá" /></div>
       ) : (
         <>
           <div className="space-y-4">

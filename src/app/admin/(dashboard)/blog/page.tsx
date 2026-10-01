@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Edit, Trash2, Eye, Clock, History } from "lucide-react";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type BlogPost = {
   id: string;
@@ -64,7 +65,7 @@ export default function AdminBlogPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading posts...</div>
+        <AdminLoading label="Đang tải bài viết" />
       </div>
     );
   }

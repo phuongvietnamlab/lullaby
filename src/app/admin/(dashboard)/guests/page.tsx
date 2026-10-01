@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Mail, Search, RefreshCw, X } from "lucide-react";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type Guest = {
   id: string;
@@ -100,7 +101,7 @@ export default function AdminGuestsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading guests...</div>
+        <AdminLoading label="Đang tải khách lưu trú" />
       </div>
     );
   }

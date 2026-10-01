@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { ArrowLeft, Save, Plus, X, Loader2, UploadCloud, ImageIcon } from "lucide-react";
 import Link from "next/link";
 import { uploadImage } from "@/lib/upload";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type RoomTypeData = {
   id: string;
@@ -197,7 +198,7 @@ export default function RoomTypeEditPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin text-gray-400" size={32} />
+        <AdminLoading label="Đang tải cấu hình phòng" />
       </div>
     );
   }

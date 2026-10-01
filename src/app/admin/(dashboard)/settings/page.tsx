@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Save, CreditCard, RefreshCw } from "lucide-react";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type Settings = {
   hotelName: string;
@@ -106,7 +107,7 @@ export default function AdminSettingsPage() {
   if (loading || !settings) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading settings...</div>
+        <AdminLoading label="Đang tải cài đặt" />
       </div>
     );
   }

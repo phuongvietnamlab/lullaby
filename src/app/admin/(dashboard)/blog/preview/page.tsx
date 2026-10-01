@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, ExternalLink } from "lucide-react";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type PostData = {
   id: string;
@@ -58,7 +59,7 @@ export default function BlogPreviewPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading preview...</div>
+        <AdminLoading label="Đang tải bản xem trước" />
       </div>
     );
   }

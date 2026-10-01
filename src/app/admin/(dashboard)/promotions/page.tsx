@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Plus, Edit, Trash2, Copy, Check, X, RefreshCw } from "lucide-react";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type Promotion = {
   id: string;
@@ -233,7 +234,7 @@ export default function AdminPromotionsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading promotions...</div>
+        <AdminLoading label="Đang tải ưu đãi" />
       </div>
     );
   }

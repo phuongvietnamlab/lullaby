@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Plus, Edit, Trash2, X, RefreshCw, UploadCloud, ImageIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { uploadImage } from "@/lib/upload";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type Tab = "types" | "rooms";
 
@@ -240,7 +241,7 @@ export default function AdminRoomsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading rooms...</div>
+        <AdminLoading label="Đang tải phòng" />
       </div>
     );
   }

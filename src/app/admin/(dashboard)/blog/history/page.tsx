@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ArrowLeft, RotateCcw, Clock, FileText } from "lucide-react";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type Revision = {
   id: string;
@@ -125,7 +126,7 @@ export default function BlogHistoryPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading history...</div>
+        <AdminLoading label="Đang tải lịch sử chỉnh sửa" />
       </div>
     );
   }

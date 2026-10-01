@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Plus, Trash2, Filter, Save, X, Loader2, Edit2, Upload } from "lucide-react";
 import { uploadImage } from "@/lib/upload";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type GalleryImage = {
   id: string;
@@ -327,7 +328,7 @@ export default function AdminGalleryPage() {
       {/* Image Grid */}
       {loading ? (
         <div className="flex items-center justify-center h-48">
-          <Loader2 className="animate-spin text-gray-400" size={32} />
+          <AdminLoading label="Đang tải thư viện ảnh" />
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">

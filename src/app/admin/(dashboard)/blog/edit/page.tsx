@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { BilingualEditor, type BilingualContent } from "@/components/admin/bilingual-editor";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type Category = { id: string; name: string };
 
@@ -116,7 +117,7 @@ export default function BlogEditPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="text-gray-500">Loading...</div>
+        <AdminLoading label="Đang tải bài viết" />
       </div>
     );
   }

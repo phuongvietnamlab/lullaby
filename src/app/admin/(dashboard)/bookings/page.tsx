@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Check, X, Eye, Filter, RefreshCw, Calendar, User, Phone, Mail, MessageSquare, LogIn, LogOut, CheckCheck, CalendarClock } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { AdminLoading } from "@/components/admin/admin-loading";
 
 type Booking = {
   id: string;
@@ -220,9 +221,7 @@ export default function AdminBookingsPage() {
       {/* Bookings Table */}
       <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
         {loading ? (
-          <div className="text-center py-12 text-gray-500 text-sm">
-            Loading bookings...
-          </div>
+          <div className="flex justify-center py-12"><AdminLoading label="Đang tải đặt phòng" /></div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
