@@ -22,6 +22,7 @@ import {
   Search,
   Bell,
   Sun,
+  Moon,
 } from "lucide-react";
 
 type NavItem = {
@@ -48,6 +49,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [dimMode, setDimMode] = useState(false);
 
   const { data: session, isPending } = authClient.useSession();
 
@@ -60,6 +65,24 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     }
   }, [isPending, session, router]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setSearchOpen(true);
+      }
+
+      if (event.key === "Escape") {
+        setSearchOpen(false);
+        setNotificationsOpen(false);
+        setUserMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   async function handleLogout() {
     await authClient.signOut();
     router.replace("/admin/login");
@@ -68,6 +91,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin";
     return pathname.startsWith(href);
+  }
+
+  function navigateTo(href: string) {
+    setSearchOpen(false);
+    setSearchQuery("");
+    router.push(href);
   }
 
   if (isPending || !session) {
@@ -81,24 +110,27 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const user = session.user;
   const displayName = user.name || user.email;
   const displayRole = (user.role as string) || "RECEPTIONIST";
+  const matchingPages = navItems.filter((item) =>
+    item.label.toLowerCase().includes(searchQuery.trim().toLowerCase())
+  );
 
   // Keep the current CMS palette independent from the historical global admin
   // themes. Inline custom properties outrank those legacy tokens regardless of
   // stylesheet load order in a production build.
   const cmsTheme = {
-    "--admin-bg": "#f6f6f1",
-    "--admin-panel": "#ffffff",
-    "--admin-ink": "#17201a",
-    "--admin-ink-soft": "#405046",
-    "--admin-muted": "#778279",
-    "--admin-line": "#e4e8e0",
+    "--admin-bg": dimMode ? "#17201a" : "#f6f6f1",
+    "--admin-panel": dimMode ? "#1f2b22" : "#ffffff",
+    "--admin-ink": dimMode ? "#edf5ec" : "#17201a",
+    "--admin-ink-soft": dimMode ? "#c0d1c0" : "#405046",
+    "--admin-muted": dimMode ? "#9db19d" : "#778279",
+    "--admin-line": dimMode ? "#35463a" : "#e4e8e0",
     "--admin-green": "#3b9238",
     "--admin-green-deep": "#28732d",
     "--admin-green-soft": "#eaf5e7",
   } as React.CSSProperties;
 
   return (
-    <div style={cmsTheme} className="admin-console admin-design-v2 min-h-screen flex bg-[var(--admin-bg)] text-[var(--admin-ink)]">
+    <div style={cmsTheme} className={`admin-console admin-design-v2 min-h-screen flex bg-[var(--admin-bg)] text-[var(--admin-ink)] ${dimMode ? "cms-dim-mode" : ""}`}>
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -193,15 +225,34 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </h2>
           </div>
 
-          <div className="hasana-search-v2 hidden md:flex flex-1 max-w-[37rem] items-center gap-2.5 px-4 py-2.5">
+          <button type="button" onClick={() => setSearchOpen(true)} className="hasana-search-v2 hidden md:flex flex-1 max-w-[37rem] items-center gap-2.5 px-4 py-2.5 text-left" aria-label="Search the admin workspace">
             <Search size={16} className="text-[var(--admin-muted)]" />
             <span className="flex-1 text-[13px] text-[var(--admin-muted)]">Search bookings, guests, rooms...</span>
             <kbd className="hidden xl:inline-flex rounded-md bg-[var(--admin-bg)] px-2 py-0.5 text-[10px] font-bold text-[var(--admin-muted)]">Ctrl K</kbd>
-          </div>
+          </button>
 
           <div className="hidden sm:flex items-center gap-2">
-            <button className="hasana-icon-button-v2" aria-label="Display settings"><Sun size={17} /></button>
-            <button className="hasana-icon-button-v2 relative" aria-label="Notifications"><Bell size={17} /><span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--admin-green)]" /></button>
+            <button
+              type="button"
+              className="hasana-icon-button-v2"
+              aria-label="Toggle display mode"
+              aria-pressed={dimMode}
+              onClick={() => setDimMode((current) => !current)}
+            >
+              {dimMode ? <Moon size={17} /> : <Sun size={17} />}
+            </button>
+            <div className="relative">
+              <button type="button" onClick={() => setNotificationsOpen((current) => !current)} className="hasana-icon-button-v2 relative" aria-label="Notifications" aria-expanded={notificationsOpen}><Bell size={17} /><span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--admin-green)]" /></button>
+              {notificationsOpen && (
+                <>
+                  <button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Close notifications" onClick={() => setNotificationsOpen(false)} />
+                  <div className="cms-popover absolute right-0 top-full z-50 mt-3 w-80" role="dialog" aria-label="Notifications">
+                    <div className="flex items-center justify-between border-b border-[var(--admin-line)] px-4 py-3"><strong>Notifications</strong><button type="button" onClick={() => setNotificationsOpen(false)} className="text-xs font-semibold text-[var(--admin-green-deep)]">Mark all read</button></div>
+                    <div className="space-y-1 p-2"><div className="cms-notification"><span className="cms-notification-dot" /><div><strong>2 reviews are waiting</strong><p>Review recent guest feedback.</p></div></div><div className="cms-notification"><span className="cms-notification-dot" /><div><strong>15 rooms are ready</strong><p>All available rooms are up to date.</p></div></div></div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           {/* User menu */}
@@ -218,19 +269,22 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             </button>
 
             {userMenuOpen && (
-              <div className="absolute right-0 mt-2 w-56 hasana-menu-popover-v2 py-2 z-50">
-                <div className="px-4 py-3 border-b border-gray-100">
-                  <p className="text-sm font-medium text-gray-900">{displayName}</p>
-                  <p className="text-xs text-gray-500">{user.email}</p>
+              <>
+                <button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Close account menu" onClick={() => setUserMenuOpen(false)} />
+                <div className="absolute right-0 mt-2 w-56 hasana-menu-popover-v2 py-2 z-50">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-900">{displayName}</p>
+                    <p className="text-xs text-gray-500">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                  >
+                    <LogOut size={16} />
+                    Sign out
+                  </button>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                >
-                  <LogOut size={16} />
-                  Sign out
-                </button>
-              </div>
+              </>
             )}
           </div>
         </header>
@@ -242,6 +296,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </div>
         </main>
       </div>
+
+      {searchOpen && (
+        <div className="fixed inset-0 z-[70] flex items-start justify-center bg-[#17201a]/30 px-4 pt-[12vh] backdrop-blur-sm" onClick={() => setSearchOpen(false)}>
+          <div className="cms-command-dialog w-full max-w-xl" role="dialog" aria-modal="true" aria-label="Search workspace" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-center gap-3 border-b border-[var(--admin-line)] px-4 py-3"><Search size={18} className="text-[var(--admin-muted)]" /><input autoFocus value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && matchingPages[0]) navigateTo(matchingPages[0].href); }} placeholder="Search a screen…" className="min-w-0 flex-1 border-0 bg-transparent p-0 text-sm outline-none" /><kbd className="rounded bg-[var(--admin-bg)] px-2 py-1 text-[10px] font-bold text-[var(--admin-muted)]">ESC</kbd></div>
+            <div className="p-2"><p className="px-2 py-2 text-[10px] font-bold uppercase tracking-[.12em] text-[var(--admin-muted)]">Navigate to</p>{matchingPages.length ? matchingPages.map((item) => <button type="button" key={item.href} onClick={() => navigateTo(item.href)} className="cms-command-result"><span>{item.icon}</span><span>{item.label}</span></button>) : <p className="px-2 py-6 text-center text-sm text-[var(--admin-muted)]">No matching screen</p>}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

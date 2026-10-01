@@ -245,8 +245,8 @@ function StatCard({ label, value }: { label: string; value: number }) {
 
 function GuestDetail({ guest, onClose }: { guest: Guest; onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40" onClick={onClose}>
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md" role="dialog" aria-modal="true" onClick={(event) => event.stopPropagation()}>
         <div className="flex items-start justify-between p-4 border-b border-gray-100">
           <div>
             <h2 className="font-semibold text-gray-900">{guest.name}</h2>
