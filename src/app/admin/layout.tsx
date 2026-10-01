@@ -1,5 +1,5 @@
 ﻿import type { Metadata, Viewport } from "next";
-import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { Be_Vietnam_Pro } from "next/font/google";
 import "../globals.css";
 import "./admin-v2.css";
 
@@ -19,17 +19,10 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-const headingFont = Cormorant_Garamond({
+const adminFont = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600"],
-  variable: "--font-heading",
-  display: "swap",
-});
-
-const bodyFont = Manrope({
-  subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-body",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-admin",
   display: "swap",
 });
 
@@ -39,7 +32,7 @@ export default function AdminRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${headingFont.variable} ${bodyFont.variable}`}>
+    <html lang="vi" className={`${adminFont.variable} admin-font-vietnam`}>
       <body className="bg-gray-50 text-gray-900 antialiased font-sans">
         {children}
       </body>

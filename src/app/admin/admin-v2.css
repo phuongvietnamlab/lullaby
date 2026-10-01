@@ -231,3 +231,177 @@
   .hasana-activity-v2 { grid-template-columns: 1fr 1fr; gap: 1.25rem; padding: 1.3rem; }
   .hasana-activity-v2 > div:first-child { grid-column: 1 / -1; }
 }
+
+/* Whole-CMS foundation: Be Vietnam Pro and a single high-specificity surface
+   system for every existing admin route, including routes that retain their
+   original Tailwind markup. */
+.admin-font-vietnam {
+  --font-heading: var(--font-admin);
+  --font-body: var(--font-admin);
+}
+
+.admin-design-v2.admin-design-v2,
+.admin-design-v2.admin-design-v2 :where(*) ,
+.admin-login,
+.admin-login :where(*) {
+  font-family: var(--font-admin), "Be Vietnam Pro", sans-serif !important;
+}
+
+.admin-design-v2.admin-design-v2 {
+  background: #f6f6f1 !important;
+  color: #17201a !important;
+}
+
+.admin-design-v2.admin-design-v2 main {
+  background:
+    radial-gradient(circle at 92% 4%, rgb(59 146 56 / .07), transparent 23rem),
+    #f6f6f1 !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(h1,h2,h3,h4,h5,h6) {
+  color: #17201a !important;
+  font-family: var(--font-admin), "Be Vietnam Pro", sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: -.025em !important;
+  line-height: 1.2 !important;
+}
+
+.admin-design-v2.admin-design-v2 main h1 {
+  font-size: clamp(1.65rem, 1.25rem + 1vw, 2.25rem) !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(p,td,label,input,select,textarea,button,a) {
+  font-family: var(--font-admin), "Be Vietnam Pro", sans-serif !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.bg-white):where(.border,[class*="shadow"]) {
+  border: 1px solid #e0e8dd !important;
+  border-radius: 1.1rem !important;
+  background: #ffffff !important;
+  box-shadow: 0 5px 18px rgb(24 38 28 / .045) !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.bg-white):where(.border,[class*="shadow"]):hover {
+  border-color: #c6dfc0 !important;
+  box-shadow: 0 14px 30px rgb(24 38 28 / .07) !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(input,select,textarea) {
+  min-height: 2.6rem;
+  border: 1px solid #d9e4d6 !important;
+  border-radius: .75rem !important;
+  background: #ffffff !important;
+  color: #17201a !important;
+  box-shadow: none !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(input,select,textarea):focus {
+  border-color: #62a75b !important;
+  box-shadow: 0 0 0 3px rgb(98 167 91 / .15) !important;
+  outline: none !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(button,a[href]) {
+  border-radius: .75rem;
+  font-weight: 600 !important;
+  transition: transform 180ms var(--ease-luxury), background-color 180ms var(--ease-luxury), border-color 180ms var(--ease-luxury), box-shadow 180ms var(--ease-luxury) !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(button,a[href]):active {
+  transform: translateY(1px) !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(button,a[href]):where([class*="bg-slate-800"],[class*="bg-slate-950"],[class*="text-white"]) {
+  border: 1px solid #2e7a31 !important;
+  background: #3b9238 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 17px rgb(48 120 58 / .17) !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(button,a[href]):where([class*="bg-slate-800"],[class*="bg-slate-950"],[class*="text-white"]):hover {
+  background: #2f7d32 !important;
+  box-shadow: 0 11px 22px rgb(48 120 58 / .24) !important;
+  transform: translateY(-1px) !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(button,a[href]):where(.border):not([class*="bg-slate"]):not([class*="text-white"]) {
+  border: 1px solid #d6e5d2 !important;
+  background: #ffffff !important;
+  color: #28732d !important;
+  box-shadow: none !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(button,a[href]):where(.border):not([class*="bg-slate"]):not([class*="text-white"]):hover {
+  border-color: #91bd8b !important;
+  background: #f2f9ef !important;
+}
+
+.admin-design-v2.admin-design-v2 main table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+.admin-design-v2.admin-design-v2 main thead tr {
+  background: #f6f9f4 !important;
+}
+
+.admin-design-v2.admin-design-v2 main th {
+  padding: .8rem 1rem !important;
+  color: #738071 !important;
+  font-size: .67rem !important;
+  font-weight: 800 !important;
+  letter-spacing: .09em !important;
+}
+
+.admin-design-v2.admin-design-v2 main td {
+  padding: .9rem 1rem !important;
+  border-color: #e6ece3 !important;
+  color: #425044 !important;
+}
+
+.admin-design-v2.admin-design-v2 main tbody tr {
+  background: #ffffff !important;
+  transition: background-color 160ms var(--ease-luxury) !important;
+}
+
+.admin-design-v2.admin-design-v2 main tbody tr:hover {
+  background: #f4faf2 !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.bg-gray-50,.bg-gray-100) {
+  background-color: #f7faf5 !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.text-gray-900,.text-gray-950) {
+  color: #17201a !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.text-gray-500,.text-gray-600) {
+  color: #6f7b70 !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.bg-green-100) {
+  background: #eaf5e7 !important;
+  color: #28732d !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.bg-yellow-100,.bg-amber-100) {
+  background: #fff2df !important;
+  color: #9b6519 !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.bg-red-100,.bg-red-50) {
+  background: #fbeae7 !important;
+  color: #ad5142 !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.bg-blue-100,.bg-indigo-100,.bg-slate-100) {
+  background: #eaf3f6 !important;
+  color: #3d6a7c !important;
+}
+
+.admin-login {
+  background: radial-gradient(circle at 14% 8%, #e2f2dd 0, transparent 27rem), radial-gradient(circle at 88% 88%, #f1e6cd 0, transparent 24rem), #f6f6f1 !important;
+}
+.admin-login h1 { font-family: var(--font-admin), "Be Vietnam Pro", sans-serif !important; letter-spacing: -.025em; }
+.admin-login-input { font-family: var(--font-admin), "Be Vietnam Pro", sans-serif !important; }
