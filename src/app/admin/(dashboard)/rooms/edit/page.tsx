@@ -282,26 +282,18 @@ export default function RoomTypeEditPage() {
 
             {/* Bilingual Name & Description */}
             <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-              <div className="flex border-b border-gray-200 bg-gray-50">
+              <div className="cms-tabs cms-tabs-in-card">
                 <button
                   type="button"
                   onClick={() => setActiveTab("vi")}
-                  className={`px-4 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "vi"
-                      ? "bg-white text-slate-800 border-b-2 border-slate-800"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
+                  className={`cms-tab ${activeTab === "vi" ? "cms-tab-active" : ""}`}
                 >
                   🇻🇳 Tiếng Việt
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab("en")}
-                  className={`px-4 py-2.5 text-sm font-medium transition-colors ${
-                    activeTab === "en"
-                      ? "bg-white text-slate-800 border-b-2 border-slate-800"
-                      : "text-gray-500 hover:text-gray-700"
-                  }`}
+                  className={`cms-tab ${activeTab === "en" ? "cms-tab-active" : ""}`}
                 >
                   🇬🇧 English
                 </button>

@@ -293,25 +293,17 @@ export default function AdminRoomsPage() {
       )}
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <div className="flex gap-6">
+      <div className="cms-tabs">
+        <div className="cms-tabs-list">
           <button
             onClick={() => setActiveTab("rooms")}
-            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === "rooms"
-                ? "border-slate-800 text-slate-800"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
+            className={`cms-tab ${activeTab === "rooms" ? "cms-tab-active" : ""}`}
           >
             Individual Rooms ({rooms.length})
           </button>
           <button
             onClick={() => setActiveTab("types")}
-            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === "types"
-                ? "border-slate-800 text-slate-800"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
+            className={`cms-tab ${activeTab === "types" ? "cms-tab-active" : ""}`}
           >
             Room Types ({roomTypes.length})
           </button>

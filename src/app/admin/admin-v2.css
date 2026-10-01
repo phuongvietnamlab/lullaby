@@ -410,3 +410,135 @@
 }
 .admin-login h1 { font-family: var(--font-admin), "Be Vietnam Pro", sans-serif !important; letter-spacing: -.025em; }
 .admin-login-input { font-family: var(--font-admin), "Be Vietnam Pro", sans-serif !important; }
+
+/* Shared interaction components ------------------------------------------------ */
+.admin-design-v2 .cms-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: .35rem;
+  min-height: 3.15rem;
+  border-bottom: 1px solid #dfe8dc;
+}
+
+.admin-design-v2 .cms-tabs-list {
+  display: flex;
+  align-items: flex-end;
+  gap: .35rem;
+}
+
+.admin-design-v2 .cms-tabs-in-card {
+  padding-inline: .75rem;
+  background: #f7faf5;
+}
+
+.admin-design-v2 .cms-tab {
+  position: relative;
+  display: inline-flex;
+  min-height: 3.1rem;
+  align-items: center;
+  border: 0 !important;
+  border-radius: .7rem .7rem 0 0 !important;
+  background: transparent !important;
+  padding: .75rem 1rem !important;
+  color: #728073 !important;
+  font-size: .8125rem !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+  transition: color 180ms var(--ease-luxury), background-color 180ms var(--ease-luxury) !important;
+}
+
+.admin-design-v2 .cms-tab:hover {
+  background: #f1f8ef !important;
+  color: #28732d !important;
+}
+
+.admin-design-v2 .cms-tab-active,
+.admin-design-v2 .cms-tab-active:hover {
+  background: #ffffff !important;
+  color: #24712b !important;
+}
+
+.admin-design-v2 .cms-tab-active::after {
+  content: "";
+  position: absolute;
+  right: .85rem;
+  bottom: -1px;
+  left: .85rem;
+  height: 2px;
+  border-radius: 999px 999px 0 0;
+  background: #3b9238;
+}
+
+/* A continuous data grid: no detached cell borders or uneven rows. */
+.admin-design-v2.admin-design-v2 main :where(.overflow-x-auto) > table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  border-spacing: 0 !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.overflow-x-auto) > table thead tr {
+  background: #f5f9f3 !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.overflow-x-auto) > table th {
+  height: 2.9rem;
+  border: 0 !important;
+  border-bottom: 1px solid #dfe8dc !important;
+  padding: .65rem 1rem !important;
+  color: #718070 !important;
+  font-size: .66rem !important;
+  font-weight: 800 !important;
+  letter-spacing: .095em !important;
+  text-transform: uppercase;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.overflow-x-auto) > table td {
+  height: 3.55rem;
+  border: 0 !important;
+  border-bottom: 1px solid #e5ece2 !important;
+  padding: .72rem 1rem !important;
+  vertical-align: middle;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.overflow-x-auto) > table tbody tr:last-child td {
+  border-bottom: 0 !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(.overflow-x-auto) > table tbody tr:hover td {
+  background: #f4faf2 !important;
+}
+
+/* Primary and secondary actions are deliberately distinct at every size. */
+.admin-design-v2.admin-design-v2 main :where(button,a[href])[class*="bg-slate-800"],
+.admin-design-v2.admin-design-v2 main :where(button,a[href])[class*="bg-slate-950"] {
+  min-height: 2.55rem;
+  border-radius: 999px !important;
+  padding-inline: 1.05rem !important;
+  background: #3b9238 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgb(48 120 58 / .18) !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(button,a[href])[class*="bg-slate-800"]:hover,
+.admin-design-v2.admin-design-v2 main :where(button,a[href])[class*="bg-slate-950"]:hover {
+  background: #2d7b30 !important;
+  box-shadow: 0 11px 22px rgb(48 120 58 / .24) !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(button,a[href])[class*="border-gray-300"] {
+  min-height: 2.55rem;
+  border: 1px solid #cbe2c7 !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  color: #28732d !important;
+  box-shadow: none !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(button,a[href])[class*="border-gray-300"]:hover {
+  border-color: #8fbe89 !important;
+  background: #f1f8ef !important;
+}
+
+.admin-design-v2.admin-design-v2 main :where(button,a[href])[class*="p-1.5"] {
+  border-radius: .6rem !important;
+}
