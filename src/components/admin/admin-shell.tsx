@@ -82,8 +82,23 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const displayName = user.name || user.email;
   const displayRole = (user.role as string) || "RECEPTIONIST";
 
+  // Keep the current CMS palette independent from the historical global admin
+  // themes. Inline custom properties outrank those legacy tokens regardless of
+  // stylesheet load order in a production build.
+  const cmsTheme = {
+    "--admin-bg": "#f6f6f1",
+    "--admin-panel": "#ffffff",
+    "--admin-ink": "#17201a",
+    "--admin-ink-soft": "#405046",
+    "--admin-muted": "#778279",
+    "--admin-line": "#e4e8e0",
+    "--admin-green": "#3b9238",
+    "--admin-green-deep": "#28732d",
+    "--admin-green-soft": "#eaf5e7",
+  } as React.CSSProperties;
+
   return (
-    <div className="admin-console admin-design-v2 min-h-screen flex bg-[var(--admin-bg)] text-[var(--admin-ink)]">
+    <div style={cmsTheme} className="admin-console admin-design-v2 min-h-screen flex bg-[var(--admin-bg)] text-[var(--admin-ink)]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div

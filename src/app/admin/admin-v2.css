@@ -136,15 +136,20 @@
 .hasana-sidebar-v2 {
   width: 16.25rem !important;
   min-height: 100dvh;
+  flex: 0 0 16.25rem;
+  box-sizing: border-box;
+  overflow-y: auto;
   background: #ffffff;
   color: var(--admin-ink);
   border-right: 1px solid var(--admin-line);
   box-shadow: none;
 }
-.hasana-brand-v2 { border-bottom: 1px solid var(--admin-line); }
-.hasana-navigation-v2 { margin-top: 1.45rem !important; }
+.hasana-brand-v2 { padding-inline: 1.25rem !important; border-bottom: 1px solid var(--admin-line); }
+.hasana-navigation-v2 { margin-top: 1.45rem !important; padding-inline: .75rem !important; }
+.hasana-navigation-v2 > p { padding-inline: .75rem !important; }
 .hasana-navigation-v2 a {
   min-height: 2.75rem;
+  padding: .625rem .75rem !important;
   border-radius: .78rem;
   color: var(--admin-ink-soft);
   transition: background-color 180ms var(--ease-luxury), color 180ms var(--ease-luxury);
