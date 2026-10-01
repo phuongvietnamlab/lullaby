@@ -32,6 +32,14 @@ type NavItem = {
   icon: React.ReactNode;
 };
 
+type AdminNotification = {
+  id: string;
+  title: string;
+  description: string;
+  href: string;
+  read: boolean;
+};
+
 const navItems: NavItem[] = [
   { label: "Dashboard", href: "/admin", icon: <LayoutDashboard size={17} /> },
   { label: "Rooms", href: "/admin/rooms", icon: <BedDouble size={17} /> },
@@ -45,6 +53,26 @@ const navItems: NavItem[] = [
   { label: "Settings", href: "/admin/settings", icon: <Settings size={17} /> },
 ];
 
+const notificationStorageKey = "hasana-admin-notifications";
+const defaultNotifications: AdminNotification[] = [
+  { id: "reviews", title: "2 reviews are waiting", description: "Review recent guest feedback.", href: "/admin/reviews", read: false },
+  { id: "rooms", title: "15 rooms are ready", description: "All available rooms are up to date.", href: "/admin/rooms", read: false },
+];
+
+function getStoredNotifications(): AdminNotification[] {
+  if (typeof window === "undefined") return defaultNotifications;
+
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(notificationStorageKey) || "[]") as Array<Pick<AdminNotification, "id" | "read">>;
+    return defaultNotifications.map((notification) => ({
+      ...notification,
+      read: saved.find((item) => item.id === notification.id)?.read ?? notification.read,
+    }));
+  } catch {
+    return defaultNotifications;
+  }
+}
+
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -53,7 +81,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [notificationsRead, setNotificationsRead] = useState(false);
+  const [notifications, setNotifications] = useState<AdminNotification[]>(getStoredNotifications);
   const [dimMode, setDimMode] = useState(false);
 
   const { data: session, isPending } = authClient.useSession();
@@ -85,6 +113,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  useEffect(() => {
+    window.localStorage.setItem(notificationStorageKey, JSON.stringify(notifications.map(({ id, read }) => ({ id, read }))));
+  }, [notifications]);
+
   async function handleLogout() {
     await authClient.signOut();
     router.replace("/admin/login");
@@ -101,10 +133,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     router.push(href);
   }
 
-  function openNotification(href: string) {
-    setNotificationsRead(true);
+  function markAllNotificationsRead() {
+    setNotifications((current) => current.map((notification) => ({ ...notification, read: true })));
+  }
+
+  function openNotification(notification: AdminNotification) {
+    setNotifications((current) => current.map((item) => item.id === notification.id ? { ...item, read: true } : item));
     setNotificationsOpen(false);
-    router.push(href);
+    router.push(notification.href);
   }
 
   if (isPending || !session) {
@@ -121,6 +157,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const matchingPages = navItems.filter((item) =>
     item.label.toLowerCase().includes(searchQuery.trim().toLowerCase())
   );
+  const unreadNotificationCount = notifications.filter((notification) => !notification.read).length;
 
   // Keep the current CMS palette independent from the historical global admin
   // themes. Inline custom properties outrank those legacy tokens regardless of
@@ -250,15 +287,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               {dimMode ? <Moon size={17} /> : <Sun size={17} />}
             </button>
             <div className="relative">
-              <button type="button" onClick={() => setNotificationsOpen((current) => !current)} className="hasana-icon-button-v2 relative" aria-label="Notifications" aria-expanded={notificationsOpen}><Bell size={17} />{!notificationsRead && <span className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--admin-green)]" />}</button>
+              <button type="button" onClick={() => setNotificationsOpen((current) => !current)} className="hasana-icon-button-v2 relative" aria-label={unreadNotificationCount ? `${unreadNotificationCount} unread notifications` : "Notifications"} aria-expanded={notificationsOpen}><Bell size={17} />{unreadNotificationCount > 0 && <span className="cms-notification-count">{unreadNotificationCount > 9 ? "9+" : unreadNotificationCount}</span>}</button>
               {notificationsOpen && (
                 <>
                   <button type="button" className="fixed inset-0 z-40 cursor-default" aria-label="Close notifications" onClick={() => setNotificationsOpen(false)} />
                   <div className="cms-popover absolute right-0 top-full z-50 mt-3 w-80" role="dialog" aria-label="Notifications">
-                    <div className="flex items-center justify-between border-b border-[var(--admin-line)] px-4 py-3"><strong>Notifications</strong><button type="button" onClick={() => setNotificationsRead(true)} className="cms-popover-action text-xs font-semibold text-[var(--admin-green-deep)]">{notificationsRead ? "All caught up" : "Mark all read"}</button></div>
+                    <div className="flex items-center justify-between border-b border-[var(--admin-line)] px-4 py-3"><strong>Notifications{unreadNotificationCount > 0 && <span className="ml-1.5 text-[var(--admin-green-deep)]">({unreadNotificationCount})</span>}</strong><button type="button" disabled={unreadNotificationCount === 0} onClick={markAllNotificationsRead} className="cms-popover-action text-xs font-semibold text-[var(--admin-green-deep)]">{unreadNotificationCount === 0 ? "All caught up" : "Mark all read"}</button></div>
                     <div className="space-y-1 p-2">
-                      <button type="button" onClick={() => openNotification("/admin/reviews")} className="cms-notification w-full text-left">{!notificationsRead && <span className="cms-notification-dot" />}<span><strong>2 reviews are waiting</strong><p>Review recent guest feedback.</p></span></button>
-                      <button type="button" onClick={() => openNotification("/admin/rooms")} className="cms-notification w-full text-left">{!notificationsRead && <span className="cms-notification-dot" />}<span><strong>15 rooms are ready</strong><p>All available rooms are up to date.</p></span></button>
+                      {notifications.map((notification) => <button type="button" key={notification.id} onClick={() => openNotification(notification)} className={`cms-notification w-full text-left ${notification.read ? "cms-notification-read" : "cms-notification-unread"}`}>{!notification.read && <span className="cms-notification-dot" />}<span><strong>{notification.title}</strong><p>{notification.description}</p></span></button>)}
                     </div>
                   </div>
                 </>
