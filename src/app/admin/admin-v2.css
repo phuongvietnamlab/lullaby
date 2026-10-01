@@ -131,3 +131,103 @@
   .admin-design-v2 .admin-activity-strip { grid-template-columns: 1fr 1fr !important; gap: 1.25rem !important; padding: 1.3rem !important; }
   .admin-design-v2 .admin-activity-strip > div:first-child { grid-column: 1 / -1; }
 }
+
+/* These names intentionally do not overlap the legacy admin selectors. */
+.hasana-sidebar-v2 {
+  width: 16.25rem !important;
+  min-height: 100dvh;
+  background: #ffffff;
+  color: var(--admin-ink);
+  border-right: 1px solid var(--admin-line);
+  box-shadow: none;
+}
+.hasana-brand-v2 { border-bottom: 1px solid var(--admin-line); }
+.hasana-navigation-v2 { margin-top: 1.45rem !important; }
+.hasana-navigation-v2 a {
+  min-height: 2.75rem;
+  border-radius: .78rem;
+  color: var(--admin-ink-soft);
+  transition: background-color 180ms var(--ease-luxury), color 180ms var(--ease-luxury);
+}
+.hasana-navigation-v2 a:hover { background: #f4f8f1; color: var(--admin-green-deep); }
+.hasana-navigation-v2 a[class*="bg-white"] { background: var(--admin-green-soft); color: var(--admin-green-deep); }
+.hasana-navigation-v2 a span:first-child { background: transparent; color: var(--admin-muted); }
+.hasana-navigation-v2 a[class*="bg-white"] span:first-child { background: var(--admin-green); color: #fff; }
+.hasana-profile-v2 { border: 1px solid var(--admin-line); border-radius: 1rem; background: #fbfcf9; }
+
+.hasana-topbar-v2 {
+  height: 4.75rem !important;
+  border-bottom: 1px solid var(--admin-line);
+  background: rgb(246 246 241 / .94);
+  box-shadow: none;
+  backdrop-filter: blur(18px);
+}
+.hasana-search-v2,.hasana-user-menu-v2 {
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgb(24 38 28 / .025);
+}
+.hasana-icon-button-v2 {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border: 1px solid var(--admin-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--admin-ink-soft);
+}
+.hasana-icon-button-v2:hover { background: var(--admin-green-soft); color: var(--admin-green-deep); }
+.hasana-menu-popover-v2 { border: 1px solid var(--admin-line); border-radius: 1rem; background: #fff; box-shadow: 0 18px 48px rgb(24 38 28 / .12); }
+
+.hasana-hero-v2 {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+.hasana-hero-v2 h1 {
+  margin: 0;
+  color: var(--admin-ink);
+  font-family: var(--font-heading), Georgia, serif;
+  font-size: clamp(2.25rem, 1.7rem + 1.6vw, 3.25rem);
+  font-weight: 500;
+  letter-spacing: -.035em;
+  line-height: .98;
+}
+.hasana-hero-v2 p:first-child { color: var(--admin-green-deep); font-size: .68rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+.hasana-hero-v2 > div:last-child { justify-content: flex-end; }
+
+.hasana-activity-v2 {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto auto;
+  align-items: center;
+  gap: clamp(1.25rem,4vw,4.5rem);
+  min-height: 8.8rem;
+  border: 1px solid #cee5ca;
+  border-radius: 1.4rem;
+  background: linear-gradient(105deg,#f5fcf1,#e8f6e5);
+  box-shadow: 0 16px 34px rgb(48 120 58 / .07);
+  padding: 1.4rem 2rem;
+}
+
+.hasana-stat-v2 {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--admin-line);
+  border-radius: 1.2rem;
+  background: #fff;
+  padding: 1.35rem;
+  box-shadow: 0 3px 12px rgb(24 38 28 / .045);
+  transition: transform 180ms var(--ease-luxury), box-shadow 180ms var(--ease-luxury);
+}
+.hasana-stat-v2:hover { box-shadow: 0 12px 28px rgb(24 38 28 / .075); transform: translateY(-2px); }
+.hasana-stat-v2 p:first-child { color: var(--admin-muted); font-size: .68rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+.hasana-stat-v2 p:nth-child(2) { color: var(--admin-ink); font-family: var(--font-heading), Georgia, serif; font-size: clamp(2rem,1.65rem + 1vw,2.6rem); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+@media (max-width:700px) {
+  .hasana-hero-v2 { align-items: flex-start; }
+  .hasana-activity-v2 { grid-template-columns: 1fr 1fr; gap: 1.25rem; padding: 1.3rem; }
+  .hasana-activity-v2 > div:first-child { grid-column: 1 / -1; }
+}

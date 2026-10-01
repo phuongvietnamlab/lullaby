@@ -76,7 +76,7 @@ function StatCard({
   };
 
   return (
-    <div className="admin-stat-card group">
+    <div className="hasana-stat-v2 group">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{label}</p>
@@ -235,7 +235,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-7">
       {/* Header */}
-      <div className="admin-hero-panel">
+      <div className="hasana-hero-v2">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">{greetingDate}</p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-gray-950 sm:text-4xl">Good afternoon, team.</h1>
@@ -258,7 +258,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="admin-activity-strip">
+      <div className="hasana-activity-v2">
         <div>
           <span className="admin-live-dot" />
           <p className="admin-kicker">Live operations</p>
